@@ -878,46 +878,85 @@
       const px = M.price(this.pair);
       if (!px) return;
 
+      // FEE SIMULATE RIDOTTE (0.05% totale) per permettere lo scalping nella demo
+      const feeRate = 0.0005; 
+
       if (!this.openTrade) {
-        // Ingresso: Ridotta la frequenza per non spammare operazioni
-        const chance = this.strategy === 'aggressiva' ? 0.15 : (this.strategy === 'moderata' ? 0.05 : 0.02);
+        // FREQUENZA INGRESSI: 
+        // Conservativa: 5% a tick | Moderata: 10% | Aggressiva: 30%
+        let chance = 0.05; 
+        if (this.strategy === 'moderata') chance = 0.10;
+        if (this.strategy === 'aggressiva') chance = 0.30;
         
         if (Math.random() < chance) {
           const qty = this.capital / px; 
           const type = Math.random() > 0.5 ? 'LONG' : 'SHORT';
-          // Salviamo anche l'orario di apertura (openTime)
           this.openTrade = { type, entry: px, qty, openTime: Date.now() };
-          $('botActiveLog').innerHTML = `Aperta posizione <b>${type}</b> a ${M.fmt.money(px, 2)} USDT`;
+          
+          // Formattazione corretta dei decimali in base alla cripto
+          const decimals = M.bySym[this.pair].dp;
+          $('botActiveLog').innerHTML = `Aperta posizione <b>${type}</b> a ${M.fmt.money(px, decimals)} USDT`;
         }
       } else {
-        // Gestione (P&L Live)
+        // GESTIONE P&L
         const diff = px - this.openTrade.entry;
-        const pnl = this.openTrade.type === 'LONG' ? (diff * this.openTrade.qty) : (-diff * this.openTrade.qty);
-        const pnlPct = pnl / this.capital;
+        let pnlBrutto = this.openTrade.type === 'LONG' ? (diff * this.openTrade.qty) : (-diff * this.openTrade.qty);
+        
+        const costoCommissioni = this.capital * feeRate;
+        const pnlNetto = pnlBrutto - costoCommissioni;
+        const pnlPct = pnlNetto / this.capital;
 
-        $('botActivePnl').textContent = M.fmt.signed(pnl, 2) + ' USDT';
-        $('botActivePnl').className = 'v ' + (pnl >= 0 ? 'up' : 'down');
+        $('botActivePnl').textContent = M.fmt.signed(pnlNetto, 2) + ' USDT';
+        $('botActivePnl').className = 'v ' + (pnlNetto >= 0 ? 'up' : 'down');
 
-        // TP e SL molto più stretti (adatti a simulazioni brevi / Scalping)
-        // TP base: 0.2% | SL base: 0.1%
-        let takeProfit = 0.002, stopLoss = -0.001; 
-        if (this.strategy === 'conservativa') { takeProfit = 0.001; stopLoss = -0.0005; }
-        if (this.strategy === 'aggressiva') { takeProfit = 0.005; stopLoss = -0.003; }
+        // REGOLE DELLE STRATEGIE (TP, SL e Time Stop)
+        let takeProfit = 0.001;    // +0.1% netto
+        let stopLoss = -0.0005;    // -0.05% netto
+        let maxHoldSecs = 45;      // Conservativa: aspetta max 45 secondi
 
-        // Calcola da quanti secondi è aperto il trade
+        if (this.strategy === 'moderata') { 
+          takeProfit = 0.0015; 
+          stopLoss = -0.001; 
+          maxHoldSecs = 30;        // Moderata: aspetta max 30 secondi
+        }
+        if (this.strategy === 'aggressiva') { 
+          takeProfit = 0.0008;     // Aggressiva: TP bassissimo per uscite lampo
+          stopLoss = -0.0008; 
+          maxHoldSecs = 15;        // Aggressiva: taglia il trade se fermo per 15 sec
+        }
+
         const tradeDurationSecs = (Date.now() - this.openTrade.openTime) / 1000;
 
+        // CONDIZIONI DI USCITA
         if (pnlPct >= takeProfit) {
-          this.closePosition(px, 'Take Profit');
+          this.closePosition(px, pnlNetto, 'Take Profit');
         } else if (pnlPct <= stopLoss) {
-          this.closePosition(px, 'Stop Loss');
-        } else if (tradeDurationSecs > 30 && Math.random() < 0.02) { 
-          // Uscita anticipata dinamica: 
-          // 1. Aspetta MINIMO 30 secondi per far muovere il prezzo
-          // 2. La probabilità di uscita a caso è crollata dal 10% al 2%
-          this.closePosition(px, 'Uscita segnale anticipato');
+          this.closePosition(px, pnlNetto, 'Stop Loss');
+        } else if (tradeDurationSecs >= maxHoldSecs) {
+          this.closePosition(px, pnlNetto, 'Time Stop (Mercato fermo)');
         }
       }
+    },
+
+    closePosition(px, pnlNettoReale, reason) {
+      this.capital += pnlNettoReale; // Aggiorna il bilancio con P&L netto
+      
+      this.history.unshift({
+        id: Date.now(),
+        pair: this.pair,
+        type: this.openTrade.type,
+        entry: this.openTrade.entry,
+        close: px,
+        pnl: pnlNettoReale,
+        reason: reason
+      });
+      
+      this.openTrade = null;
+      $('botActiveLog').textContent = `Ultima chiusura (${reason}). In attesa di nuovo setup...`;
+      $('botActivePnl').textContent = '0.00 USDT';
+      $('botActivePnl').className = 'v';
+      
+      this.renderHistory();
     },
 
     closePosition(px, reason) {
