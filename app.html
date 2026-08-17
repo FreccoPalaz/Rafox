@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Rafox — App</title>
+<meta name="theme-color" content="#0B0A08">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B0A08;
+    --bg-panel:#14120D;
+    --amber:#FFB000;
+    --amber-dim:#C97A1A;
+    --ink:#F2ECE2;
+    --ink-dim:#948C7C;
+    --grid:#2A2620;
+    --up:#4FD1AE;
+    --down:#E85D4C;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    font-size:15px;
+    -webkit-font-smoothing:antialiased;
+    padding-bottom:calc(72px + env(safe-area-inset-bottom));
+  }
+  .mono{font-family:'IBM Plex Mono',monospace;}
+
+  /* ---------- barra superiore ---------- */
+  .appbar{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:calc(14px + env(safe-area-inset-top)) 20px 14px;
+    border-bottom:1px solid var(--grid);
+    background:var(--bg-panel);
+    position:sticky;top:0;z-index:20;
+  }
+  .logo{
+    font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:17px;
+    letter-spacing:0.08em;color:var(--amber);
+  }
+  .logo span{
+    color:var(--ink-dim);font-weight:400;font-size:11px;margin-left:7px;
+    font-family:'IBM Plex Mono',monospace;letter-spacing:0;
+  }
+  .live-flag{
+    display:inline-flex;align-items:center;gap:7px;
+    font-family:'IBM Plex Mono',monospace;font-size:11px;
+    letter-spacing:0.06em;text-transform:uppercase;color:var(--ink-dim);
+  }
+  .live-flag::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--ink-dim);}
+  .live-flag[data-state="live"]{color:var(--up);}
+  .live-flag[data-state="live"]::before{background:var(--up);box-shadow:0 0 7px var(--up);}
+  .live-flag[data-state="wait"]{color:var(--amber);}
+  .live-flag[data-state="wait"]::before{background:var(--amber);}
+  .live-flag[data-state="down"]{color:var(--down);}
+  .live-flag[data-state="down"]::before{background:var(--down);}
+
+  .wrap{max-width:900px;margin:0 auto;padding:0 20px;}
+  .view{display:none;padding:24px 0 40px;}
+  .view.active{display:block;}
+
+  h2.view-title{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:22px;margin-bottom:4px;}
+  .view-sub{color:var(--ink-dim);font-size:13px;margin-bottom:24px;}
+  .label{
+    font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.1em;
+    text-transform:uppercase;color:var(--amber-dim);margin-bottom:7px;display:block;
+  }
+
+  /* ---------- quotazione ---------- */
+  .quote-row{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin:14px 0 0;}
+  #price{
+    font-family:'IBM Plex Mono',monospace;font-weight:600;
+    font-size:clamp(30px,8vw,42px);transition:color .18s;
+  }
+  #price.tick-up{color:var(--up);}
+  #price.tick-down{color:var(--down);}
+  #chg{font-family:'IBM Plex Mono',monospace;font-size:15px;}
+  .up{color:var(--up);}
+  .down{color:var(--down);}
+  .daily{
+    display:flex;gap:26px;flex-wrap:wrap;
+    font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--ink-dim);
+    border-top:1px solid var(--grid);padding-top:14px;margin-top:16px;
+  }
+  .daily b{color:var(--ink);font-weight:600;}
+
+  select,input{
+    background:var(--bg-panel);border:1px solid var(--grid);color:var(--ink);
+    font-family:'IBM Plex Mono',monospace;font-size:14px;padding:12px 14px;
+    outline:none;width:100%;transition:border-color .2s;
+    -webkit-appearance:none;appearance:none;border-radius:0;
+  }
+  select:focus,input:focus{border-color:var(--amber-dim);}
+  select:focus-visible,input:focus-visible,button:focus-visible{outline:2px solid var(--amber);outline-offset:2px;}
+
+  .frames{display:flex;margin:18px 0 12px;}
+  .frames button{
+    flex:1;background:transparent;border:1px solid var(--grid);border-left-width:0;
+    color:var(--ink-dim);font-family:'IBM Plex Mono',monospace;font-size:12px;
+    padding:11px 0;cursor:pointer;
+  }
+  .frames button:first-child{border-left-width:1px;}
+  .frames button[aria-pressed="true"]{background:var(--bg-panel);color:var(--amber);border-color:var(--amber-dim);}
+  #chart{height:340px;border:1px solid var(--grid);background:var(--bg-panel);}
+  @media(max-width:640px){#chart{height:260px;}}
+  .fallback{
+    display:none;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--ink-dim);
+    border:1px dashed var(--grid);padding:26px;text-align:center;line-height:1.7;
+  }
+
+  /* ---------- pannelli ---------- */
+  .panel{background:var(--bg-panel);border:1px solid var(--grid);margin-bottom:22px;}
+  .panel-head{
+    display:flex;justify-content:space-between;align-items:center;gap:12px;
+    padding:14px 18px;border-bottom:1px solid var(--grid);
+  }
+  .panel-head h3{
+    font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:500;
+    letter-spacing:0.12em;text-transform:uppercase;color:var(--amber);
+  }
+  .panel-head em{
+    font-style:normal;font-family:'IBM Plex Mono',monospace;
+    font-size:11px;color:var(--ink-dim);
+  }
+  .panel-body{padding:18px;}
+
+  .grid-form{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .grid-form .span2{grid-column:1/-1;}
+  .btn{
+    background:var(--amber);color:var(--bg);border:none;
+    font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:13px;
+    padding:13px 20px;cursor:pointer;letter-spacing:0.02em;transition:background .2s;width:100%;
+  }
+  .btn:hover{background:#FFC640;}
+  .btn-x{
+    background:transparent;border:none;color:var(--ink-dim);cursor:pointer;
+    font-family:'IBM Plex Mono',monospace;font-size:16px;line-height:1;padding:4px 6px;
+  }
+  .btn-x:hover{color:var(--down);}
+
+  table{
+    width:100%;border-collapse:collapse;
+    font-family:'IBM Plex Mono',monospace;font-size:13px;margin-top:18px;
+  }
+  th{
+    text-align:right;font-weight:500;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;
+    color:var(--ink-dim);padding-bottom:9px;border-bottom:1px solid var(--grid);
+  }
+  th:first-child,td:first-child{text-align:left;}
+  td{padding:11px 0;border-bottom:1px dashed var(--grid);text-align:right;vertical-align:top;}
+  tbody tr:last-child td{border-bottom:none;}
+  td small{display:block;color:var(--ink-dim);font-size:11px;margin-top:3px;}
+  th:last-child,td:last-child{width:30px;}
+
+  .empty{
+    font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--ink-dim);
+    border:1px dashed var(--grid);padding:18px;margin-top:18px;line-height:1.7;
+  }
+  .total{
+    display:flex;justify-content:space-between;align-items:baseline;gap:12px;
+    font-family:'IBM Plex Mono',monospace;
+    border-top:1px solid var(--grid);margin-top:16px;padding-top:15px;
+  }
+  .total .k{font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink-dim);}
+  .total .v{font-size:19px;font-weight:600;}
+  .note{
+    font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--ink-dim);
+    line-height:1.7;margin-top:16px;border-top:1px dashed var(--grid);padding-top:14px;
+  }
+  .warn{
+    font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--down);
+    border:1px solid var(--down);padding:11px 13px;line-height:1.6;margin-top:16px;
+  }
+
+  /* ---------- navigazione inferiore ---------- */
+  .tabbar{
+    position:fixed;bottom:0;left:0;right:0;z-index:30;
+    display:flex;background:var(--bg-panel);border-top:1px solid var(--grid);
+    padding-bottom:env(safe-area-inset-bottom);
+  }
+  .tabbar button{
+    flex:1;background:transparent;border:none;cursor:pointer;
+    padding:14px 4px;font-family:'IBM Plex Mono',monospace;font-size:11px;
+    letter-spacing:0.04em;color:var(--ink-dim);border-top:2px solid transparent;margin-top:-1px;
+  }
+  .tabbar button[aria-selected="true"]{color:var(--amber);border-top-color:var(--amber);}
+
+  /* ---------- avvisi ---------- */
+  #toasts{
+    position:fixed;left:16px;right:16px;z-index:40;
+    bottom:calc(84px + env(safe-area-inset-bottom));
+    display:flex;flex-direction:column;gap:10px;
+  }
+  @media(min-width:640px){#toasts{left:auto;width:340px;}}
+  .toast{
+    background:var(--bg-panel);border:1px solid var(--amber);border-left-width:3px;
+    padding:13px 15px;font-size:13.5px;line-height:1.5;
+    box-shadow:0 14px 40px rgba(0,0,0,0.55);
+  }
+  .toast b{
+    display:block;font-family:'IBM Plex Mono',monospace;font-size:10px;
+    letter-spacing:0.12em;text-transform:uppercase;color:var(--amber);margin-bottom:4px;
+  }
+</style>
+</head>
+<body>
+
+<header class="appbar">
+  <a class="logo" href="index.html" style="text-decoration:none;">RAFOX <span>/ app</span></a>
+  <span class="live-flag" id="status" data-state="wait" role="status">Connessione</span>
+</header>
+
+<div class="wrap">
+
+  <div class="panel" id="installBanner" hidden style="margin:20px 0 0;">
+    <div class="panel-body" style="display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;">
+      <span class="note" style="border:none;padding:0;margin:0;" id="installText">Installa Rafox sulla schermata Home per aprirla come un'app.</span>
+      <button class="btn" id="installBtn" type="button" style="width:auto;flex:none;">Installa</button>
+    </div>
+  </div>
+
+  <section class="view active" id="view-mercati">
+    <label class="label" for="symbol">Strumento</label>
+    <select id="symbol"></select>
+
+    <div class="quote-row">
+      <span id="price">—</span>
+      <span id="chg">—</span>
+    </div>
+    <div class="daily">
+      <span>Max 24h <b id="high">—</b></span>
+      <span>Min 24h <b id="low">—</b></span>
+      <span>Volume 24h <b id="vol">—</b></span>
+    </div>
+
+    <div class="frames" role="group" aria-label="Intervallo del grafico">
+      <button type="button" data-tf="1m">1m</button>
+      <button type="button" data-tf="15m">15m</button>
+      <button type="button" data-tf="1h" aria-pressed="true">1h</button>
+      <button type="button" data-tf="4h">4h</button>
+      <button type="button" data-tf="1d">1g</button>
+    </div>
+    <div id="chart"></div>
+    <p class="fallback" id="chartFallback">
+      Il grafico non si è caricato: la libreria non è raggiungibile da questa rete.
+      I prezzi qui sopra continuano ad aggiornarsi.
+    </p>
+  </section>
+
+  <section class="view" id="view-portafoglio">
+    <h2 class="view-title">Portafoglio</h2>
+    <p class="view-sub">Posizioni inserite a mano, valorizzate sui prezzi live di mercato.</p>
+
+    <div class="panel">
+      <div class="panel-head"><h3>Nuova posizione</h3></div>
+      <div class="panel-body">
+        <div class="grid-form">
+          <div class="span2">
+            <label class="label" for="pfSym">Asset</label>
+            <select id="pfSym"></select>
+          </div>
+          <div>
+            <label class="label" for="pfQty">Quantità</label>
+            <input id="pfQty" type="number" step="any" min="0" inputmode="decimal" placeholder="0,5">
+          </div>
+          <div>
+            <label class="label" for="pfPx">Prezzo di carico</label>
+            <input id="pfPx" type="number" step="any" min="0" inputmode="decimal" placeholder="USDT">
+          </div>
+          <div class="span2">
+            <button class="btn" id="pfAdd" type="button">Aggiungi posizione</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head"><h3>Posizioni</h3><em id="pfCount"></em></div>
+      <div class="panel-body">
+        <div class="empty" id="pfEmpty">Nessuna posizione. Aggiungine una per vedere il P&amp;L muoversi sui prezzi reali.</div>
+        <table id="pfTable" hidden>
+          <thead><tr><th>Asset</th><th>Valore</th><th>P&amp;L</th><th></th></tr></thead>
+          <tbody id="pfBody"></tbody>
+        </table>
+        <div class="total" id="pfTotal" hidden>
+          <span class="k">Totale · P&amp;L</span>
+          <span class="v" id="pfTotalVal">—</span>
+        </div>
+        <p class="note">P&amp;L calcolato sul prezzo di mercato corrente. Commissioni, spread e slippage non sono inclusi.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="view" id="view-bot">
+    <h2 class="view-title">Bot Live</h2>
+    <p class="view-sub">Collega il tuo account Binance e avvia la strategia automatica.</p>
+
+    <div class="panel">
+      <div class="panel-head"><h3>Piano attivo</h3><em id="planName">—</em></div>
+      <div class="panel-body">
+        <p class="note" id="planNote" style="border:none;padding:0;margin:0;">—</p>
+      </div>
+    </div>
+
+    <div class="warn" id="upgrade-banner" hidden>
+      <strong>Piano Starter.</strong> Per far girare il bot su Binance serve il piano PRO.
+      <a href="index.html#prezzi" style="color:var(--amber);margin-left:6px;">Passa a PRO →</a>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head"><h3>Connessione API Binance</h3></div>
+      <div class="panel-body">
+        <div class="grid-form">
+          <div class="span2">
+            <label class="label" for="binanceKey">API Key</label>
+            <input id="binanceKey" type="text" autocomplete="off" placeholder="Incolla la chiave pubblica">
+          </div>
+          <div class="span2">
+            <label class="label" for="binanceSecret">API Secret</label>
+            <input id="binanceSecret" type="password" autocomplete="off" placeholder="Incolla la chiave segreta">
+          </div>
+          <div class="span2">
+            <button class="btn bot-input" id="btnSaveKeys" type="button">Salva nel Vault Sicuro</button>
+          </div>
+        </div>
+        <p class="note">
+          La chiave segreta non viene mai salvata in questo browser: parte subito, via HTTPS, verso il
+          server che la cifra. Sulla chiave creata su Binance disattiva il permesso di prelievo — è la
+          protezione più importante in caso qualcosa vada storto altrove.
+        </p>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head"><h3>Avvio sessione</h3></div>
+      <div class="panel-body">
+        <div class="grid-form">
+          <div>
+            <label class="label" for="botPair">Coppia</label>
+            <select id="botPair" class="bot-input">
+              <option value="BTCUSDT">BTC / USDT</option>
+              <option value="ETHUSDT">ETH / USDT</option>
+            </select>
+          </div>
+          <div>
+            <label class="label" for="botDuration">Timer</label>
+            <select id="botDuration" class="bot-input">
+              <option value="60">1 ora</option>
+              <option value="240">4 ore</option>
+            </select>
+          </div>
+          <div class="span2">
+            <button class="btn bot-input" id="btnStartBot" type="button">Avvia Bot Live</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="view" id="view-alert">
+    <h2 class="view-title">Alert di prezzo</h2>
+    <p class="view-sub">Scattano quando il prezzo reale attraversa la soglia.</p>
+
+    <div class="panel">
+      <div class="panel-head"><h3>Nuovo alert</h3></div>
+      <div class="panel-body">
+        <div class="grid-form">
+          <div class="span2">
+            <label class="label" for="alSym">Asset</label>
+            <select id="alSym"></select>
+          </div>
+          <div>
+            <label class="label" for="alDir">Condizione</label>
+            <select id="alDir">
+              <option value="above">Sale sopra</option>
+              <option value="below">Scende sotto</option>
+            </select>
+          </div>
+          <div>
+            <label class="label" for="alPx">Soglia</label>
+            <input id="alPx" type="number" step="any" min="0" inputmode="decimal" placeholder="USDT">
+          </div>
+          <div class="span2">
+            <button class="btn" id="alAdd" type="button">Crea alert</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head"><h3>Attivi</h3><em id="alCount"></em></div>
+      <div class="panel-body">
+        <div class="empty" id="alEmpty">Nessun alert. Il primo scatta appena il prezzo tocca la soglia che imposti.</div>
+        <table id="alTable" hidden>
+          <thead><tr><th>Asset</th><th>Condizione</th><th>Stato</th><th></th></tr></thead>
+          <tbody id="alBody"></tbody>
+        </table>
+        <p class="note" id="alHint"></p>
+        <div class="warn">
+          Gli alert vengono controllati mentre l'app è aperta. Per riceverli con l'app chiusa
+          serve il servizio di notifiche push lato server, non ancora attivo.
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<nav class="tabbar" role="tablist" aria-label="Sezioni">
+  <button type="button" role="tab" data-view="mercati" aria-selected="true">Mercati</button>
+  <button type="button" role="tab" data-view="portafoglio" aria-selected="false">Portafoglio</button>
+  <button type="button" role="tab" data-view="bot" aria-selected="false">Bot Live</button>
+  <button type="button" role="tab" data-view="alert" aria-selected="false">Alert</button>
+</nav>
+
+<div id="toasts" aria-live="polite"></div>
+
+<script src="rafox-market.js"></script>
+<script>
+(function(){
+  'use strict';
+  const M = window.RafoxMarket;
+  const $ = id => document.getElementById(id);
+
+  const SYMBOLS = ['BTCUSDT','ETHUSDT','SOLUSDT','BNBUSDT','XRPUSDT',
+                   'ADAUSDT','AVAXUSDT','LINKUSDT','DOGEUSDT','PAXGUSDT'];
+  const view = { symbol:'BTCUSDT', tf:'1h' };
+
+  /* ---------- persistenza: localStorage con ripiego in memoria ---------- */
+  const store = (function(){
+    let ok = true;
+    try { localStorage.setItem('__rfx','1'); localStorage.removeItem('__rfx'); }
+    catch { ok = false; }
+    const mem = {};
+    return {
+      persistent: ok,
+      get(k, fb){
+        try { const v = ok ? localStorage.getItem(k) : mem[k]; return v ? JSON.parse(v) : fb; }
+        catch { return fb; }
+      },
+      set(k, v){
+        const s = JSON.stringify(v);
+        try { ok ? localStorage.setItem(k, s) : (mem[k] = s); } catch { mem[k] = s; }
+      }
+    };
+  })();
+
+  let positions = store.get('rfx.positions', []);
+  let alerts    = store.get('rfx.alerts', []);
+
+  function toast(title, body){
+    const el = document.createElement('div');
+    el.className = 'toast';
+    el.innerHTML = '<b></b><span></span>';
+    el.children[0].textContent = title;
+    el.children[1].textContent = body;
+    $('toasts').appendChild(el);
+    setTimeout(() => el.remove(), 9000);
+  }
+
+  /* ---------- selettori ---------- */
+  const options = SYMBOLS.map(s =>
+    `<option value="${s}">${M.bySym[s].label} — ${M.bySym[s].name}</option>`).join('');
+  for (const id of ['symbol','pfSym','alSym']) $(id).innerHTML = options;
+  $('symbol').value = view.symbol;
+
+  /* ---------- grafico ---------- */
+  let chart = null, series = null;
+
+  function initChart(){
+    if (typeof LightweightCharts === 'undefined') {
+      $('chart').style.display = 'none';
+      $('chartFallback').style.display = 'block';
+      return;
+    }
+    const css   = getComputedStyle(document.documentElement);
+    const grid  = css.getPropertyValue('--grid').trim();
+    const dim   = css.getPropertyValue('--ink-dim').trim();
+    const up    = css.getPropertyValue('--up').trim();
+    const down  = css.getPropertyValue('--down').trim();
+    const panel = css.getPropertyValue('--bg-panel').trim();
+
+    chart = LightweightCharts.createChart($('chart'), {
+      autoSize:true,
+      layout:{ background:{ type:'solid', color:panel }, textColor:dim,
+               fontFamily:"'IBM Plex Mono', monospace", fontSize:11 },
+      grid:{ vertLines:{ color:grid }, horzLines:{ color:grid } },
+      rightPriceScale:{ borderColor:grid },
+      timeScale:{ borderColor:grid, timeVisible:true, secondsVisible:false },
+      crosshair:{ vertLine:{ color:dim, labelBackgroundColor:'#0B0A08' },
+                  horzLine:{ color:dim, labelBackgroundColor:'#0B0A08' } },
+      localization:{ locale:'it-IT' }
+    });
+    series = chart.addCandlestickSeries({
+      upColor:up, downColor:down, borderVisible:false,
+      wickUpColor:up, wickDownColor:down
+    });
+  }
+
+  async function loadCandles(){
+    if (!series) return;
+    try {
+      series.setData(await M.klines(view.symbol, view.tf, 500));
+      chart.timeScale().fitContent();
+    } catch {
+      toast('Candele non caricate', 'Il grafico riprova al prossimo cambio di intervallo.');
+    }
+  }
+
+  /* ---------- quotazione ---------- */
+  function paintQuote(row){
+    const dp = M.fmt.dp(view.symbol);
+    if (row.price != null) {
+      const el = $('price');
+      const prev = parseFloat(el.dataset.v || '');
+      el.textContent = M.fmt.money(row.price, dp);
+      if (isFinite(prev) && row.price !== prev) {
+        el.classList.remove('tick-up','tick-down');
+        void el.offsetWidth;
+        el.classList.add(row.price > prev ? 'tick-up' : 'tick-down');
+        setTimeout(() => el.classList.remove('tick-up','tick-down'), 420);
+      }
+      el.dataset.v = row.price;
+    }
+    if (row.pct != null) {
+      $('chg').textContent = M.fmt.pct(row.pct);
+      $('chg').className = row.pct >= 0 ? 'up' : 'down';
+    }
+    if (row.high != null) $('high').textContent = M.fmt.money(row.high, dp);
+    if (row.low  != null) $('low').textContent  = M.fmt.money(row.low, dp);
+    if (row.vol  != null) $('vol').textContent  = M.fmt.compact(row.vol);
+  }
+
+  /* ---------- portafoglio ---------- */
+  function addPosition(){
+    if (positions.length >= caps().maxPositions) {
+      toast('Limite del piano ' + caps().label,
+            `Puoi tenere fino a ${caps().maxPositions} posizioni. Passa a un piano superiore per averne di più.`);
+      return;
+    }
+    const sym = $('pfSym').value;
+    const qty = parseFloat($('pfQty').value);
+    const px  = parseFloat($('pfPx').value);
+    if (!(qty > 0) || !(px > 0)) {
+      toast('Dati incompleti', 'Quantità e prezzo di carico devono essere maggiori di zero.');
+      return;
+    }
+    positions.push({ id:Date.now(), sym, qty, px });
+    store.set('rfx.positions', positions);
+    $('pfQty').value = ''; $('pfPx').value = '';
+    renderPortfolio();
+  }
+
+  function renderPortfolio(){
+    const n = positions.length;
+    $('pfCount').textContent = n ? n + (n === 1 ? ' posizione' : ' posizioni') : '';
+    $('pfEmpty').hidden = n > 0;
+    $('pfTable').hidden = !n;
+    $('pfTotal').hidden = !n;
+    if (!n) return;
+
+    let value = 0, cost = 0, complete = true;
+    $('pfBody').innerHTML = positions.map(p => {
+      const a = M.bySym[p.sym], live = M.price(p.sym);
+      const c = p.qty * p.px;
+      cost += c;
+      if (live == null) complete = false; else value += p.qty * live;
+      const v   = live == null ? null : p.qty * live;
+      const pnl = v == null ? null : v - c;
+      const pct = v == null ? null : pnl / c * 100;
+      const k   = pnl == null ? '' : (pnl >= 0 ? 'up' : 'down');
+      return `<tr>
+        <td>${a.short}<small>${M.fmt.money(p.qty, 6)} @ ${M.fmt.money(p.px, a.dp)}</small></td>
+        <td>${v == null ? '—' : M.fmt.money(v, 2)}<small>costo ${M.fmt.money(c, 2)}</small></td>
+        <td class="${k}">${pnl == null ? '—' : M.fmt.signed(pnl, 2)}<small class="${k}">${pct == null ? '' : M.fmt.pct(pct)}</small></td>
+        <td><button class="btn-x" type="button" data-rm="${p.id}" aria-label="Rimuovi ${a.short}">×</button></td>
+      </tr>`;
+    }).join('');
+
+    const pnl = complete ? value - cost : null;
+    const pct = complete && cost ? pnl / cost * 100 : null;
+    $('pfTotalVal').innerHTML = pnl == null ? '—'
+      : `<span class="${pnl >= 0 ? 'up' : 'down'}">${M.fmt.signed(pnl, 2)} USDT · ${M.fmt.pct(pct)}</span>`;
+  }
+
+  /* ---------- alert ---------- */
+  function addAlert(){
+    if (alerts.length >= caps().maxAlerts) {
+      toast('Limite del piano ' + caps().label,
+            `Puoi tenere fino a ${caps().maxAlerts} alert. Passa a un piano superiore per averne di più.`);
+      return;
+    }
+    const px = parseFloat($('alPx').value);
+    if (!(px > 0)) { toast('Soglia mancante', 'Indica il prezzo da monitorare.'); return; }
+    alerts.push({ id:Date.now(), sym:$('alSym').value, dir:$('alDir').value, px, fired:false });
+    store.set('rfx.alerts', alerts);
+    $('alPx').value = '';
+    renderAlerts();
+    if ('Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission().then(renderAlerts);
+    }
+  }
+
+  function renderAlerts(){
+    const n = alerts.length;
+    $('alCount').textContent = n ? n + (n === 1 ? ' attivo' : ' attivi') : '';
+    $('alEmpty').hidden = n > 0;
+    $('alTable').hidden = !n;
+    $('alBody').innerHTML = alerts.map(al => {
+      const a = M.bySym[al.sym];
+      return `<tr>
+        <td>${a.short}</td>
+        <td>${al.dir === 'above' ? '≥' : '≤'} ${M.fmt.money(al.px, a.dp)}</td>
+        <td>${al.fired ? '<span class="up">scattato</span>' : 'in attesa'}</td>
+        <td><button class="btn-x" type="button" data-rma="${al.id}" aria-label="Elimina alert ${a.short}">×</button></td>
+      </tr>`;
+    }).join('');
+    const perm = 'Notification' in window ? Notification.permission : 'unsupported';
+    $('alHint').textContent = perm === 'granted'
+      ? 'Notifiche di sistema attive.'
+      : 'Consenti le notifiche per ricevere gli avvisi anche con l\u2019app in secondo piano.';
+  }
+
+  function checkAlerts(sym, price){
+    let changed = false;
+    for (const al of alerts) {
+      if (al.sym !== sym || al.fired) continue;
+      if (al.dir === 'above' ? price < al.px : price > al.px) continue;
+      al.fired = true; changed = true;
+      const a = M.bySym[sym];
+      const text = `${a.label} a ${M.fmt.money(price, a.dp)} ` +
+                   `(soglia ${al.dir === 'above' ? '≥' : '≤'} ${M.fmt.money(al.px, a.dp)})`;
+      toast('Alert scattato', text);
+      if ('Notification' in window && Notification.permission === 'granted') {
+        try { new Notification('Rafox — alert di prezzo', { body:text, icon:'icon-192.png' }); } catch {}
+      }
+    }
+    if (changed) { store.set('rfx.alerts', alerts); renderAlerts(); }
+  }
+
+  /* ---------- navigazione ---------- */
+  document.querySelector('.tabbar').addEventListener('click', e => {
+    const b = e.target.closest('button[data-view]');
+    if (!b) return;
+    document.querySelectorAll('.tabbar button')
+      .forEach(x => x.setAttribute('aria-selected', String(x === b)));
+    document.querySelectorAll('.view')
+      .forEach(v => v.classList.toggle('active', v.id === 'view-' + b.dataset.view));
+    window.scrollTo({ top:0, behavior:'smooth' });
+    if (b.dataset.view === 'mercati' && chart) chart.timeScale().fitContent();
+  });
+
+  /* ---------- eventi ---------- */
+  $('symbol').addEventListener('change', async () => {
+    view.symbol = $('symbol').value;
+    $('price').dataset.v = '';
+    paintQuote({ price:null, pct:null, high:null, low:null, vol:null });
+    M.setKline(view.symbol, view.tf);
+    await Promise.all([loadCandles(), M.ticker24h([view.symbol])]);
+  });
+
+  document.querySelector('.frames').addEventListener('click', async e => {
+    const b = e.target.closest('button[data-tf]');
+    if (!b) return;
+    document.querySelectorAll('.frames button')
+      .forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+    view.tf = b.dataset.tf;
+    M.setKline(view.symbol, view.tf);
+    await loadCandles();
+  });
+
+  $('pfAdd').addEventListener('click', addPosition);
+  $('alAdd').addEventListener('click', addAlert);
+  $('pfPx').addEventListener('keydown', e => { if (e.key === 'Enter') addPosition(); });
+  $('alPx').addEventListener('keydown', e => { if (e.key === 'Enter') addAlert(); });
+
+  $('pfBody').addEventListener('click', e => {
+    const b = e.target.closest('[data-rm]');
+    if (!b) return;
+    positions = positions.filter(p => p.id !== +b.dataset.rm);
+    store.set('rfx.positions', positions);
+    renderPortfolio();
+  });
+  $('alBody').addEventListener('click', e => {
+    const b = e.target.closest('[data-rma]');
+    if (!b) return;
+    alerts = alerts.filter(a => a.id !== +b.dataset.rma);
+    store.set('rfx.alerts', alerts);
+    renderAlerts();
+  });
+
+  /* ---------- flusso live ---------- */
+  M.on('status', s => { $('status').dataset.state = s.state; $('status').textContent = s.text; });
+
+  M.on('price', row => {
+    if (row.symbol === view.symbol) paintQuote(row);
+    checkAlerts(row.symbol, row.price);
+    renderPortfolio();
+  });
+
+  M.on('kline', ev => {
+    if (ev.symbol === view.symbol && series) series.update(ev.candle);
+  });
+
+  /* =====================================================================
+     BOT LIVE — gestione piano PRO, salvataggio chiavi, avvio sessione.
+
+     ATTENZIONE SICUREZZA: la API Secret non deve MAI passare da
+     localStorage o qualunque storage persistente lato client — nemmeno
+     per un istante, nemmeno "temporaneamente". Va spedita subito al
+     backend via HTTPS e dimenticata dal browser. BACKEND_URL qui sotto è
+     un segnaposto: sostituiscilo con l'indirizzo reale del tuo servizio
+     Python prima di usare questo pannello con chiavi vere.
+     ===================================================================== */
+  const BACKEND_URL = null; // es. 'https://api.tuo-dominio.it' — finché è null, il pannello resta in modalità dimostrativa
+
+  /* Capacità di ciascun piano — devono restare allineate a quanto promesso
+     nella sezione Prezzi del sito. NOTA: questi limiti girano nel browser,
+     quindi sono un'interfaccia, non una barriera: un utente tecnico può
+     aggirarli. La verifica che conta va fatta sul backend, prima di
+     eseguire qualunque ordine reale. */
+  const PLANS = {
+    starter: {
+      label: 'Starter',
+      bot: false,
+      maxPositions: 3,
+      maxAlerts: 3,
+      pairs: ['BTCUSDT'],
+      note: 'Nel piano Starter il bot live non è disponibile e puoi tenere fino a 3 posizioni e 3 alert.'
+    },
+    pro: {
+      label: 'Pro',
+      bot: true,
+      maxPositions: Infinity,
+      maxAlerts: Infinity,
+      pairs: ['BTCUSDT','ETHUSDT','SOLUSDT'],
+      note: 'Piano Pro: bot live attivo su BTC, ETH e SOL, posizioni e alert illimitati.'
+    },
+    elite: {
+      label: 'Elite',
+      bot: true,
+      maxPositions: Infinity,
+      maxAlerts: Infinity,
+      pairs: ['BTCUSDT','ETHUSDT','SOLUSDT','BNBUSDT','XRPUSDT','AVAXUSDT','LINKUSDT'],
+      note: 'Piano Elite: bot live su tutte le coppie disponibili, nessun limite.'
+    }
+  };
+
+  // Il piano arriva dall'URL (?plan=…) quando si entra dalla sezione Prezzi,
+  // altrimenti si riprende quello già salvato. Resta attivo dopo un refresh.
+  let plan = store.get('rfx.plan', 'starter');
+  const urlPlan = new URLSearchParams(window.location.search).get('plan');
+  if (urlPlan && PLANS[urlPlan]) {
+    plan = urlPlan;
+    store.set('rfx.plan', plan);
+    window.history.replaceState({}, document.title, window.location.pathname);
+  }
+  if (!PLANS[plan]) plan = 'starter';
+
+  function caps(){ return PLANS[plan]; }
+
+  function applyPlanLimits(){
+    const c = caps();
+    const banner = $('upgrade-banner');
+    banner.hidden = c.bot;
+    document.querySelectorAll('.bot-input').forEach(el => { el.disabled = !c.bot; });
+    $('btnStartBot').textContent = c.bot ? 'Avvia Bot Live' : 'Disponibile dai piani Pro';
+    $('planName').textContent = c.label;
+    $('planNote').textContent = c.note;
+
+    // le coppie selezionabili dipendono dal piano
+    $('botPair').innerHTML = c.pairs
+      .map(s => `<option value="${s}">${M.bySym[s].label}</option>`).join('');
+  }
+
+  $('btnSaveKeys').addEventListener('click', async () => {
+    const apiKey = $('binanceKey').value.trim();
+    const apiSecret = $('binanceSecret').value.trim();
+    if (!apiKey || !apiSecret) {
+      toast('Dati incompleti', 'Inserisci sia la API Key sia la API Secret.');
+      return;
+    }
+    if (!BACKEND_URL) {
+      toast('Backend non collegato',
+        'Questo pannello è ancora dimostrativo: nessuna chiave è stata inviata o salvata da nessuna parte.');
+      $('binanceKey').value = ''; $('binanceSecret').value = '';
+      return;
+    }
+    try {
+      const res = await fetch(BACKEND_URL + '/api/keys', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ apiKey, apiSecret })
+      });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      toast('Chiavi salvate', 'La API Secret è stata inviata al server e non resta su questo dispositivo.');
+    } catch (e) {
+      console.error('[Rafox] salvataggio chiavi non riuscito:', e);
+      toast('Salvataggio non riuscito', 'Il server non ha risposto. Le chiavi non sono state salvate.');
+    } finally {
+      // la secret esce dal campo appena tentato l'invio, riuscito o no —
+      // non deve restare visibile né recuperabile nel DOM più del necessario
+      $('binanceKey').value = ''; $('binanceSecret').value = '';
+    }
+  });
+
+  $('btnStartBot').addEventListener('click', async () => {
+    if (!caps().bot) { toast('Piano ' + caps().label, 'Il bot live è disponibile dai piani Pro ed Elite.'); return; }
+    if (!BACKEND_URL) {
+      toast('Backend non collegato', 'Questo pannello è ancora dimostrativo: nessun ordine viene inviato.');
+      return;
+    }
+    const pair = $('botPair').value, minutes = $('botDuration').value;
+    try {
+      const res = await fetch(BACKEND_URL + '/api/bot/start', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pair, minutes })
+      });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      toast('Bot avviato', `Sessione live su ${pair} per ${minutes} minuti.`);
+    } catch (e) {
+      console.error('[Rafox] avvio bot non riuscito:', e);
+      toast('Avvio non riuscito', 'Il server non ha risposto. Nessuna sessione è partita.');
+    }
+  });
+
+  applyPlanLimits();
+
+  /* ---------- installazione sulla home ---------- */
+  let deferredInstall = null;
+
+  window.addEventListener('beforeinstallprompt', e => {
+    e.preventDefault();
+    deferredInstall = e;
+    $('installText').textContent = 'Installa Rafox sulla schermata Home per aprirla come un\u2019app.';
+    $('installBtn').textContent = 'Installa';
+    $('installBanner').hidden = false;
+  });
+
+  $('installBtn').addEventListener('click', async () => {
+    if (deferredInstall) {
+      deferredInstall.prompt();
+      const choice = await deferredInstall.userChoice;
+      deferredInstall = null;
+      if (choice.outcome === 'accepted') $('installBanner').hidden = true;
+    } else {
+      // iOS Safari non espone un prompt nativo: solo istruzioni.
+      toast('Aggiungi a Home', 'Su iPhone: tocca Condividi (il quadrato con la freccia) in basso, poi "Aggiungi a Home".');
+    }
+  });
+
+  window.addEventListener('appinstalled', () => { $('installBanner').hidden = true; });
+
+  (function maybeShowIOSInstall(){
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+    const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+    if (isIOS && !isStandalone) {
+      $('installText').textContent = 'Su iPhone: apri Condividi in basso e scegli "Aggiungi a Home" per installare Rafox.';
+      $('installBtn').textContent = 'Come si fa';
+      $('installBanner').hidden = false;
+    }
+  })();
+
+  /* ---------- avvio ---------- */
+  (async function start(){
+    renderPortfolio();
+    renderAlerts();
+    try { await M.loadChartLib(); }
+    catch (e) { console.error('[Rafox] libreria grafici non caricata:', e); }
+    initChart();
+    M.start({ symbols:SYMBOLS, kline:{ symbol:view.symbol, interval:view.tf } });
+    try { await M.ticker24h(SYMBOLS); } catch (e) { console.warn('[Rafox]', e); }
+    await loadCandles();
+    if (!store.persistent) {
+      toast('Salvataggio non disponibile',
+            'Posizioni e alert valgono solo per questa sessione: lo storage del browser è bloccato qui.');
+    }
+    if ('serviceWorker' in navigator && location.protocol === 'https:') {
+      navigator.serviceWorker.register('sw.js').catch(() => {});
+    }
+  })();
+})();
+</script>
+</body>
+</html>
