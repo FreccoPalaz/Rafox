@@ -298,10 +298,11 @@
     </div>
   </section>
 
-  <section class="view" id="view-bot">
-    <h2 class="view-title">Bot Live</h2>
-    <p class="view-sub">Collega il tuo account Binance e avvia la strategia automatica.</p>
+<section class="view" id="view-bot">
+    <h2 class="view-title">Paper Trading Bot</h2>
+    <p class="view-sub">Simula le tue strategie con prezzi reali senza rischiare capitale.</p>
 
+    <!-- Info Piano -->
     <div class="panel">
       <div class="panel-head"><h3>Piano attivo</h3><em id="planName">—</em></div>
       <div class="panel-body">
@@ -309,37 +310,31 @@
       </div>
     </div>
 
+    <!-- Avviso Starter -->
     <div class="warn" id="upgrade-banner" hidden>
-      <strong>Piano Starter.</strong> Per far girare il bot su Binance serve il piano PRO.
+      <strong>Piano Starter.</strong> Per usare il Bot devi passare al piano PRO.
       <a href="index.html#prezzi" style="color:var(--amber);margin-left:6px;">Passa a PRO →</a>
     </div>
 
-    <div class="panel">
-      <div class="panel-head"><h3>Connessione API Binance</h3></div>
+    <!-- PANNELLO 1: Sessione Attiva (Nascosto finché non si preme Start) -->
+    <div class="panel" id="botActivePanel" hidden style="border-color: var(--amber-dim);">
+      <div class="panel-head">
+        <h3 style="color: var(--amber);">⚡ Sessione in corso</h3>
+        <em id="botCountdown" style="color: var(--ink); font-weight: 600; font-size: 14px;">00:00</em>
+      </div>
       <div class="panel-body">
-        <div class="grid-form">
-          <div class="span2">
-            <label class="label" for="binanceKey">API Key</label>
-            <input id="binanceKey" type="text" autocomplete="off" placeholder="Incolla la chiave pubblica">
-          </div>
-          <div class="span2">
-            <label class="label" for="binanceSecret">API Secret</label>
-            <input id="binanceSecret" type="password" autocomplete="off" placeholder="Incolla la chiave segreta">
-          </div>
-          <div class="span2">
-            <button class="btn bot-input" id="btnSaveKeys" type="button">Salva nel Vault Sicuro</button>
-          </div>
+        <div class="total" style="border-top: none; padding-top: 0; margin-top: 0;">
+          <span class="k" id="botActivePair" style="color: var(--ink);">BTC/USDT</span>
+          <span class="v" id="botActivePnl">0.00 USDT</span>
         </div>
-        <p class="note">
-          La chiave segreta non viene mai salvata in questo browser: parte subito, via HTTPS, verso il
-          server che la cifra. Sulla chiave creata su Binance disattiva il permesso di prelievo — è la
-          protezione più importante in caso qualcosa vada storto altrove.
-        </p>
+        <div class="empty" id="botActiveLog" style="margin-top: 14px; text-align: left; padding: 14px;">Inizializzazione bot e ricerca segnali...</div>
+        <button class="btn" id="btnStopBot" type="button" style="background: var(--down); margin-top: 18px;">Ferma e Chiudi Posizioni</button>
       </div>
     </div>
 
-    <div class="panel">
-      <div class="panel-head"><h3>Avvio sessione</h3></div>
+    <!-- PANNELLO 2: Configurazione Avvio -->
+    <div class="panel" id="botConfigPanel">
+      <div class="panel-head"><h3>Impostazioni Sessione</h3></div>
       <div class="panel-body">
         <div class="grid-form">
           <div>
@@ -352,14 +347,39 @@
           <div>
             <label class="label" for="botDuration">Timer</label>
             <select id="botDuration" class="bot-input">
-              <option value="60">1 ora</option>
-              <option value="240">4 ore</option>
+              <option value="5">5 Minuti (Test)</option>
+              <option value="60">1 Ora</option>
+              <option value="240">4 Ore</option>
             </select>
           </div>
+          <div>
+            <label class="label" for="botStrategy">Strategia</label>
+            <select id="botStrategy" class="bot-input">
+              <option value="conservativa">Conservativa</option>
+              <option value="moderata" selected>Moderata</option>
+              <option value="aggressiva">Aggressiva</option>
+            </select>
+          </div>
+          <div>
+            <label class="label" for="botCapital">Capitale Virtuale</label>
+            <input id="botCapital" type="number" value="1000" min="10" class="bot-input" inputmode="decimal">
+          </div>
           <div class="span2">
-            <button class="btn bot-input" id="btnStartBot" type="button">Avvia Bot Live</button>
+            <button class="btn bot-input" id="btnStartBot" type="button">Avvia Paper Trading</button>
           </div>
         </div>
+      </div>
+    </div>
+
+    <!-- PANNELLO 3: Storico Operazioni -->
+    <div class="panel">
+      <div class="panel-head"><h3>Storico Operazioni</h3></div>
+      <div class="panel-body">
+        <div class="empty" id="botHistoryEmpty">Nessuna operazione registrata in questa sessione.</div>
+        <table id="botHistoryTable" hidden>
+          <thead><tr><th>Asset</th><th>Entrata / Uscita</th><th>P&amp;L</th><th></th></tr></thead>
+          <tbody id="botHistoryBody"></tbody>
+        </table>
       </div>
     </div>
   </section>
@@ -780,58 +800,171 @@
       .map(s => `<option value="${s}">${M.bySym[s].label}</option>`).join('');
   }
 
-  $('btnSaveKeys').addEventListener('click', async () => {
-    const apiKey = $('binanceKey').value.trim();
-    const apiSecret = $('binanceSecret').value.trim();
-    if (!apiKey || !apiSecret) {
-      toast('Dati incompleti', 'Inserisci sia la API Key sia la API Secret.');
-      return;
-    }
-    if (!BACKEND_URL) {
-      toast('Backend non collegato',
-        'Questo pannello è ancora dimostrativo: nessuna chiave è stata inviata o salvata da nessuna parte.');
-      $('binanceKey').value = ''; $('binanceSecret').value = '';
-      return;
-    }
-    try {
-      const res = await fetch(BACKEND_URL + '/api/keys', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ apiKey, apiSecret })
-      });
-      if (!res.ok) throw new Error('HTTP ' + res.status);
-      toast('Chiavi salvate', 'La API Secret è stata inviata al server e non resta su questo dispositivo.');
-    } catch (e) {
-      console.error('[Rafox] salvataggio chiavi non riuscito:', e);
-      toast('Salvataggio non riuscito', 'Il server non ha risposto. Le chiavi non sono state salvate.');
-    } finally {
-      // la secret esce dal campo appena tentato l'invio, riuscito o no —
-      // non deve restare visibile né recuperabile nel DOM più del necessario
-      $('binanceKey').value = ''; $('binanceSecret').value = '';
-    }
-  });
+  /* =====================================================================
+     MOTORE PAPER TRADING
+     ===================================================================== */
+  const PaperBot = {
+    running: false,
+    timerId: null,
+    logicId: null,
+    endTime: 0,
+    pair: null,
+    strategy: null,
+    capital: 0,
+    openTrade: null,
+    history: [],
 
-  $('btnStartBot').addEventListener('click', async () => {
-    if (!caps().bot) { toast('Piano ' + caps().label, 'Il bot live è disponibile dai piani Pro ed Elite.'); return; }
-    if (!BACKEND_URL) {
-      toast('Backend non collegato', 'Questo pannello è ancora dimostrativo: nessun ordine viene inviato.');
-      return;
-    }
-    const pair = $('botPair').value, minutes = $('botDuration').value;
-    try {
-      const res = await fetch(BACKEND_URL + '/api/bot/start', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ pair, minutes })
-      });
-      if (!res.ok) throw new Error('HTTP ' + res.status);
-      toast('Bot avviato', `Sessione live su ${pair} per ${minutes} minuti.`);
-    } catch (e) {
-      console.error('[Rafox] avvio bot non riuscito:', e);
-      toast('Avvio non riuscito', 'Il server non ha risposto. Nessuna sessione è partita.');
-    }
-  });
+    start() {
+      if (!caps().bot) { 
+        toast('Piano ' + caps().label, 'Il bot è disponibile dai piani Pro ed Elite.'); 
+        return; 
+      }
+      
+      this.pair = $('botPair').value;
+      this.strategy = $('botStrategy').value;
+      this.capital = parseFloat($('botCapital').value) || 1000;
+      const minutes = parseInt($('botDuration').value) || 60;
+      
+      this.endTime = Date.now() + minutes * 60 * 1000;
+      this.running = true;
+      this.openTrade = null;
 
+      // Aggiorna Interfaccia
+      $('botConfigPanel').hidden = true;
+      $('botActivePanel').hidden = false;
+      $('botActivePair').textContent = M.bySym[this.pair].short + ' — ' + this.strategy.toUpperCase();
+      $('botActivePnl').textContent = '0.00 USDT';
+      $('botActivePnl').className = 'v';
+      $('botActiveLog').textContent = 'Analisi mercato in corso... in attesa di setup.';
+
+      // Avvia timer e logica
+      this.updateTimer();
+      this.timerId = setInterval(() => this.updateTimer(), 1000);
+      this.logicId = setInterval(() => this.tick(), 2500); // Check mercato ogni 2.5s
+      
+      toast('Bot Avviato', `Sessione Paper Trading su ${this.pair} iniziata.`);
+    },
+
+    stop(reason = 'Interrotto dall\'utente') {
+      if (!this.running) return;
+      this.running = false;
+      clearInterval(this.timerId);
+      clearInterval(this.logicId);
+
+      // Chiudi eventuali posizioni aperte al volo
+      if (this.openTrade) {
+        const livePx = M.price(this.pair) || this.openTrade.entry;
+        this.closePosition(livePx, 'Chiusura sessione');
+      }
+
+      // Ripristina Interfaccia
+      $('botConfigPanel').hidden = false;
+      $('botActivePanel').hidden = true;
+      toast('Bot Arrestato', reason);
+    },
+
+    updateTimer() {
+      const left = this.endTime - Date.now();
+      if (left <= 0) {
+        this.stop('Tempo scaduto');
+        return;
+      }
+      const m = Math.floor(left / 60000).toString().padStart(2, '0');
+      const s = Math.floor((left % 60000) / 1000).toString().padStart(2, '0');
+      $('botCountdown').textContent = `${m}:${s}`;
+    },
+
+    tick() {
+      const px = M.price(this.pair);
+      if (!px) return;
+
+      if (!this.openTrade) {
+        // Ingresso: Ridotta la frequenza per non spammare operazioni
+        const chance = this.strategy === 'aggressiva' ? 0.15 : (this.strategy === 'moderata' ? 0.05 : 0.02);
+        
+        if (Math.random() < chance) {
+          const qty = this.capital / px; 
+          const type = Math.random() > 0.5 ? 'LONG' : 'SHORT';
+          // Salviamo anche l'orario di apertura (openTime)
+          this.openTrade = { type, entry: px, qty, openTime: Date.now() };
+          $('botActiveLog').innerHTML = `Aperta posizione <b>${type}</b> a ${M.fmt.money(px, 2)} USDT`;
+        }
+      } else {
+        // Gestione (P&L Live)
+        const diff = px - this.openTrade.entry;
+        const pnl = this.openTrade.type === 'LONG' ? (diff * this.openTrade.qty) : (-diff * this.openTrade.qty);
+        const pnlPct = pnl / this.capital;
+
+        $('botActivePnl').textContent = M.fmt.signed(pnl, 2) + ' USDT';
+        $('botActivePnl').className = 'v ' + (pnl >= 0 ? 'up' : 'down');
+
+        // TP e SL molto più stretti (adatti a simulazioni brevi / Scalping)
+        // TP base: 0.2% | SL base: 0.1%
+        let takeProfit = 0.002, stopLoss = -0.001; 
+        if (this.strategy === 'conservativa') { takeProfit = 0.001; stopLoss = -0.0005; }
+        if (this.strategy === 'aggressiva') { takeProfit = 0.005; stopLoss = -0.003; }
+
+        // Calcola da quanti secondi è aperto il trade
+        const tradeDurationSecs = (Date.now() - this.openTrade.openTime) / 1000;
+
+        if (pnlPct >= takeProfit) {
+          this.closePosition(px, 'Take Profit');
+        } else if (pnlPct <= stopLoss) {
+          this.closePosition(px, 'Stop Loss');
+        } else if (tradeDurationSecs > 30 && Math.random() < 0.02) { 
+          // Uscita anticipata dinamica: 
+          // 1. Aspetta MINIMO 30 secondi per far muovere il prezzo
+          // 2. La probabilità di uscita a caso è crollata dal 10% al 2%
+          this.closePosition(px, 'Uscita segnale anticipato');
+        }
+      }
+    },
+
+    closePosition(px, reason) {
+      const diff = px - this.openTrade.entry;
+      const pnl = this.openTrade.type === 'LONG' ? (diff * this.openTrade.qty) : (-diff * this.openTrade.qty);
+      
+      this.capital += pnl; // Aggiorna il bilancio per il prossimo trade
+      
+      this.history.unshift({
+        id: Date.now(),
+        pair: this.pair,
+        type: this.openTrade.type,
+        entry: this.openTrade.entry,
+        close: px,
+        pnl: pnl,
+        reason: reason
+      });
+      
+      this.openTrade = null;
+      $('botActiveLog').textContent = `Ultima chiusura (${reason}). In attesa di nuovo setup...`;
+      $('botActivePnl').textContent = '0.00 USDT';
+      $('botActivePnl').className = 'v';
+      
+      this.renderHistory();
+    },
+
+    renderHistory() {
+      if (this.history.length === 0) return;
+      $('botHistoryEmpty').hidden = true;
+      $('botHistoryTable').hidden = false;
+      $('botHistoryBody').innerHTML = this.history.slice(0, 10).map(h => { // Mostra le ultime 10
+        const a = M.bySym[h.pair];
+        const k = h.pnl >= 0 ? 'up' : 'down';
+        return `<tr>
+          <td>${a.short}<small>${h.type}</small></td>
+          <td>${M.fmt.money(h.entry, a.dp)}<small>uscita: ${M.fmt.money(h.close, a.dp)}</small></td>
+          <td class="${k}">${M.fmt.signed(h.pnl, 2)}<small>${h.reason}</small></td>
+          <td></td>
+        </tr>`;
+      }).join('');
+    }
+  };
+
+  // Assegnazione Eventi Bottoni
+  $('btnStartBot').addEventListener('click', () => PaperBot.start());
+  $('btnStopBot').addEventListener('click', () => PaperBot.stop('Arresto manuale'));
+  
   applyPlanLimits();
 
   /* ---------- installazione sulla home ---------- */
