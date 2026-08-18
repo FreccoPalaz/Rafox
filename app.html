@@ -905,7 +905,9 @@
       const px = M.price(this.pair);
       if (!px) return;
 
+      // FEE SIMULATE (0.05% totale = 0.0005)
       const feeRate = 0.0005; 
+      const costoCommissioni = this.capital * feeRate;
 
       if (!this.openTrade) {
         let chance = 0.02; 
@@ -919,7 +921,6 @@
             type = Math.random() > 0.5 ? 'LONG' : 'SHORT';
           }
           
-          // Memorizziamo entry e impostiamo subito bestPrice uguale a entry
           this.openTrade = { type, entry: px, qty, openTime: Date.now(), bestPrice: px };
           
           const decimals = M.bySym[this.pair].dp;
@@ -930,9 +931,9 @@
         const diff = px - this.openTrade.entry;
         let pnlBrutto = this.openTrade.type === 'LONG' ? (diff * this.openTrade.qty) : (-diff * this.openTrade.qty);
         
-        const costoCommissioni = this.capital * feeRate;
+        // IL PNL NETTO INCLUDE GIÀ LA SOTTRAZIONE DELLE COMMISSIONI
         const pnlNetto = pnlBrutto - costoCommissioni;
-        const pnlPct = pnlNetto / this.capital;
+        const pnlPctNetto = pnlNetto / this.capital; // Percentuale di guadagno/perdita PULITA
 
         $('botActivePnl').textContent = M.fmt.signed(pnlNetto, 2) + ' €';
         $('botActivePnl').className = 'v ' + (pnlNetto >= 0 ? 'up' : 'down');
@@ -947,53 +948,71 @@
           if (this.openTrade.type === 'LONG' && px > this.openTrade.bestPrice) this.openTrade.bestPrice = px;
           if (this.openTrade.type === 'SHORT' && px < this.openTrade.bestPrice) this.openTrade.bestPrice = px;
 
-          // Calcola quanto il prezzo è sceso/salito rispetto al picco (ritracciamento)
-          let retracement = 0;
-          if (this.openTrade.type === 'LONG') {
-            retracement = (this.openTrade.bestPrice - px) / this.openTrade.bestPrice;
-          } else {
-            retracement = (px - this.openTrade.bestPrice) / this.openTrade.bestPrice;
-          }
+          let retracement = this.openTrade.type === 'LONG' 
+            ? (this.openTrade.bestPrice - px) / this.openTrade.bestPrice 
+            : (px - this.openTrade.bestPrice) / this.openTrade.bestPrice;
 
-          // Sensibilità: quanta variazione contraria tolleriamo prima di uscire?
-          let sensitivity, maxHoldSecs;
+          let sensitivity, maxHoldSecs, stopLossNetto;
           if (this.strategy === 'conservativa') {
-            sensitivity = 0.0003; // Tolleranza 0.03%: se inverte di un nulla, fugge
-            maxHoldSecs = 20;
+            sensitivity = 0.0005; // 0.05% di ritracciamento
+            stopLossNetto = -0.0005; // -0.05% netto
+            maxHoldSecs = 180;
           } else if (this.strategy === 'moderata') {
-            sensitivity = 0.0010; // Tolleranza 0.1%: respiro medio
-            maxHoldSecs = 40;
+            sensitivity = 0.0010; // 0.1% di ritracciamento
+            stopLossNetto = -0.0015; // -0.15% netto
+            maxHoldSecs = 240;
           } else if (this.strategy === 'aggressiva') {
-            sensitivity = 0.0025; // Tolleranza 0.25%: insegue trend molto larghi
-            maxHoldSecs = 60;
+            sensitivity = 0.0020; // 0.2% di ritracciamento
+            stopLossNetto = -0.0030; // -0.3% netto
+            maxHoldSecs = 300;
           }
 
+          // Se il prezzo inverte oltre la sensibilità...
           if (retracement >= sensitivity) {
-            // Capisce se l'inversione è avvenuta subito (Stop Loss) o dopo un guadagno (Trailing)
-            const motivo = this.openTrade.bestPrice === this.openTrade.entry ? 'Stop Loss rapido (Trend contrario)' : 'Trailing Stop (Trend invertito)';
-            this.closePosition(px, pnlNetto, costoCommissioni, motivo);
-          } else if (tradeDurationSecs >= maxHoldSecs) {
-            this.closePosition(px, pnlNetto, costoCommissioni, 'Time Stop');
+            // L'uscita dinamica scatta SOLO se le spese sono coperte e siamo in positivo netto!
+            if (pnlNetto > 0) {
+              this.closePosition(px, pnlNetto, costoCommissioni, 'Trailing Stop (Profitto Protetto)');
+            } else {
+              // Se le spese NON sono coperte, esce solo se tocca lo Stop Loss rigido (evita uscite anticipate in rosso)
+              if (pnlPctNetto <= stopLossNetto) {
+                this.closePosition(px, pnlNetto, costoCommissioni, 'Stop Loss (Trend contrario)');
+              }
+            }
+          } 
+          // Se non ha invertito ma tocca comunque lo stop loss massimo consentito
+          else if (pnlPctNetto <= stopLossNetto) {
+            this.closePosition(px, pnlNetto, costoCommissioni, 'Stop Loss Sicurezza');
+          } 
+          // Se il mercato è immobile
+          else if (tradeDurationSecs >= maxHoldSecs) {
+            this.closePosition(px, pnlNetto, costoCommissioni, 'Time Stop (Mercato laterale)');
           }
         } 
         // ==========================================
         // 2. LOGICA FISSA (Soglie P&L tradizionali)
         // ==========================================
         else {
-          let takeProfit, stopLoss, maxHoldSecs;
+          let targetNetto, stopLossNetto, maxHoldSecs;
 
+          // TARGET IMPOSTATI SUL GUADAGNO PULITO DA PORTARE A CASA
           if (this.strategy === 'conservativa') {
-            takeProfit = 0.002; stopLoss = -0.0002; maxHoldSecs = 20;
+            targetNetto = 0.001;     // Vuole +0.1% netto
+            stopLossNetto = -0.0005; // Esce a -0.05% netto
+            maxHoldSecs = 180;
           } else if (this.strategy === 'moderata') {
-            takeProfit = 0.0025; stopLoss = -0.001; maxHoldSecs = 40;
+            targetNetto = 0.002;     // Vuole +0.2% netto
+            stopLossNetto = -0.0015; // Esce a -0.15% netto
+            maxHoldSecs = 240;
           } else if (this.strategy === 'aggressiva') {
-            takeProfit = 0.0015; stopLoss = -0.0025; maxHoldSecs = 60;
+            targetNetto = 0.003;     // Vuole +0.3% netto (target più ambizioso)
+            stopLossNetto = -0.0025; // Tolleranza maggiore
+            maxHoldSecs = 300;
           }
 
-          if (pnlPct >= takeProfit) {
-            this.closePosition(px, pnlNetto, costoCommissioni, 'Take Profit');
-          } else if (pnlPct <= stopLoss) {
-            this.closePosition(px, pnlNetto, costoCommissioni, 'Stop Loss');
+          if (pnlPctNetto >= targetNetto) {
+            this.closePosition(px, pnlNetto, costoCommissioni, 'Take Profit Netto');
+          } else if (pnlPctNetto <= stopLossNetto) {
+            this.closePosition(px, pnlNetto, costoCommissioni, 'Stop Loss Netto');
           } else if (tradeDurationSecs >= maxHoldSecs) {
             this.closePosition(px, pnlNetto, costoCommissioni, 'Time Stop');
           }
