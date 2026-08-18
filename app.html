@@ -347,9 +347,13 @@
           <div>
             <label class="label" for="botDuration">Timer</label>
             <select id="botDuration" class="bot-input">
+              <option value="1">1 Minuto (Test)</option>
+              <option value="3">3 Minuti (Test)</option>
               <option value="5">5 Minuti (Test)</option>
+              <option value="30">30 Minuti</option>
               <option value="60">1 Ora</option>
               <option value="240">4 Ore</option>
+              <option value="720">12 Ore</option>
             </select>
           </div>
           <div>
@@ -358,6 +362,13 @@
               <option value="conservativa">Conservativa</option>
               <option value="moderata" selected>Moderata</option>
               <option value="aggressiva">Aggressiva</option>
+            </select>
+          </div>
+          <div>
+            <label class="label" for="botExitLogic">Logica Uscita</label>
+            <select id="botExitLogic" class="bot-input">
+              <option value="trailing" selected>Dinamica (Insegue il Trend)</option>
+              <option value="fixed">Fissa (Soglie P&L)</option>
             </select>
           </div>
           <div>
@@ -801,7 +812,10 @@
   }
 
   /* =====================================================================
-     MOTORE PAPER TRADING (In Euro, con tracking spese e resoconto)
+     MOTORE PAPER TRADING
+     ===================================================================== */
+  /* =====================================================================
+     MOTORE PAPER TRADING (Doppia Logica: Fissa vs Dinamica)
      ===================================================================== */
   const PaperBot = {
     running: false,
@@ -810,8 +824,9 @@
     endTime: 0,
     pair: null,
     strategy: null,
+    exitLogic: null, // Memorizza la logica scelta (fixed o trailing)
     capital: 0,
-    initialCapital: 0, // Per calcolare il profitto/perdita finale
+    initialCapital: 0,
     openTrade: null,
     history: [],
 
@@ -823,19 +838,21 @@
       
       this.pair = $('botPair').value;
       this.strategy = $('botStrategy').value;
+      this.exitLogic = $('botExitLogic') ? $('botExitLogic').value : 'trailing';
       this.capital = parseFloat($('botCapital').value) || 1000;
-      this.initialCapital = this.capital; // Salviamo il capitale di partenza
+      this.initialCapital = this.capital;
       const minutes = parseInt($('botDuration').value) || 60;
       
       this.endTime = Date.now() + minutes * 60 * 1000;
       this.running = true;
       this.openTrade = null;
-      this.history = []; // Resetta lo storico al nuovo avvio
+      this.history = []; 
 
       // Aggiorna Interfaccia
       $('botConfigPanel').hidden = true;
       $('botActivePanel').hidden = false;
-      $('botActivePair').textContent = M.bySym[this.pair].short + ' — ' + this.strategy.toUpperCase();
+      const logicName = this.exitLogic === 'trailing' ? 'DINAMICA' : 'FISSA';
+      $('botActivePair').textContent = `${M.bySym[this.pair].short} — ${this.strategy.toUpperCase()} (${logicName})`;
       $('botActivePnl').textContent = '0.00 €';
       $('botActivePnl').className = 'v';
       $('botActiveLog').textContent = 'Analisi mercato in corso... in attesa di setup.';
@@ -848,7 +865,7 @@
       this.timerId = setInterval(() => this.updateTimer(), 1000);
       this.logicId = setInterval(() => this.tick(), 500); 
       
-      toast('Bot Avviato', `Sessione Paper Trading su ${this.pair} iniziata.`);
+      toast('Bot Avviato', `Sessione su ${this.pair} iniziata.`);
     },
 
     stop(reason = 'Interrotto dall\'utente') {
@@ -857,7 +874,6 @@
       clearInterval(this.timerId);
       clearInterval(this.logicId);
 
-      // Chiudi eventuali posizioni aperte al volo
       if (this.openTrade) {
         const livePx = M.price(this.pair) || this.openTrade.entry;
         const diff = livePx - this.openTrade.entry;
@@ -867,13 +883,11 @@
         this.closePosition(livePx, pnlNetto, costoCommissioni, 'Chiusura sessione');
       }
 
-      // Calcolo del resoconto finale
       const profittoTotale = this.capital - this.initialCapital;
 
-      // Ripristina Interfaccia
       $('botConfigPanel').hidden = false;
       $('botActivePanel').hidden = true;
-      toast('Sessione Conclusa', `${reason}. Risultato Netto: ${M.fmt.signed(profittoTotale, 2)} €`);
+      toast('Sessione Conclusa', `${reason}. Risultato: ${M.fmt.signed(profittoTotale, 2)} €`);
     },
 
     updateTimer() {
@@ -891,32 +905,28 @@
       const px = M.price(this.pair);
       if (!px) return;
 
-      // FEE SIMULATE (0.05% totale)
       const feeRate = 0.0005; 
 
       if (!this.openTrade) {
-        // --- 1. REGOLE DI INGRESSO (BASATE SULLE TUE STRATEGIE) ---
-        let chance = 0.02; // Conservativo: entra raramente (poche operazioni, massima cautela)
-        
-        if (this.strategy === 'moderata') chance = 0.12;   // Moderato: entra più spesso, con bilanciamento
-        if (this.strategy === 'aggressiva') chance = 0.45;  // Aggressivo: entra spessissimo, a ripetizione
+        let chance = 0.02; 
+        if (this.strategy === 'moderata') chance = 0.12;
+        if (this.strategy === 'aggressiva') chance = 0.45;
         
         if (Math.random() < chance) {
           const qty = this.capital / px; 
-          
-          // L'aggressivo fa LONG e SHORT ovunque, conservativo e moderato preferiscono cercare il rialzo (LONG)
           let type = 'LONG';
           if (this.strategy === 'aggressiva') {
             type = Math.random() > 0.5 ? 'LONG' : 'SHORT';
           }
-
-          this.openTrade = { type, entry: px, qty, openTime: Date.now() };
+          
+          // Memorizziamo entry e impostiamo subito bestPrice uguale a entry
+          this.openTrade = { type, entry: px, qty, openTime: Date.now(), bestPrice: px };
           
           const decimals = M.bySym[this.pair].dp;
           $('botActiveLog').innerHTML = `Aperta posizione <b>${type}</b> a ${M.fmt.money(px, decimals)} €`;
         }
       } else {
-        // --- 2. GESTIONE P&L E USCITE ---
+        // GESTIONE P&L
         const diff = px - this.openTrade.entry;
         let pnlBrutto = this.openTrade.type === 'LONG' ? (diff * this.openTrade.qty) : (-diff * this.openTrade.qty);
         
@@ -925,36 +935,68 @@
         const pnlPct = pnlNetto / this.capital;
 
         $('botActivePnl').textContent = M.fmt.signed(pnlNetto, 2) + ' €';
-        $('botActivePnl'.className = 'v ' + (pnlNetto >= 0 ? 'up' : 'down');
-
-        // PARAMETRI DI RISCHIO DIVERSIFICATI PER STRATEGIA
-        let takeProfit, stopLoss, maxHoldSecs;
-
-        if (this.strategy === 'conservativa') {
-          takeProfit = 0.002;   // Cerca un guadagno pulito (+0.2%)
-          stopLoss = -0.0002;   // FUORI SUBITO se perde un minimo (-0.02%). Rischio quasi zero!
-          maxHoldSecs = 20;     // Se non sale subito, taglia corto.
-        } 
-        else if (this.strategy === 'moderata') {
-          takeProfit = 0.0025;  // Target equilibrato (+0.25%)
-          stopLoss = -0.001;    // Può permettersi di perdere un po' di più (-0.1%) per trovare il profitto
-          maxHoldSecs = 40;     // Più tempo per respirare
-        } 
-        else if (this.strategy === 'aggressiva') {
-          takeProfit = 0.0015;  // Prende piccoli profitti rapidi
-          stopLoss = -0.0025;   // Rischio alto: tollera perdite ampie (-0.25%) pur di rimanere a mercato
-          maxHoldSecs = 60;     // Lascia correre la posizione per fare tantissime operazioni
-        }
+        $('botActivePnl').className = 'v ' + (pnlNetto >= 0 ? 'up' : 'down');
 
         const tradeDurationSecs = (Date.now() - this.openTrade.openTime) / 1000;
 
-        // CONDIZIONI DI CHIUSURA
-        if (pnlPct >= takeProfit) {
-          this.closePosition(px, pnlNetto, costoCommissioni, 'Take Profit');
-        } else if (pnlPct <= stopLoss) {
-          this.closePosition(px, pnlNetto, costoCommissioni, 'Stop Loss (Taglio rischio)');
-        } else if (tradeDurationSecs >= maxHoldSecs) {
-          this.closePosition(px, pnlNetto, costoCommissioni, 'Time Stop');
+        // ==========================================
+        // 1. LOGICA DINAMICA (Trailing / Inversione)
+        // ==========================================
+        if (this.exitLogic === 'trailing') {
+          // Aggiorna il picco (bestPrice)
+          if (this.openTrade.type === 'LONG' && px > this.openTrade.bestPrice) this.openTrade.bestPrice = px;
+          if (this.openTrade.type === 'SHORT' && px < this.openTrade.bestPrice) this.openTrade.bestPrice = px;
+
+          // Calcola quanto il prezzo è sceso/salito rispetto al picco (ritracciamento)
+          let retracement = 0;
+          if (this.openTrade.type === 'LONG') {
+            retracement = (this.openTrade.bestPrice - px) / this.openTrade.bestPrice;
+          } else {
+            retracement = (px - this.openTrade.bestPrice) / this.openTrade.bestPrice;
+          }
+
+          // Sensibilità: quanta variazione contraria tolleriamo prima di uscire?
+          let sensitivity, maxHoldSecs;
+          if (this.strategy === 'conservativa') {
+            sensitivity = 0.0003; // Tolleranza 0.03%: se inverte di un nulla, fugge
+            maxHoldSecs = 20;
+          } else if (this.strategy === 'moderata') {
+            sensitivity = 0.0010; // Tolleranza 0.1%: respiro medio
+            maxHoldSecs = 40;
+          } else if (this.strategy === 'aggressiva') {
+            sensitivity = 0.0025; // Tolleranza 0.25%: insegue trend molto larghi
+            maxHoldSecs = 60;
+          }
+
+          if (retracement >= sensitivity) {
+            // Capisce se l'inversione è avvenuta subito (Stop Loss) o dopo un guadagno (Trailing)
+            const motivo = this.openTrade.bestPrice === this.openTrade.entry ? 'Stop Loss rapido (Trend contrario)' : 'Trailing Stop (Trend invertito)';
+            this.closePosition(px, pnlNetto, costoCommissioni, motivo);
+          } else if (tradeDurationSecs >= maxHoldSecs) {
+            this.closePosition(px, pnlNetto, costoCommissioni, 'Time Stop');
+          }
+        } 
+        // ==========================================
+        // 2. LOGICA FISSA (Soglie P&L tradizionali)
+        // ==========================================
+        else {
+          let takeProfit, stopLoss, maxHoldSecs;
+
+          if (this.strategy === 'conservativa') {
+            takeProfit = 0.002; stopLoss = -0.0002; maxHoldSecs = 20;
+          } else if (this.strategy === 'moderata') {
+            takeProfit = 0.0025; stopLoss = -0.001; maxHoldSecs = 40;
+          } else if (this.strategy === 'aggressiva') {
+            takeProfit = 0.0015; stopLoss = -0.0025; maxHoldSecs = 60;
+          }
+
+          if (pnlPct >= takeProfit) {
+            this.closePosition(px, pnlNetto, costoCommissioni, 'Take Profit');
+          } else if (pnlPct <= stopLoss) {
+            this.closePosition(px, pnlNetto, costoCommissioni, 'Stop Loss');
+          } else if (tradeDurationSecs >= maxHoldSecs) {
+            this.closePosition(px, pnlNetto, costoCommissioni, 'Time Stop');
+          }
         }
       }
     },
@@ -969,7 +1011,7 @@
         entry: this.openTrade.entry,
         close: px,
         pnl: pnlNettoReale,
-        fee: costoCommissioni, // Salviamo le spese
+        fee: costoCommissioni,
         reason: reason
       });
       
@@ -1000,7 +1042,7 @@
 
   // Assegnazione Eventi Bottoni
   $('btnStartBot').addEventListener('click', () => PaperBot.start());
-  if($('btnStopBot')) $('btnStopBot').addEventListener('click', () => PaperBot.stop('Arresto manuale'));
+  $('btnStopBot').addEventListener('click', () => PaperBot.stop('Arresto manuale'));
   
   applyPlanLimits();
 
