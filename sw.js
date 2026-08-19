@@ -2,11 +2,12 @@
    I dati di mercato NON vengono mai messi in cache — un prezzo vecchio
    è peggio di un prezzo assente. */
 
-const CACHE = 'rafox-v9';
+const CACHE = 'rafox-v15';
 const SHELL = [
   'app.html',
   'index.html',
   'rafox-market.js',
+  'rafox-api.js',
   'manifest.json',
   'icon-192.png',
   'icon-512.png',

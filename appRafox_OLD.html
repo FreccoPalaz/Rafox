@@ -139,12 +139,6 @@
     padding:13px 20px;cursor:pointer;letter-spacing:0.02em;transition:background .2s;width:100%;
   }
   .btn:hover{background:#FFC640;}
-  .btn-ghost{
-    background:transparent;color:var(--amber);border:1px solid var(--amber-dim);
-    font-family:'IBM Plex Mono',monospace;font-weight:600;cursor:pointer;
-    letter-spacing:0.02em;transition:background .2s,border-color .2s;
-  }
-  .btn-ghost:hover{background:rgba(255,176,0,0.08);border-color:var(--amber);}
   .btn-x{
     background:transparent;border:none;color:var(--ink-dim);cursor:pointer;
     font-family:'IBM Plex Mono',monospace;font-size:16px;line-height:1;padding:4px 6px;
@@ -214,6 +208,84 @@
     display:block;font-family:'IBM Plex Mono',monospace;font-size:10px;
     letter-spacing:0.12em;text-transform:uppercase;color:var(--amber);margin-bottom:4px;
   }
+
+/* =========================================================
+     MIGLIORAMENTI DESIGN: Premium, Terminale e Transizioni
+     ========================================================= */
+  
+  /* 1. Badge Elite/Pro e Pannello Premium */
+  .badge-plan {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 2px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-left: 10px;
+  }
+  .badge-pro { background: var(--amber); color: var(--bg); }
+  .badge-elite { background: var(--up); color: var(--bg); }
+  .panel-premium { border-color: var(--amber-dim); position: relative; overflow: hidden; }
+  .panel-premium::before {
+    content: ''; position: absolute; top: 0; left: 0; width: 3px; height: 100%; background: var(--amber);
+  }
+
+  /* 2. Terminale Sessione Live */
+  .live-indicator {
+    display: inline-block;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--up);
+    box-shadow: 0 0 8px var(--up);
+    animation: pulse-live 1.5s infinite;
+    margin-right: 8px;
+  }
+  @keyframes pulse-live {
+    0% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(1.2); }
+    100% { opacity: 1; transform: scale(1); }
+  }
+  .huge-pnl {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: clamp(32px, 8vw, 46px);
+    font-weight: 700;
+    display: block;
+    margin: 14px 0;
+    letter-spacing: -0.02em;
+  }
+  .console-log {
+    background: var(--bg);
+    border: 1px dashed var(--grid);
+    padding: 16px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12.5px;
+    color: var(--ink-dim);
+    margin-top: 16px;
+    text-align: left;
+    border-radius: 4px;
+  }
+  .console-log b { color: var(--ink); }
+
+  /* 3. Micro-interazioni e Transizioni */
+  .view.active {
+    animation: fade-in 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  @keyframes fade-in {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .btn {
+    transition: all 0.2s ease;
+  }
+  .btn:active {
+    transform: scale(0.98); /* Effetto "tasto premuto" tattile */
+  }
+  .tabbar button {
+    transition: color 0.2s ease, border-color 0.2s ease;
+  }
+  
 </style>
 </head>
 <body>
@@ -352,20 +424,28 @@
     <!-- Area operativa -->
     <div id="botArea" hidden>
 
-      <div class="panel">
-        <div class="panel-head"><h3>Conto demo</h3><em id="accountPlan">&mdash;</em></div>
+      <div class="panel panel-premium">
+        <div class="panel-head">
+          <h3 style="color: var(--amber); display: flex; align-items: center;">
+            <span class="live-indicator" id="liveDot" hidden></span> Conto demo
+          </h3>
+          <em id="accountPlan" style="display:flex; align-items:center;">&mdash;</em>
+        </div>
         <div class="panel-body">
-          <div class="daily" style="border-top:none;padding-top:0;margin-top:0;">
+          <div style="text-align: center; margin-bottom: 20px;">
+            <span class="k" style="color: var(--ink-dim); font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase;">P&amp;L Totale</span>
+            <span class="huge-pnl" id="accPnl">&mdash;</span>
+          </div>
+          <div class="daily" style="border-top:1px solid var(--grid);padding-top:14px;margin-top:0;">
             <span>Equity <b id="accEquity">&mdash;</b></span>
             <span>Liquidit&agrave; <b id="accCash">&mdash;</b></span>
             <span>Investito <b id="accInvested">&mdash;</b></span>
-            <span>P&amp;L totale <b id="accPnl">&mdash;</b></span>
           </div>
           <table id="accTable" hidden>
             <thead><tr><th>Asset</th><th>Valore</th><th>P&amp;L</th><th>Stop</th></tr></thead>
             <tbody id="accBody"></tbody>
           </table>
-          <div class="empty" id="accEmpty">Nessuna posizione aperta dal bot.</div>
+          <div class="empty" id="accEmpty" style="margin-top: 20px;">Nessuna posizione aperta dal bot.</div>
           <p class="note" id="accStale" hidden>
             Prezzi di mercato non disponibili in questo momento: i valori mostrati non sono aggiornati.
           </p>
@@ -390,13 +470,11 @@
             <div id="suggestionText" style="font-family:var(--mono);color:var(--amber);font-size:15px;">&mdash;</div>
             <ul id="suggestionReasons" style="margin:10px 0 0;padding-left:18px;color:var(--ink-dim);font-size:13px;line-height:1.6;"></ul>
             <div id="suggestionWarnings"></div>
-            <div id="entrySignalBox" style="margin-top:14px;"></div>
           </div>
           <p class="note">
             Sono misure del mercato di adesso, <b>non una previsione</b>. Indicano quale
-            combinazione strategia/durata &egrave; meccanicamente adatta alle condizioni
-            correnti &mdash; e cambiano ogni volta che il mercato si muove, non sono fisse.
-            Nessuno di questi numeri dice cosa succeder&agrave; da qui alla fine della sessione.
+            strategia &egrave; meccanicamente adatta alle condizioni correnti, che possono
+            cambiare in qualsiasi momento. Nessuno di questi numeri dice cosa succeder&agrave;.
           </p>
         </div>
       </div>
@@ -862,15 +940,14 @@
     }
   }
 
-  function fillSymbolChoices(plan, accountType){
-    // deve restare allineato ai limiti del server; il server decide comunque.
-    // Il conto demo non ha restrizioni di simboli: mostra l'elenco più ampio.
+  function fillSymbolChoices(plan){
+    // deve restare allineato ai limiti del server; il server decide comunque
     const byPlan = {
       starter: [],
       pro:   ['BTCUSDT','ETHUSDT','SOLUSDT'],
       elite: ['BTCUSDT','ETHUSDT','SOLUSDT','BNBUSDT','XRPUSDT','AVAXUSDT','LINKUSDT']
     };
-    const list = accountType === 'demo' ? byPlan.elite : (byPlan[plan] || []);
+    const list = byPlan[plan] || [];
     $('botPair').innerHTML = list
       .map(s => `<option value="${s}">${M.bySym[s] ? M.bySym[s].label : s}</option>`).join('');
     if (list.length) $('botPair').options[0].selected = true;
@@ -906,6 +983,9 @@
     const active = s && s.status === 'active';
     $('btnStopBot').hidden = !active;
     $('btnStartBot').disabled = active;
+    
+    // Accende o spegne il pallino rosso/verde del live
+    if ($('liveDot')) $('liveDot').hidden = !active; 
 
     if (!s || s.status === 'none') { $('sessionState').textContent = 'nessuna sessione'; return; }
     if (active) {
@@ -927,9 +1007,7 @@
       session_started:'sessione avviata', session_finished:'sessione conclusa',
       position_opened:'posizione aperta', position_closed:'posizione chiusa',
       order_approved:'ordine approvato', order_rejected:'ordine rifiutato',
-      emergency_stop:'arresto emergenza', market_unavailable:'mercato non disponibile',
-      waiting_for_entry:'in attesa di ingresso', duration_warning:'avviso durata',
-      position_held:'posizione mantenuta'
+      emergency_stop:'arresto emergenza', market_unavailable:'mercato non disponibile'
     };
     $('auditBody').innerHTML = rows.map(r => {
       const t = new Date(r.at).toLocaleTimeString('it-IT');
@@ -967,17 +1045,10 @@
     $('suggestionBox').hidden = false;
 
     const labels = { conservative:'Conservativa', moderate:'Moderata', aggressive:'Aggressiva' };
-    const durLabels = { 60:'1 ora', 180:'3 ore', 300:'5 ore', 480:'8 ore', 720:'12 ore', 1440:'24 ore' };
-
     if (s.strategy) {
-      const durMin = s.suggested_duration_minutes;
-      const durTxt = durLabels[durMin] || (durMin ? (durMin + ' minuti') : '');
       $('suggestionText').innerHTML =
         `${labels[s.strategy] || s.strategy} <small style="color:var(--ink-dim);">` +
-        `\u2014 lettura ${s.confidence}</small>` +
-        (durTxt ? ` <button type="button" id="btnApplySuggestion" class="btn-ghost" ` +
-          `style="margin-left:10px;font-size:12px;padding:4px 10px;">` +
-          `Applica: ${labels[s.strategy]} \u00b7 ${durTxt}</button>` : '');
+        `\u2014 lettura ${s.confidence}</small>`;
     } else {
       $('suggestionText').innerHTML =
         '<span class="down">Nessuna strategia adatta a questa durata</span>';
@@ -988,46 +1059,11 @@
 
     $('suggestionWarnings').innerHTML = (s.warnings || [])
       .map(w => `<div class="warn" style="margin-top:10px;">${w}</div>`).join('');
-
-    const signals = data.entry_signals || [];
-    if (signals.length) {
-      const rows = signals.map(sig => {
-        const sym = M.bySym[sig.symbol] ? M.bySym[sig.symbol].short : sig.symbol;
-        const cls = sig.action === 'buy' ? 'up' : (sig.action === 'sell' ? 'down' : '');
-        const label = sig.action === 'buy' ? 'ingresso valido'
-                    : sig.action === 'sell' ? 'uscita'
-                    : 'in attesa';
-        return `<div style="display:flex;justify-content:space-between;gap:10px;padding:4px 0;">
-          <span>${sym} <small style="color:var(--ink-dim);">(${sig.interval || ''})</small></span>
-          <span class="${cls}">${label}</span>
-        </div>`;
-      }).join('');
-      $('entrySignalBox').innerHTML =
-        `<div class="label" style="margin-bottom:6px;">Segnale d'ingresso adesso, sul grafico della strategia</div>` +
-        rows +
-        `<p style="color:var(--ink-dim);font-size:12px;margin-top:8px;line-height:1.5;">
-          Questa lettura usa un timeframe diverso da quello della tabella sopra:
-          pu&ograve; restare "in attesa" anche quando il regime generale &egrave;
-          favorevole. &Egrave; lo stesso calcolo che user&agrave; il bot per decidere,
-          non un'approssimazione.
-        </p>`;
-    } else {
-      $('entrySignalBox').innerHTML = '';
-    }
-
-    const applyBtn = document.getElementById('btnApplySuggestion');
-    if (applyBtn) {
-      applyBtn.addEventListener('click', () => {
-        if (s.strategy) $('botStrategy').value = s.strategy;
-        if (s.suggested_duration_minutes) $('botDuration').value = s.suggested_duration_minutes;
-        $('botStrategy').dispatchEvent(new Event('change'));
-        scheduleRegime();
-      });
-    }
   }
 
   async function refreshRegime(){
     const symbols = Array.from($('botPair').selectedOptions).map(o => o.value);
+    const minutes = parseInt($('botDuration').value, 10);
     if (!symbols.length) {
       $('regimeEmpty').hidden = false;
       $('regimeTable').hidden = true;
@@ -1036,10 +1072,7 @@
     }
     $('regimeState').textContent = 'lettura in corso\u2026';
     try {
-      // Nessuna durata inviata: il consiglio è libero, sceglie strategia
-      // E durata dal regime di mercato. Se l'utente ne ha già scelta una
-      // diversa dal menu, la useremo solo per il pulsante "Avvia bot".
-      paintRegime(await API.regime(symbols, null));
+      paintRegime(await API.regime(symbols, minutes));
     } catch (e) {
       $('regimeState').textContent = 'non disponibile';
       $('regimeEmpty').hidden = false;
@@ -1083,11 +1116,15 @@
       account = accounts.find(a => a.type === 'demo') || accounts[0];
       if (!account) { toast('Nessun conto', 'Il tuo utente non ha conti collegati.'); return; }
 
-      $('accountPlan').textContent = 'piano ' + info.plan;
-      const canBot = account.type === 'demo' || info.plan !== 'starter';
+      // Aggiunge i badge PRO/ELITE
+      let badgeHtml = '';
+      if (info.plan === 'pro') badgeHtml = '<span class="badge-plan badge-pro">PRO</span>';
+      else if (info.plan === 'elite') badgeHtml = '<span class="badge-plan badge-elite">ELITE</span>';
+      $('accountPlan').innerHTML = 'piano ' + info.plan + badgeHtml;
+      const canBot = info.plan !== 'starter';
       $('upgrade-banner').hidden = canBot;
       document.querySelectorAll('.bot-input').forEach(el => { el.disabled = !canBot; });
-      fillSymbolChoices(info.plan, account.type);
+      fillSymbolChoices(info.plan);
 
       showAuthOrBot();
       await loadStrategies();
@@ -1137,6 +1174,7 @@
     });
 
     $('botPair').addEventListener('change', scheduleRegime);
+    $('botDuration').addEventListener('change', scheduleRegime);
 
     $('btnStartBot').addEventListener('click', async () => {
       const symbols = Array.from($('botPair').selectedOptions).map(o => o.value);

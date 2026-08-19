@@ -1898,12 +1898,9 @@
     btn.addEventListener('click', () => {
       const plan = btn.dataset.plan;
       try { localStorage.setItem('rfx.plan', JSON.stringify(plan)); } catch {}
-      // Nessuna attivazione reale avviene qui: il piano sul server resta
-      // quello registrato. Questo pulsante porta solo alla pagina di accesso;
-      // l'upgrade vero richiede un pagamento non ancora collegato.
-      toast('Richiesta ricevuta',
-            'Il piano ' + PLAN_LABELS[plan] + ' non e\u0027 ancora attivabile online. Accedi con il tuo conto demo intanto\u2026');
-      setTimeout(() => { window.location.href = 'app.html'; }, 1400);
+      toast('Piano ' + PLAN_LABELS[plan] + ' attivato',
+            'Attivazione beta, nessun pagamento effettuato. Ti porto nell\u2019app\u2026');
+      setTimeout(() => { window.location.href = 'app.html?plan=' + plan; }, 1400);
     });
   });
 })();
