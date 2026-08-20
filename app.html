@@ -12,16 +12,16 @@
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root{
-    /* Colori Fintech Moderni */
-    --bg: #0F172A; /* Blu slate profondo, elegante */
-    --bg-panel: #1E293B; /* Pannelli in risalto morbido */
+    /* Colori Fintech Moderni — scuriti per maggiore contrasto con pannelli e grafico */
+    --bg: #070B14; /* Blu slate quasi nero, più profondo dell'originale */
+    --bg-panel: #131B2E; /* Pannelli in risalto più netto sul fondo scurito */
     --amber: #F59E0B; /* Oro Rafox per mantenere il brand */
     --amber-dim: #B45309;
     --ink: #F8FAFC;
     --ink-dim: #94A3B8;
     --grid: #334155;
-    --up: #10B981; /* Verde smeraldo per i profitti */
-    --down: #EF4444; /* Rosso vibrante per le perdite */
+    --up: #16E092; /* Verde smeraldo più acceso: risalta di più sul fondo scuro */
+    --down: #FF5A6E; /* Rosso più vibrante, stesso motivo */
   }
 
   /* Arrotondiamo i bordi per un look più moderno (stile App) */
@@ -88,8 +88,8 @@
     font-family:'IBM Plex Mono',monospace;font-weight:600;
     font-size:clamp(30px,8vw,42px);transition:color .18s;
   }
-  #price.tick-up{color:var(--up);}
-  #price.tick-down{color:var(--down);}
+  #price.tick-up{color:var(--up);text-shadow:0 0 18px rgba(22,224,146,.5);}
+  #price.tick-down{color:var(--down);text-shadow:0 0 18px rgba(255,90,110,.5);}
   #chg{font-family:'IBM Plex Mono',monospace;font-size:15px;}
   .up{color:var(--up);}
   .down{color:var(--down);}
@@ -109,15 +109,20 @@
   select:focus,input:focus{border-color:var(--amber-dim);}
   select:focus-visible,input:focus-visible,button:focus-visible{outline:2px solid var(--amber);outline-offset:2px;}
 
-  .frames{display:flex;margin:18px 0 12px;}
+  .frames{display:flex;margin:18px 0 12px;background:var(--bg);border-radius:10px;padding:4px;gap:2px;}
   .frames button{
-    flex:1;background:transparent;border:1px solid var(--grid);border-left-width:0;
-    color:var(--ink-dim);font-family:'IBM Plex Mono',monospace;font-size:12px;
-    padding:11px 0;cursor:pointer;
+    flex:1;background:transparent;border:none;border-radius:7px;
+    color:var(--ink-dim);font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;
+    padding:10px 0;cursor:pointer;transition:background .18s,color .18s,box-shadow .18s;
   }
-  .frames button:first-child{border-left-width:1px;}
-  .frames button[aria-pressed="true"]{background:var(--bg-panel);color:var(--amber);border-color:var(--amber-dim);}
-  #chart{height:340px;border:1px solid var(--grid);background:var(--bg-panel);}
+  .frames button[aria-pressed="true"]{
+    background:var(--amber);color:var(--bg);
+    box-shadow:0 4px 14px rgba(245,158,11,.35);
+  }
+  #chart{
+    height:340px;border:1px solid var(--grid);background:var(--bg-panel);
+    box-shadow:0 0 0 1px rgba(0,0,0,.3), 0 20px 50px rgba(0,0,0,.35);
+  }
   @media(max-width:640px){#chart{height:260px;}}
   .fallback{
     display:none;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--ink-dim);
@@ -125,7 +130,10 @@
   }
 
   /* ---------- pannelli ---------- */
-  .panel{background:var(--bg-panel);border:1px solid var(--grid);margin-bottom:22px;}
+  .panel{
+    background:var(--bg-panel);border:1px solid var(--grid);margin-bottom:22px;
+    box-shadow:0 1px 0 rgba(255,255,255,.02) inset, 0 10px 30px rgba(0,0,0,.25);
+  }
   .panel-head{
     display:flex;justify-content:space-between;align-items:center;gap:12px;
     padding:14px 18px;border-bottom:1px solid var(--grid);
@@ -145,15 +153,120 @@
   .btn{
     background:var(--amber);color:var(--bg);border:none;
     font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:13px;
-    padding:13px 20px;cursor:pointer;letter-spacing:0.02em;transition:background .2s;width:100%;
+    padding:13px 20px;cursor:pointer;letter-spacing:0.02em;width:100%;
+    box-shadow:0 0 0 1px rgba(245,158,11,.2), 0 6px 18px rgba(245,158,11,.14);
+    transition:background .2s, box-shadow .2s, transform .15s;
   }
-  .btn:hover{background:#FFC640;}
+  .btn:hover{
+    background:#FFC640;transform:translateY(-1px);
+    box-shadow:0 0 0 1px rgba(245,158,11,.35), 0 10px 26px rgba(245,158,11,.24);
+  }
+  .btn:active{transform:translateY(0);}
   .btn-ghost{
     background:transparent;color:var(--amber);border:1px solid var(--amber-dim);
     font-family:'IBM Plex Mono',monospace;font-weight:600;cursor:pointer;
-    letter-spacing:0.02em;transition:background .2s,border-color .2s;
+    letter-spacing:0.02em;transition:background .2s,border-color .2s,box-shadow .2s;
   }
-  .btn-ghost:hover{background:rgba(255,176,0,0.08);border-color:var(--amber);}
+  .btn-ghost:hover{
+    background:rgba(255,176,0,0.08);border-color:var(--amber);
+    box-shadow:0 0 14px rgba(245,158,11,.15);
+  }
+
+  /* ---------- wizard Bot Live ---------- */
+  .step-head h3{display:flex;align-items:center;gap:8px;}
+  .step-num{
+    display:inline-flex;align-items:center;justify-content:center;
+    width:20px;height:20px;border-radius:50%;background:var(--amber);color:var(--bg);
+    font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;flex:none;
+  }
+  .pill{
+    display:inline-flex;align-items:center;gap:6px;
+    font-family:'IBM Plex Mono',monospace;font-size:11.5px;font-weight:600;
+    padding:5px 11px;border-radius:20px;border:1px solid var(--grid);white-space:nowrap;
+  }
+  .pill::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--ink-dim);}
+  .pill.up{color:var(--up);border-color:var(--up);background:rgba(16,185,129,0.08);}
+  .pill.up::before{background:var(--up);}
+  .pill.down{color:var(--down);border-color:var(--down);background:rgba(239,68,68,0.08);}
+  .pill.down::before{background:var(--down);}
+
+  /* ---------- Step 1: chip prezzo asset selezionato ---------- */
+  .asset-chip{
+    display:inline-flex;align-items:center;gap:8px;
+    font-family:'IBM Plex Mono',monospace;font-size:12.5px;
+    padding:6px 12px;border-radius:20px;border:1px solid var(--grid);
+    background:var(--bg);color:var(--ink-dim);
+  }
+  .asset-chip b{color:var(--ink);font-weight:600;}
+
+  /* ---------- Step 2: pulsante primario in evidenza ---------- */
+  .btn-glow{
+    background:var(--amber);color:var(--bg);border:none;border-radius:10px;
+    font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:14px;
+    padding:14px 22px;cursor:pointer;letter-spacing:0.02em;width:100%;
+    box-shadow:0 0 0 1px rgba(245,158,11,.25), 0 8px 24px rgba(245,158,11,.18);
+    transition:box-shadow .2s, transform .15s, background .2s;
+  }
+  .btn-glow:hover{background:#FFC640;box-shadow:0 0 0 1px rgba(245,158,11,.4), 0 10px 30px rgba(245,158,11,.28);}
+  .btn-glow:active{transform:translateY(1px);}
+
+  .advisor-text{
+    font-family:'Inter',sans-serif;font-size:15.5px;line-height:1.65;color:var(--ink);
+  }
+
+  /* ---------- schede strategia (Step 3) ---------- */
+  .strategy-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:8px;}
+  @media(max-width:520px){.strategy-cards{grid-template-columns:1fr;}}
+  .strategy-card{
+    background:var(--bg);border:1px solid var(--grid);border-radius:10px;
+    padding:14px 12px;cursor:pointer;text-align:left;
+    transition:border-color .18s,box-shadow .18s,transform .12s;
+  }
+  .strategy-card:hover{border-color:var(--amber-dim);transform:translateY(-1px);}
+  .strategy-card.active{
+    border-color:var(--amber);
+    box-shadow:0 0 0 1px var(--amber), 0 8px 20px rgba(245,158,11,.15);
+  }
+  .strategy-card .sc-icon{font-size:18px;margin-bottom:6px;}
+  .strategy-card .sc-label{
+    font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:13px;color:var(--ink);
+    margin-bottom:8px;
+  }
+  .strategy-card .sc-meter{
+    width:100%;height:3px;border-radius:2px;background:var(--grid);overflow:hidden;
+  }
+  .strategy-card .sc-meter span{display:block;height:100%;background:var(--amber);}
+  .strategy-card .sc-meter-label{
+    font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:var(--ink-dim);
+    margin-top:5px;letter-spacing:0.04em;text-transform:uppercase;
+  }
+
+  /* ---------- watchlist (Mercati) ---------- */
+  .watch-row{
+    display:flex;align-items:center;justify-content:space-between;gap:12px;
+    padding:13px 18px;margin:0 -18px;cursor:pointer;border-bottom:1px solid var(--grid);
+    transition:background .15s,border-color .15s;border-left:3px solid transparent;
+  }
+  .watch-row:last-child{border-bottom:none;}
+  .watch-row:hover{background:rgba(255,255,255,.03);}
+  .watch-row.active{background:rgba(245,158,11,.07);border-left-color:var(--amber);}
+  .watch-row .wr-left{display:flex;flex-direction:column;gap:2px;min-width:0;}
+  .watch-row .wr-sym{font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:13.5px;color:var(--ink);}
+  .watch-row .wr-name{font-family:'Inter',sans-serif;font-size:11px;color:var(--ink-dim);
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .watch-row .wr-right{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex:none;}
+  .watch-row .wr-price{font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:13.5px;color:var(--ink);}
+  details.collapse{margin-top:14px;border-top:1px dashed var(--grid);padding-top:12px;}
+  details.collapse > summary{
+    cursor:pointer;list-style:none;font-family:'IBM Plex Mono',monospace;
+    font-size:11.5px;color:var(--amber-dim);letter-spacing:0.04em;
+    display:flex;align-items:center;gap:6px;user-select:none;
+  }
+  details.collapse > summary::-webkit-details-marker{display:none;}
+  details.collapse > summary::before{content:'▸';transition:transform .15s;}
+  details.collapse[open] > summary::before{transform:rotate(90deg);}
+  details.collapse > summary:hover{color:var(--amber);}
+  details.collapse .collapse-body{padding-top:12px;}
   .btn-x{
     background:transparent;border:none;color:var(--ink-dim);cursor:pointer;
     font-family:'IBM Plex Mono',monospace;font-size:16px;line-height:1;padding:4px 6px;
@@ -178,6 +291,35 @@
     font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--ink-dim);
     border:1px dashed var(--grid);padding:18px;margin-top:18px;line-height:1.7;
   }
+  .audit-row{
+    padding:13px 0;border-bottom:1px dashed var(--grid);
+    font-family:'IBM Plex Mono',monospace;font-size:12.5px;
+  }
+  .audit-row:last-child{border-bottom:none;}
+  .audit-row .audit-top{
+    display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:5px;
+  }
+  .audit-row .audit-time{color:var(--ink-dim);font-size:11.5px;flex:none;}
+  .audit-row .audit-event{font-weight:600;}
+  .audit-row .audit-sym{color:var(--ink-dim);font-size:11px;}
+  .audit-row .audit-reason{
+    color:var(--ink-dim);font-size:12px;line-height:1.55;
+    word-break:break-word;overflow-wrap:anywhere;
+  }
+
+  /* ---------- righe portafoglio / alert ---------- */
+  .item-row{
+    display:flex;align-items:center;justify-content:space-between;gap:12px;
+    padding:13px 0;border-bottom:1px dashed var(--grid);
+  }
+  .item-row:last-child{border-bottom:none;}
+  .item-row .ir-left{display:flex;flex-direction:column;gap:3px;min-width:0;}
+  .item-row .ir-sym{font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:13.5px;color:var(--ink);}
+  .item-row .ir-sub{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink-dim);}
+  .item-row .ir-right{display:flex;align-items:center;gap:10px;flex:none;}
+  .item-row .ir-values{display:flex;flex-direction:column;align-items:flex-end;gap:3px;}
+  .item-row .ir-value{font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:13.5px;}
+  .item-row .ir-sub2{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink-dim);}
   .total{
     display:flex;justify-content:space-between;align-items:baseline;gap:12px;
     font-family:'IBM Plex Mono',monospace;
@@ -282,31 +424,47 @@
   </div>
 
   <section class="view active" id="view-mercati">
-    <label class="label" for="symbol">Strumento</label>
-    <select id="symbol"></select>
+    <select id="symbol" style="position:absolute;width:1px;height:1px;overflow:hidden;opacity:0;"></select>
 
-    <div class="quote-row">
-      <span id="price">—</span>
-      <span id="chg">—</span>
-    </div>
-    <div class="daily">
-      <span>Max 24h <b id="high">—</b></span>
-      <span>Min 24h <b id="low">—</b></span>
-      <span>Volume 24h <b id="vol">—</b></span>
+    <div class="panel">
+      <div class="panel-head"><h3>Mercati</h3><em id="watchlistState"></em></div>
+      <div class="panel-body">
+        <select id="watchSort" style="margin-bottom:14px;">
+          <option value="default">Ordine predefinito</option>
+          <option value="pct_desc">Variazione 24h: dalla maggiore</option>
+          <option value="pct_asc">Variazione 24h: dalla minore</option>
+          <option value="name_asc">Nome: A-Z</option>
+        </select>
+        <div id="watchlist"></div>
+      </div>
     </div>
 
-    <div class="frames" role="group" aria-label="Intervallo del grafico">
-      <button type="button" data-tf="1m">1m</button>
-      <button type="button" data-tf="15m">15m</button>
-      <button type="button" data-tf="1h" aria-pressed="true">1h</button>
-      <button type="button" data-tf="4h">4h</button>
-      <button type="button" data-tf="1d">1g</button>
+    <div class="panel">
+      <div class="panel-body">
+        <div class="quote-row">
+          <span id="price">—</span>
+          <span id="chg">—</span>
+        </div>
+        <div class="daily">
+          <span>Max 24h <b id="high">—</b></span>
+          <span>Min 24h <b id="low">—</b></span>
+          <span>Volume 24h <b id="vol">—</b></span>
+        </div>
+
+        <div class="frames" role="group" aria-label="Intervallo del grafico">
+          <button type="button" data-tf="1m">1m</button>
+          <button type="button" data-tf="15m">15m</button>
+          <button type="button" data-tf="1h" aria-pressed="true">1h</button>
+          <button type="button" data-tf="4h">4h</button>
+          <button type="button" data-tf="1d">1g</button>
+        </div>
+        <div id="chart"></div>
+        <p class="fallback" id="chartFallback">
+          Il grafico non si è caricato: la libreria non è raggiungibile da questa rete.
+          I prezzi qui sopra continuano ad aggiornarsi.
+        </p>
+      </div>
     </div>
-    <div id="chart"></div>
-    <p class="fallback" id="chartFallback">
-      Il grafico non si è caricato: la libreria non è raggiungibile da questa rete.
-      I prezzi qui sopra continuano ad aggiornarsi.
-    </p>
   </section>
 
   <section class="view" id="view-portafoglio">
@@ -340,14 +498,12 @@
       <div class="panel-head"><h3>Posizioni</h3><em id="pfCount"></em></div>
       <div class="panel-body">
         <div class="empty" id="pfEmpty">Nessuna posizione. Aggiungine una per vedere il P&amp;L muoversi sui prezzi reali.</div>
-        <table id="pfTable" hidden>
-          <thead><tr><th>Asset</th><th>Valore</th><th>P&amp;L</th><th></th></tr></thead>
-          <tbody id="pfBody"></tbody>
-        </table>
-        <div class="total" id="pfTotal" hidden>
-          <span class="k">Totale · P&amp;L</span>
-          <span class="v" id="pfTotalVal">—</span>
+        <div id="pfSummary" class="stat-grid" hidden style="grid-template-columns:repeat(3,1fr);margin-bottom:4px;">
+          <div class="stat-card"><span class="k">Valore attuale</span><span class="v" id="pfSumValue">&mdash;</span></div>
+          <div class="stat-card"><span class="k">Costo</span><span class="v" id="pfSumCost">&mdash;</span></div>
+          <div class="stat-card"><span class="k">P&amp;L</span><span class="v" id="pfSumPnl">&mdash;</span></div>
         </div>
+        <div id="pfList"></div>
         <p class="note">P&amp;L calcolato sul prezzo di mercato corrente. Commissioni, spread e slippage non sono inclusi.</p>
       </div>
     </div>
@@ -373,21 +529,7 @@
     <!-- Area operativa -->
     <div id="botArea" hidden>
 
-      <!-- NUOVO: RAFOX AI ADVISOR -->
-      <div class="panel" style="border-left: 3px solid var(--amber);">
-        <div class="panel-head"><h3>Rafox AI Advisor 🧠</h3><em id="aiStatus">Live</em></div>
-        <div class="panel-body">
-          <p id="aiMessage" style="font-family:'IBM Plex Mono',monospace; font-size:13px; color:var(--amber); margin-bottom: 10px;">
-            In attesa di analisi dati di mercato...
-          </p>
-          <div style="width: 100%; background: var(--grid); height: 4px; border-radius: 2px;">
-             <div id="riskThermometer" style="width: 15%; background: var(--up); height: 4px; border-radius: 2px; transition: width 0.5s;"></div>
-          </div>
-          <p class="note" style="border:none; margin-top:8px;">Esposizione del capitale raccomandata.</p>
-        </div>
-      </div>
-
-      <!-- VECCHIO: Conto demo (rimasto intatto!) -->
+      <!-- Conto demo: contesto persistente, non fa parte dei passi guidati -->
       <div class="panel">
         <div class="panel-head"><h3>Conto demo</h3><em id="accountPlan">&mdash;</em></div>
         <div class="panel-body">
@@ -413,39 +555,86 @@
         <a href="index.html#prezzi" style="color:var(--amber);margin-left:6px;">Vedi i piani &rarr;</a>
       </div>
 
+      <!-- STEP 1 — Asset: la prima scelta, in cima. Tutto il resto dipende da questa. -->
       <div class="panel">
-        <div class="panel-head"><h3>Lettura del mercato</h3><em id="regimeState">&mdash;</em></div>
+        <div class="panel-head step-head"><h3><span class="step-num">1</span> Seleziona l'asset</h3></div>
         <div class="panel-body">
-          <table id="regimeTable" hidden>
-            <thead><tr><th>Strumento</th><th>Direzione</th><th>Forza</th><th>Volatilit&agrave;</th></tr></thead>
-            <tbody id="regimeBody"></tbody>
-          </table>
-          <div class="empty" id="regimeEmpty">Seleziona strumenti e durata per la lettura.</div>
-          <div id="suggestionBox" hidden style="margin-top:14px;border-top:1px solid var(--grid);padding-top:14px;">
-            <div class="label" style="margin-bottom:6px;">Strategia compatibile</div>
-            <div id="suggestionText" style="font-family:var(--mono);color:var(--amber);font-size:15px;">&mdash;</div>
-            <ul id="suggestionReasons" style="margin:10px 0 0;padding-left:18px;color:var(--ink-dim);font-size:13px;line-height:1.6;"></ul>
-            <div id="suggestionWarnings"></div>
-            <div id="entrySignalBox" style="margin-top:14px;"></div>
-          </div>
-          <p class="note">
-            Sono misure del mercato di adesso, <b>non una previsione</b>. Indicano quale
-            combinazione strategia/durata &egrave; meccanicamente adatta alle condizioni
-            correnti &mdash; e cambiano ogni volta che il mercato si muove, non sono fisse.
-            Nessuno di questi numeri dice cosa succeder&agrave; da qui alla fine della sessione.
+          <label class="label" for="botPair">Strumenti</label>
+          <select id="botPair" class="bot-input" multiple size="4"></select>
+          <div id="assetChips" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;"></div>
+          <p class="note" style="margin-top:10px;">
+            Puoi selezionare pi&ugrave; strumenti: la lettura del mercato qui sotto si
+            aggiorna da sola appena cambi la selezione.
           </p>
         </div>
       </div>
 
-      <div class="panel">
-        <div class="panel-head"><h3>Sessione</h3><em id="sessionState">&mdash;</em></div>
+      <!-- STEP 2 — Verdetto AI: identità "Rafox AI Advisor" di Gemini, ora con dati reali.
+           Il paragrafo in linguaggio naturale è DESCRITTIVO (cosa sta facendo il mercato,
+           quale strategia è compatibile), mai un consiglio personale o una promessa — vedi
+           nota per Giovanni sul perché. La frase di cautela resta visibile qui, non solo
+           dentro "Vedi analisi tecnica": nasconderla insieme ai dettagli tecnici sarebbe
+           esattamente il tipo di scelta che rende un'interfaccia rassicurante ma scorretta. -->
+      <div class="panel" style="border-left: 3px solid var(--amber);">
+        <div class="panel-head step-head">
+          <h3><span class="step-num">2</span> Rafox AI Advisor 🧠</h3><em id="regimeState">&mdash;</em>
+        </div>
         <div class="panel-body">
-          <div class="grid-form">
-            <div>
-              <label class="label" for="botStrategy">Strategia</label>
-              <select id="botStrategy" class="bot-input"></select>
+          <div class="empty" id="regimeEmpty">Seleziona uno strumento per la lettura.</div>
+
+          <div id="suggestionBox" hidden>
+            <p class="advisor-text" id="advisorText">&mdash;</p>
+
+            <p class="note" style="border:none;margin-top:10px;padding-top:0;">
+              Descrive le condizioni di adesso, non prevede cosa succeder&agrave;: pu&ograve;
+              cambiare al prossimo aggiornamento.
+            </p>
+
+            <div id="trendBadges" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;"></div>
+
+            <!-- id "suggestionText" mantenuto per compatibilità con il JS esistente
+                 (contiene "Applica: Strategia · Durata"); qui non compare come testo
+                 principale ma resta il contenitore del pulsante generato dinamicamente -->
+            <div id="suggestionText" style="margin-top:16px;"></div>
+
+            <div style="width:100%;background:var(--grid);height:4px;border-radius:2px;margin-top:18px;">
+              <div id="riskThermometer" style="width:10%;background:var(--ink-dim);height:4px;border-radius:2px;transition:width .5s,background .3s;"></div>
             </div>
-            <div>
+            <p class="note" style="border:none;margin-top:6px;padding-top:0;" id="thermometerCaption">Affidabilit&agrave; della lettura attuale.</p>
+
+            <details class="collapse">
+              <summary>Vedi analisi tecnica</summary>
+              <div class="collapse-body">
+                <div id="regimeTable" hidden></div>
+                <ul id="suggestionReasons" style="margin:10px 0 0;padding-left:18px;color:var(--ink-dim);font-size:13px;line-height:1.6;"></ul>
+                <div id="suggestionWarnings"></div>
+                <div id="entrySignalBox" style="margin-top:14px;"></div>
+                <p class="note">
+                  Sono misure del mercato di adesso, <b>non una previsione</b>. Indicano quale
+                  combinazione strategia/durata &egrave; meccanicamente adatta alle condizioni
+                  correnti &mdash; e cambiano ogni volta che il mercato si muove, non sono fisse.
+                  Nessuno di questi numeri dice cosa succeder&agrave; da qui alla fine della sessione.
+
+                </p>
+              </div>
+            </details>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 3 — Avvio: controlli compatti, poi il pulsante grande. L'arresto
+           d'emergenza resta separato e visivamente secondario: è un'azione
+           distruttiva, non deve competere con quella primaria. -->
+      <div class="panel">
+        <div class="panel-head step-head"><h3><span class="step-num">3</span> Avvia</h3><em id="sessionState">&mdash;</em></div>
+        <div class="panel-body">
+          <div>
+            <label class="label">Strategia</label>
+            <select id="botStrategy" class="bot-input" style="position:absolute;width:1px;height:1px;overflow:hidden;opacity:0;"></select>
+            <div id="strategyCards" class="strategy-cards"></div>
+          </div>
+          <div class="grid-form" style="margin-top:16px;">
+            <div class="span2">
               <label class="label" for="botDuration">Durata</label>
               <select id="botDuration" class="bot-input">
                 <optgroup label="Troppo brevi per operare">
@@ -465,34 +654,33 @@
                 </optgroup>
               </select>
             </div>
-            <div class="span2">
-              <label class="label" for="botPair">Strumenti</label>
-              <select id="botPair" class="bot-input" multiple size="4"></select>
-            </div>
-            <div class="span2">
-              <button class="btn bot-input" id="btnStartBot" type="button">Avvia bot (demo)</button>
-            </div>
-            <div class="span2">
-              <button class="btn" id="btnStopBot" type="button" hidden
-                      style="background:transparent;border:1px solid var(--grid);color:var(--ink);">Ferma e liquida</button>
-            </div>
-            <div class="span2">
-              <button class="btn" id="btnCloseAll" type="button"
-                      style="background:transparent;border:1px solid var(--down);color:var(--down);">Arresto di emergenza</button>
-            </div>
           </div>
-          <p class="note" id="strategyNote">&mdash;</p>
+          <p class="note" id="strategyNote" style="margin-top:12px;">&mdash;</p>
+          <p class="note" id="selectionMismatch" hidden style="border-color:var(--amber-dim);color:var(--amber);"></p>
+
+          <button class="btn bot-input" id="btnStartBot" type="button" style="margin-top:16px;">Avvia bot (demo)</button>
+          <button class="btn" id="btnStopBot" type="button" hidden
+                  style="background:transparent;border:1px solid var(--grid);color:var(--ink);margin-top:10px;">Ferma e liquida</button>
+
+          <div style="margin-top:22px;border-top:1px dashed var(--grid);padding-top:14px;">
+            <button class="btn" id="btnCloseAll" type="button"
+                    style="background:transparent;border:1px solid var(--down);color:var(--down);font-size:11.5px;padding:10px 16px;">
+              Arresto di emergenza
+            </button>
+          </div>
         </div>
       </div>
 
       <div class="panel">
         <div class="panel-head"><h3>Decisioni del bot</h3><em id="auditCount"></em></div>
         <div class="panel-body">
-          <div class="empty" id="auditEmpty">Nessuna decisione registrata.</div>
-          <table id="auditTable" hidden>
-            <thead><tr><th>Ora</th><th>Evento</th><th>Motivo</th></tr></thead>
-            <tbody id="auditBody"></tbody>
-          </table>
+          <details class="collapse" id="auditDetails">
+            <summary>Mostra le decisioni registrate</summary>
+            <div class="collapse-body">
+              <div class="empty" id="auditEmpty">Nessuna decisione registrata.</div>
+              <div id="auditList"></div>
+            </div>
+          </details>
           <p class="note">
             Vengono registrati anche gli ordini rifiutati dal risk engine: un rifiuto dice
             quanto un&rsquo;esecuzione.
@@ -530,6 +718,7 @@
           <div class="span2">
             <label class="label" for="alSym">Asset</label>
             <select id="alSym"></select>
+            <p class="note" id="alCurrentPrice" style="margin-top:8px;border:none;padding-top:0;">&mdash;</p>
           </div>
           <div>
             <label class="label" for="alDir">Condizione</label>
@@ -553,15 +742,12 @@
       <div class="panel-head"><h3>Attivi</h3><em id="alCount"></em></div>
       <div class="panel-body">
         <div class="empty" id="alEmpty">Nessun alert. Il primo scatta appena il prezzo tocca la soglia che imposti.</div>
-        <table id="alTable" hidden>
-          <thead><tr><th>Asset</th><th>Condizione</th><th>Stato</th><th></th></tr></thead>
-          <tbody id="alBody"></tbody>
-        </table>
+        <div id="alList"></div>
         <p class="note" id="alHint"></p>
-        <div class="warn">
+        <p class="note">
           Gli alert vengono controllati mentre l'app è aperta. Per riceverli con l'app chiusa
           serve il servizio di notifiche push lato server, non ancora attivo.
-        </div>
+        </p>
       </div>
     </div>
   </section>
@@ -628,8 +814,82 @@
   for (const id of ['symbol','pfSym','alSym']) $(id).innerHTML = options;
   $('symbol').value = view.symbol;
 
+  /* ---------- watchlist ---------- */
+  const latestPrices = {};  // symbol -> { price, pct } — popolato dal flusso live
+  let watchSort = 'default';
+
+  function sortedSymbols(){
+    const list = [...SYMBOLS];
+    if (watchSort === 'name_asc') {
+      list.sort((a, b) => M.bySym[a].name.localeCompare(M.bySym[b].name));
+    } else if (watchSort === 'pct_desc' || watchSort === 'pct_asc') {
+      list.sort((a, b) => {
+        const pa = latestPrices[a] && latestPrices[a].pct != null ? latestPrices[a].pct : -Infinity;
+        const pb = latestPrices[b] && latestPrices[b].pct != null ? latestPrices[b].pct : -Infinity;
+        return watchSort === 'pct_desc' ? pb - pa : pa - pb;
+      });
+    }
+    return list;
+  }
+
+  function renderWatchlist(){
+    $('watchlist').innerHTML = sortedSymbols().map(sym => {
+      const a = M.bySym[sym];
+      const row = latestPrices[sym];
+      const priceTxt = row && row.price != null ? M.fmt.money(row.price, a.dp) : '\u2014';
+      const pctTxt = row && row.pct != null
+        ? `<span class="pill ${row.pct >= 0 ? 'up' : 'down'}" style="font-size:10px;padding:2px 8px;">` +
+          `${row.pct >= 0 ? '\u25b2' : '\u25bc'} ${M.fmt.pct(row.pct)}</span>`
+        : '';
+      return `<div class="watch-row${sym === view.symbol ? ' active' : ''}" data-symbol="${sym}">
+        <div class="wr-left">
+          <span class="wr-sym">${a.short}</span>
+          <span class="wr-name">${a.name}</span>
+        </div>
+        <div class="wr-right">
+          <span class="wr-price">${priceTxt}</span>
+          ${pctTxt}
+        </div>
+      </div>`;
+    }).join('');
+  }
+  renderWatchlist();
+  $('watchSort').addEventListener('change', () => {
+    watchSort = $('watchSort').value;
+    renderWatchlist();
+  });
+
+  function updateWatchlistRow(sym){
+    const el = $('watchlist').querySelector(`[data-symbol="${sym}"]`);
+    if (!el) return;
+    const a = M.bySym[sym], row = latestPrices[sym];
+    if (!row) return;
+    el.querySelector('.wr-price').textContent = row.price != null ? M.fmt.money(row.price, a.dp) : '\u2014';
+    let pillEl = el.querySelector('.pill');
+    if (row.pct != null) {
+      const cls = row.pct >= 0 ? 'up' : 'down';
+      const html = `${row.pct >= 0 ? '\u25b2' : '\u25bc'} ${M.fmt.pct(row.pct)}`;
+      if (!pillEl) {
+        pillEl = document.createElement('span');
+        pillEl.style.fontSize = '10px'; pillEl.style.padding = '2px 8px';
+        el.querySelector('.wr-right').appendChild(pillEl);
+      }
+      pillEl.className = 'pill ' + cls;
+      pillEl.textContent = html;
+    }
+  }
+
+  $('watchlist').addEventListener('click', e => {
+    const row = e.target.closest('.watch-row');
+    if (!row) return;
+    $('symbol').value = row.dataset.symbol;
+    $('symbol').dispatchEvent(new Event('change'));
+    $('watchlist').querySelectorAll('.watch-row').forEach(r =>
+      r.classList.toggle('active', r.dataset.symbol === row.dataset.symbol));
+  });
+
   /* ---------- grafico ---------- */
-  let chart = null, series = null;
+  let chart = null, series = null, volumeSeries = null, emaFastSeries = null, emaSlowSeries = null;
 
   function initChart(){
     if (typeof LightweightCharts === 'undefined') {
@@ -659,12 +919,57 @@
       upColor:up, downColor:down, borderVisible:false,
       wickUpColor:up, wickDownColor:down
     });
+
+    // Medie mobili: lo stesso calcolo che la strategia usa per decidere
+    // quando entrare, reso visibile invece di restare solo nel testo
+    // dell'AI Advisor. Periodi indicativi (20/50): la strategia attiva usa
+    // periodi propri diversi per Conservativa/Moderata/Aggressiva, questa
+    // è una lettura di riferimento generale sul grafico, non un secondo
+    // calcolo della strategia stessa.
+    emaFastSeries = chart.addLineSeries({
+      color: up, lineWidth: 1, priceLineVisible: false, lastValueVisible: false,
+    });
+    emaSlowSeries = chart.addLineSeries({
+      color: css.getPropertyValue('--amber').trim(), lineWidth: 1,
+      priceLineVisible: false, lastValueVisible: false,
+    });
+
+    // Volume come istogramma in basso, su una scala propria (occupa solo
+    // il 20% inferiore del grafico) — dato già presente in ogni candela,
+    // prima non veniva mai disegnato.
+    volumeSeries = chart.addHistogramSeries({
+      priceFormat:{ type:'volume' },
+      priceScaleId:'volume',
+    });
+    chart.priceScale('volume').applyOptions({
+      scaleMargins:{ top:0.82, bottom:0 },
+    });
   }
 
   async function loadCandles(){
     if (!series) return;
     try {
-      series.setData(await M.klines(view.symbol, view.tf, 500));
+      const candles = await M.klines(view.symbol, view.tf, 500);
+      series.setData(candles);
+
+      if (emaFastSeries && emaSlowSeries && candles.length > 50) {
+        const closes = candles.map(c => c.close);
+        const fast = M.ema(closes, 20);
+        const slow = M.ema(closes, 50);
+        emaFastSeries.setData(candles.map((c, i) => ({ time: c.time, value: fast[i] })));
+        emaSlowSeries.setData(candles.map((c, i) => ({ time: c.time, value: slow[i] })));
+      }
+
+      if (volumeSeries) {
+        const css = getComputedStyle(document.documentElement);
+        const up = css.getPropertyValue('--up').trim();
+        const down = css.getPropertyValue('--down').trim();
+        volumeSeries.setData(candles.map(c => ({
+          time: c.time,
+          value: c.volume || 0,
+          color: c.close >= c.open ? up + '55' : down + '55',  // trasparenza: non deve competere con le candele
+        })));
+      }
       chart.timeScale().fitContent();
     } catch {
       toast('Candele non caricate', 'Il grafico riprova al prossimo cambio di intervallo.');
@@ -687,8 +992,9 @@
       el.dataset.v = row.price;
     }
     if (row.pct != null) {
-      $('chg').textContent = M.fmt.pct(row.pct);
-      $('chg').className = row.pct >= 0 ? 'up' : 'down';
+      const pillCls = row.pct >= 0 ? 'up' : 'down';
+      $('chg').textContent = (row.pct >= 0 ? '\u25b2 ' : '\u25bc ') + M.fmt.pct(row.pct);
+      $('chg').className = 'pill ' + pillCls;
     }
     if (row.high != null) $('high').textContent = M.fmt.money(row.high, dp);
     if (row.low  != null) $('low').textContent  = M.fmt.money(row.low, dp);
@@ -714,32 +1020,54 @@
     const n = positions.length;
     $('pfCount').textContent = n ? n + (n === 1 ? ' posizione' : ' posizioni') : '';
     $('pfEmpty').hidden = n > 0;
-    $('pfTable').hidden = !n;
-    $('pfTotal').hidden = !n;
-    if (!n) return;
+    $('pfSummary').hidden = !n;
+    if (!n) { $('pfList').innerHTML = ''; return; }
 
+    // Prima passata: calcola valore/costo per ogni posizione e il totale,
+    // perché il peso percentuale di ciascuna dipende dal totale.
     let value = 0, cost = 0, complete = true;
-    $('pfBody').innerHTML = positions.map(p => {
+    const rows = positions.map(p => {
       const a = M.bySym[p.sym], live = M.price(p.sym);
       const c = p.qty * p.px;
       cost += c;
       if (live == null) complete = false; else value += p.qty * live;
-      const v   = live == null ? null : p.qty * live;
+      const v = live == null ? null : p.qty * live;
+      return { p, a, c, v };
+    });
+
+    $('pfList').innerHTML = rows.map(({ p, a, c, v }) => {
       const pnl = v == null ? null : v - c;
       const pct = v == null ? null : pnl / c * 100;
       const k   = pnl == null ? '' : (pnl >= 0 ? 'up' : 'down');
-      return `<tr>
-        <td>${a.short}<small>${M.fmt.money(p.qty, 6)} @ ${M.fmt.money(p.px, a.dp)}</small></td>
-        <td>${v == null ? '—' : M.fmt.money(v, 2)}<small>costo ${M.fmt.money(c, 2)}</small></td>
-        <td class="${k}">${pnl == null ? '—' : M.fmt.signed(pnl, 2)}<small class="${k}">${pct == null ? '' : M.fmt.pct(pct)}</small></td>
-        <td><button class="btn-x" type="button" data-rm="${p.id}" aria-label="Rimuovi ${a.short}">×</button></td>
-      </tr>`;
+      const allocation = (v != null && value > 0) ? (v / value * 100) : null;
+      return `<div class="item-row">
+        <div class="ir-left">
+          <span class="ir-sym">${a.short}</span>
+          <span class="ir-sub">${M.fmt.money(p.qty, 6)} @ ${M.fmt.money(p.px, a.dp)}</span>
+          ${allocation != null ? `<div class="sc-meter" style="width:80px;margin-top:5px;"><span style="width:${allocation.toFixed(0)}%;"></span></div>
+          <span class="ir-sub" style="font-size:10px;">${allocation.toFixed(1)}% del portafoglio</span>` : ''}
+        </div>
+        <div class="ir-right">
+          <div class="ir-values">
+            <span class="ir-value">${v == null ? '\u2014' : M.fmt.money(v, 2)}</span>
+            <span class="ir-value ${k}" style="font-size:11px;">${pnl == null ? '' : M.fmt.signed(pnl, 2) + ' \u00b7 ' + M.fmt.pct(pct)}</span>
+          </div>
+          <button class="btn-x" type="button" data-rm="${p.id}" aria-label="Rimuovi ${a.short}">\u00d7</button>
+        </div>
+      </div>`;
     }).join('');
 
     const pnl = complete ? value - cost : null;
     const pct = complete && cost ? pnl / cost * 100 : null;
-    $('pfTotalVal').innerHTML = pnl == null ? '—'
-      : `<span class="${pnl >= 0 ? 'up' : 'down'}">${M.fmt.signed(pnl, 2)} USDT · ${M.fmt.pct(pct)}</span>`;
+    $('pfSumValue').textContent = complete ? M.fmt.money(value, 2) : '\u2014';
+    $('pfSumCost').textContent = M.fmt.money(cost, 2);
+    const pnlEl = $('pfSumPnl');
+    if (pnl == null) {
+      pnlEl.textContent = '\u2014'; pnlEl.className = 'v';
+    } else {
+      pnlEl.textContent = `${M.fmt.signed(pnl, 2)} \u00b7 ${M.fmt.pct(pct)}`;
+      pnlEl.className = 'v ' + (pnl >= 0 ? 'up' : 'down');
+    }
   }
 
   /* ---------- alert ---------- */
@@ -759,15 +1087,28 @@
     const n = alerts.length;
     $('alCount').textContent = n ? n + (n === 1 ? ' attivo' : ' attivi') : '';
     $('alEmpty').hidden = n > 0;
-    $('alTable').hidden = !n;
-    $('alBody').innerHTML = alerts.map(al => {
+    $('alList').innerHTML = alerts.map(al => {
       const a = M.bySym[al.sym];
-      return `<tr>
-        <td>${a.short}</td>
-        <td>${al.dir === 'above' ? '≥' : '≤'} ${M.fmt.money(al.px, a.dp)}</td>
-        <td>${al.fired ? '<span class="up">scattato</span>' : 'in attesa'}</td>
-        <td><button class="btn-x" type="button" data-rma="${al.id}" aria-label="Elimina alert ${a.short}">×</button></td>
-      </tr>`;
+      const live = M.price(al.sym);
+      let distanceLine = '';
+      if (!al.fired && live != null && al.px > 0) {
+        const dist = (al.px - live) / live * 100;
+        const already = al.dir === 'above' ? dist <= 0 : dist >= 0;
+        distanceLine = already
+          ? `<span class="ir-sub" style="font-size:10px;">condizione gi\u00e0 soddisfatta</span>`
+          : `<span class="ir-sub" style="font-size:10px;">manca ${Math.abs(dist).toFixed(1)}% al livello</span>`;
+      }
+      return `<div class="item-row">
+        <div class="ir-left">
+          <span class="ir-sym">${a.short}</span>
+          <span class="ir-sub">${al.dir === 'above' ? '\u2265' : '\u2264'} ${M.fmt.money(al.px, a.dp)}</span>
+          ${distanceLine}
+        </div>
+        <div class="ir-right">
+          ${al.fired ? '<span class="pill up">scattato</span>' : '<span class="pill">in attesa</span>'}
+          <button class="btn-x" type="button" data-rma="${al.id}" aria-label="Elimina alert ${a.short}">\u00d7</button>
+        </div>
+      </div>`;
     }).join('');
     const perm = 'Notification' in window ? Notification.permission : 'unsupported';
     $('alHint').textContent = perm === 'granted'
@@ -825,6 +1166,16 @@
 
   $('pfAdd').addEventListener('click', addPosition);
   $('alAdd').addEventListener('click', addAlert);
+
+  function updateAlertCurrentPrice(){
+    const sym = $('alSym').value;
+    const a = M.bySym[sym];
+    const live = M.price(sym);
+    $('alCurrentPrice').textContent = live != null
+      ? `Prezzo attuale: ${M.fmt.money(live, a.dp)}`
+      : 'Prezzo attuale non ancora disponibile.';
+  }
+  $('alSym').addEventListener('change', updateAlertCurrentPrice);
   // --- NUOVI COMANDI RAFOX ---
   $('btnStripePortal').addEventListener('click', () => {
     // Portale Clienti Stripe collegato
@@ -847,14 +1198,14 @@
   $('pfPx').addEventListener('keydown', e => { if (e.key === 'Enter') addPosition(); });
   $('alPx').addEventListener('keydown', e => { if (e.key === 'Enter') addAlert(); });
 
-  $('pfBody').addEventListener('click', e => {
+  $('pfList').addEventListener('click', e => {
     const b = e.target.closest('[data-rm]');
     if (!b) return;
     positions = positions.filter(p => p.id !== +b.dataset.rm);
     store.set('rfx.positions', positions);
     renderPortfolio();
   });
-  $('alBody').addEventListener('click', e => {
+  $('alList').addEventListener('click', e => {
     const b = e.target.closest('[data-rma]');
     if (!b) return;
     alerts = alerts.filter(a => a.id !== +b.dataset.rma);
@@ -866,7 +1217,10 @@
   M.on('status', s => { $('status').dataset.state = s.state; $('status').textContent = s.text; });
 
   M.on('price', row => {
+    latestPrices[row.symbol] = { price: row.price, pct: row.pct };
+    updateWatchlistRow(row.symbol);
     if (row.symbol === view.symbol) paintQuote(row);
+    if (row.symbol === $('alSym').value) updateAlertCurrentPrice();
     checkAlerts(row.symbol, row.price);
     renderPortfolio();
   });
@@ -899,13 +1253,13 @@
     }
 
     if (loggedIn) {
-      // Seleziona la visuale operativa e nasconde il Muro
-      $('loginScreen').hidden = true;
+      // Forza la scomparsa del Muro sovrascrivendo lo stile
+      $('loginScreen').style.display = 'none';
       $('mainApp').hidden = false;
       $('botArea').hidden = false; 
     } else {
-      // Blocca tutto dietro il Muro
-      $('loginScreen').hidden = false;
+      // Mostra il Muro e nasconde l'App
+      $('loginScreen').style.display = 'flex';
       $('mainApp').hidden = true;
     }
   }
@@ -917,6 +1271,26 @@
         .map(s => `<option value="${s.name}">${s.label}</option>`).join('');
       $('botStrategy').value = 'moderate';
       const byName = Object.fromEntries(list.map(s => [s.name, s]));
+      const durLabels = { 60:'1 ora', 180:'3 ore', 300:'5 ore', 480:'8 ore', 720:'12 ore', 1440:'24 ore' };
+      const icons = { conservative:'\u{1F6E1}\uFE0F', moderate:'\u2696\uFE0F', aggressive:'\u26A1' };
+
+      // Schede cliccabili: il <select> nascosto resta l'unica fonte di
+      // verità per il resto del codice (JS esistente invariato), le
+      // schede si limitano a impostarne il valore e simulare il change.
+      $('strategyCards').innerHTML = list.map(s => `
+        <button type="button" class="strategy-card" data-strategy="${s.name}">
+          <div class="sc-icon">${icons[s.name] || '\u25CF'}</div>
+          <div class="sc-label">${s.label}</div>
+          <div class="sc-meter"><span style="width:${s.max_exposure_pct}%;"></span></div>
+          <div class="sc-meter-label">Esposizione max ${s.max_exposure_pct}%</div>
+        </button>`).join('');
+      $('strategyCards').querySelectorAll('.strategy-card').forEach(card => {
+        card.addEventListener('click', () => {
+          $('botStrategy').value = card.dataset.strategy;
+          $('botStrategy').dispatchEvent(new Event('change'));
+        });
+      });
+
       const describe = () => {
         const c = byName[$('botStrategy').value];
         if (!c) return;
@@ -924,8 +1298,33 @@
           `${c.label} — rischio ${c.risk_per_trade_pct}% per operazione, esposizione max ` +
           `${c.max_exposure_pct}%, max ${c.max_positions} posizioni, stop giornaliero ` +
           `${c.daily_loss_limit_pct}%. Sono parametri di rischio, non rendimenti attesi.`;
+
+        $('strategyCards').querySelectorAll('.strategy-card').forEach(card => {
+          card.classList.toggle('active', card.dataset.strategy === $('botStrategy').value);
+        });
+
+        // Se la selezione attuale (manuale) è diversa dal suggerimento live
+        // dell'AI Advisor, lo si dice esplicitamente: sono due cose diverse
+        // (una scelta tua, un consiglio del sistema), non un contrasto.
+        const mismatchEl = $('selectionMismatch');
+        if (!mismatchEl) return;
+        const currentDuration = parseInt($('botDuration').value, 10);
+        if (lastSuggestion &&
+            (lastSuggestion.strategy !== $('botStrategy').value ||
+             lastSuggestion.suggested_duration_minutes !== currentDuration)) {
+          const sugLabel = byName[lastSuggestion.strategy] ? byName[lastSuggestion.strategy].label : lastSuggestion.strategy;
+          const sugDur = durLabels[lastSuggestion.suggested_duration_minutes] || '';
+          mismatchEl.hidden = false;
+          mismatchEl.textContent =
+            `Hai selezionato manualmente ${c.label} \u00b7 ${durLabels[currentDuration] || currentDuration + ' min'}. ` +
+            `L'AI Advisor suggerisce invece ${sugLabel}${sugDur ? ' \u00b7 ' + sugDur : ''} in base al mercato attuale.`;
+        } else {
+          mismatchEl.hidden = true;
+        }
       };
       $('botStrategy').addEventListener('change', describe);
+      $('botDuration').addEventListener('change', describe);
+      recheckSelectionMismatch = describe;
       describe();
     } catch (e) {
       $('strategyNote').textContent = 'Strategie non caricate: ' + e.message;
@@ -992,7 +1391,6 @@
   function paintAudit(rows){
     $('auditCount').textContent = rows.length ? rows.length + ' voci' : '';
     $('auditEmpty').hidden = rows.length > 0;
-    $('auditTable').hidden = rows.length === 0;
     const label = {
       session_started:'sessione avviata', session_finished:'sessione conclusa',
       position_opened:'posizione aperta', position_closed:'posizione chiusa',
@@ -1001,18 +1399,23 @@
       waiting_for_entry:'in attesa di ingresso', duration_warning:'avviso durata',
       position_held:'posizione mantenuta'
     };
-    $('auditBody').innerHTML = rows.map(r => {
+    $('auditList').innerHTML = rows.map(r => {
       const t = new Date(r.at).toLocaleTimeString('it-IT');
       const cls = r.decision === 'rejected' ? 'down' : (r.decision === 'executed' ? 'up' : '');
-      return `<tr>
-        <td>${t}</td>
-        <td class="${cls}">${label[r.event] || r.event}${r.symbol ? '<small>' + r.symbol + '</small>' : ''}</td>
-        <td style="text-align:left;">${r.reason || '—'}</td>
-      </tr>`;
+      return `<div class="audit-row">
+        <div class="audit-top">
+          <span class="audit-time">${t}</span>
+          <span class="audit-event ${cls}">${label[r.event] || r.event}</span>
+          ${r.symbol ? `<span class="audit-sym">${r.symbol}</span>` : ''}
+        </div>
+        <div class="audit-reason">${r.reason || '\u2014'}</div>
+      </div>`;
     }).join('');
   }
 
   let regimeTimer = null;
+  let lastSuggestion = null;  // { strategy, suggested_duration_minutes } — per confronto con la selezione manuale
+  let recheckSelectionMismatch = null;  // impostata da loadStrategies(), richiamata da paintRegime
 
   function paintRegime(data){
     const rows = data.regimes || [];
@@ -1020,38 +1423,91 @@
     $('regimeTable').hidden = rows.length === 0;
     $('regimeState').textContent = rows.length ? 'aggiornata' : '\u2014';
 
-    $('regimeBody').innerHTML = rows.map(r => {
-      const dirClass = r.direction === 'rialzista' ? 'up'
-                     : (r.direction === 'ribassista' ? 'down' : '');
-      const volClass = r.volatility_level === 'alta' ? 'down' : '';
+    // Badge compatti in cima: la direzione a colpo d'occhio, senza dover
+    // aprire "Espandi analisi" solo per sapere se il mercato sale o scende.
+    $('trendBadges').innerHTML = rows.map(r => {
+      const cls = r.direction === 'rialzista' ? 'up' : (r.direction === 'ribassista' ? 'down' : '');
       const sym = M.bySym[r.symbol] ? M.bySym[r.symbol].short : r.symbol;
-      return `<tr>
-        <td>${sym}</td>
-        <td class="${dirClass}">${r.direction}</td>
-        <td>${r.trend_strength > 0 ? '+' : ''}${r.trend_strength} ATR</td>
-        <td class="${volClass}">${r.volatility_pct}% <small>${r.volatility_level}</small></td>
-      </tr>`;
+      return `<span class="pill ${cls}">${sym} \u00b7 ${r.direction}</span>`;
+    }).join('');
+
+    $('regimeTable').innerHTML = rows.map(r => {
+      const dirCls = r.direction === 'rialzista' ? 'up' : (r.direction === 'ribassista' ? 'down' : '');
+      const volCls = r.volatility_level === 'alta' ? 'down' : '';
+      const sym = M.bySym[r.symbol] ? M.bySym[r.symbol].short : r.symbol;
+      return `<div class="audit-row">
+        <div class="audit-top">
+          <span class="audit-event">${sym}</span>
+          <span class="audit-event ${dirCls}">${r.direction}</span>
+        </div>
+        <div class="audit-reason">
+          Forza ${r.trend_strength > 0 ? '+' : ''}${r.trend_strength} ATR
+          \u00b7 volatilit\u00e0 <span class="${volCls}">${r.volatility_pct}% ${r.volatility_level}</span>
+        </div>
+      </div>`;
     }).join('');
 
     const s = data.suggestion || {};
+    lastSuggestion = s.strategy ? s : null;
+    if (recheckSelectionMismatch) recheckSelectionMismatch();
     $('suggestionBox').hidden = false;
 
+    // Frase in linguaggio naturale: descrive cosa sta facendo il mercato e
+    // quale strategia è compatibile. Mai un consiglio personale ("ti
+    // consiglio...") né una promessa di risultato ("per proteggere il
+    // capitale") — solo una descrizione di condizioni meccaniche, tradotta
+    // in italiano semplice invece che in sigle tecniche.
     const labels = { conservative:'Conservativa', moderate:'Moderata', aggressive:'Aggressiva' };
     const durLabels = { 60:'1 ora', 180:'3 ore', 300:'5 ore', 480:'8 ore', 720:'12 ore', 1440:'24 ore' };
+
+    const names = rows.map(r => (M.bySym[r.symbol] && M.bySym[r.symbol].name) || r.symbol);
+    const assetPhrase = names.length === 0 ? 'gli strumenti selezionati'
+                       : names.length === 1 ? names[0]
+                       : names.length === 2 ? `${names[0]} e ${names[1]}`
+                       : `${names[0]} e altri ${names.length - 1} strumenti`;
+
+    const directions = [...new Set(rows.map(r => r.direction))];
+    const mixedDirections = directions.length > 1;
+    const marketPhrase = mixedDirections
+      ? 'mostra letture miste tra gli strumenti selezionati'
+      : `è attualmente ${directions[0] || 'in fase di lettura'}`;
+
+    const highVol = rows.some(r => r.volatility_level === 'alta');
+    const volPhrase = highVol ? ', con movimenti più ampi del solito' : '';
 
     if (s.strategy) {
       const durMin = s.suggested_duration_minutes;
       const durTxt = durLabels[durMin] || (durMin ? (durMin + ' minuti') : '');
-      $('suggestionText').innerHTML =
-        `${labels[s.strategy] || s.strategy} <small style="color:var(--ink-dim);">` +
-        `\u2014 lettura ${s.confidence}</small>` +
-        (durTxt ? ` <button type="button" id="btnApplySuggestion" class="btn-ghost" ` +
-          `style="margin-left:10px;font-size:12px;padding:4px 10px;">` +
-          `Applica: ${labels[s.strategy]} \u00b7 ${durTxt}</button>` : '');
+      $('advisorText').innerHTML =
+        `Il mercato di <b>${assetPhrase}</b> ${marketPhrase}${volPhrase}. ` +
+        `Le condizioni di adesso sono compatibili con una strategia <b>${labels[s.strategy] || s.strategy}</b>` +
+        (durTxt ? ` su un orizzonte di <b>${durTxt}</b>.` : '.');
+
+      $('suggestionText').innerHTML = durTxt
+        ? `<button type="button" id="btnApplySuggestion" class="btn-glow">` +
+          `✨ Applica: ${labels[s.strategy]} \u00b7 ${durTxt}</button>`
+        : '';
     } else {
-      $('suggestionText').innerHTML =
-        '<span class="down">Nessuna strategia adatta a questa durata</span>';
+      $('advisorText').innerHTML =
+        `Il mercato di <b>${assetPhrase}</b> ${marketPhrase}${volPhrase}. ` +
+        `In questo momento nessuna strategia è chiaramente compatibile con queste condizioni.`;
+      $('suggestionText').innerHTML = '';
     }
+
+    // Il termometro riflette l'affidabilità della lettura attuale (quanto
+    // è netto il segnale), non un'esposizione consigliata: non esiste un
+    // numero di "esposizione" da mostrare qui senza inventarlo.
+    const confidenceMap = {
+      buona:   { pct: 85, cls: 'up',   label: 'Lettura netta' },
+      media:   { pct: 55, cls: '',     label: 'Lettura moderata' },
+      debole:  { pct: 25, cls: 'down', label: 'Lettura debole' },
+      nessuna: { pct: 8,  cls: 'down', label: 'Dati insufficienti' },
+    };
+    const conf = confidenceMap[s.confidence] || confidenceMap.nessuna;
+    const therm = $('riskThermometer');
+    therm.style.width = conf.pct + '%';
+    therm.style.background = conf.cls === 'up' ? 'var(--up)' : (conf.cls === 'down' ? 'var(--down)' : 'var(--amber)');
+    $('thermometerCaption').textContent = `${conf.label} \u2014 affidabilit\u00e0 della lettura attuale, non un livello di esposizione.`;
 
     $('suggestionReasons').innerHTML = (s.reasons || [])
       .map(r => `<li>${r}</li>`).join('');
@@ -1067,9 +1523,24 @@
         const label = sig.action === 'buy' ? 'ingresso valido'
                     : sig.action === 'sell' ? 'uscita'
                     : 'in attesa';
-        return `<div style="display:flex;justify-content:space-between;gap:10px;padding:4px 0;">
-          <span>${sym} <small style="color:var(--ink-dim);">(${sig.interval || ''})</small></span>
-          <span class="${cls}">${label}</span>
+        const details = [];
+        if (sig.rsi != null) {
+          const rsiCls = sig.rsi >= sig.rsi_ipercomprato ? 'down' : '';
+          details.push(`RSI <span class="${rsiCls}">${sig.rsi}</span> (soglia ${sig.rsi_ipercomprato})`);
+        }
+        if (sig.rapporto_volume != null) {
+          const volCls = sig.rapporto_volume < sig.rapporto_volume_minimo ? 'down' : '';
+          details.push(`volume <span class="${volCls}">${sig.rapporto_volume}x</span> la media (min ${sig.rapporto_volume_minimo}x)`);
+        }
+        const detailLine = details.length
+          ? `<div style="font-size:11px;color:var(--ink-dim);margin-top:2px;">${details.join(' \u00b7 ')}</div>`
+          : '';
+        return `<div style="padding:6px 0;">
+          <div style="display:flex;justify-content:space-between;gap:10px;">
+            <span>${sym} <small style="color:var(--ink-dim);">(${sig.interval || ''})</small></span>
+            <span class="${cls}">${label}</span>
+          </div>
+          ${detailLine}
         </div>`;
       }).join('');
       $('entrySignalBox').innerHTML =
@@ -1079,7 +1550,9 @@
           Questa lettura usa un timeframe diverso da quello della tabella sopra:
           pu&ograve; restare "in attesa" anche quando il regime generale &egrave;
           favorevole. &Egrave; lo stesso calcolo che user&agrave; il bot per decidere,
-          non un'approssimazione.
+          non un'approssimazione. L'ingresso richiede anche RSI non ipercomprato
+          e volume sopra la media recente: filtrano movimenti gi&agrave; estesi o
+          non confermati da una partecipazione reale.
         </p>`;
     } else {
       $('entrySignalBox').innerHTML = '';
@@ -1119,7 +1592,19 @@
     }
   }
 
+  function paintAssetChips(){
+    const symbols = Array.from($('botPair').selectedOptions).map(o => o.value);
+    $('assetChips').innerHTML = symbols.map(sym => {
+      const a = M.bySym[sym];
+      const price = M.price ? M.price(sym) : null;
+      const dp = M.fmt && M.fmt.dp ? M.fmt.dp(sym) : 2;
+      const priceTxt = (price != null && M.fmt) ? M.fmt.money(price, dp) : '\u2014';
+      return `<span class="asset-chip">${a ? a.short : sym} <b>${priceTxt}</b></span>`;
+    }).join('');
+  }
+
   function scheduleRegime(){
+    paintAssetChips();  // dato locale, nessuna richiesta: aggiorna subito
     // piccolo ritardo: cambiando più strumenti di fila si evita una
     // richiesta per ogni clic
     if (regimeTimer) clearTimeout(regimeTimer);
@@ -1158,6 +1643,7 @@
       $('upgrade-banner').hidden = canBot;
       document.querySelectorAll('.bot-input').forEach(el => { el.disabled = !canBot; });
       fillSymbolChoices(info.plan, account.type);
+      paintAssetChips();
 
       showAuthOrBot();
       await loadStrategies();
@@ -1290,6 +1776,7 @@
   (async function start(){
     renderPortfolio();
     renderAlerts();
+    updateAlertCurrentPrice();
     try { await M.loadChartLib(); }
     catch (e) { console.error('[Rafox] libreria grafici non caricata:', e); }
     initChart();
