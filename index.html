@@ -226,11 +226,11 @@
 
   /* ================= PREZZI ================= */
   .pricing-grid{
-    display:grid;grid-template-columns:repeat(3,1fr);gap:20px;align-items:stretch;
+    display:grid;grid-template-columns:repeat(4,1fr);gap:16px;align-items:stretch;
   }
   .price-card{
     background:var(--bg-panel);border:1px solid var(--line);border-radius:var(--radius);
-    padding:32px 28px;display:flex;flex-direction:column;
+    padding:28px 22px;display:flex;flex-direction:column;
   }
   .price-card.featured{
     background:var(--bg-elevated);border-color:rgba(245,158,11,0.4);
@@ -243,18 +243,26 @@
     font-size:10.5px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;
     padding:5px 14px;border-radius:20px;white-space:nowrap;
   }
+  .price-badge.trial{
+    background:transparent;color:var(--ink-dim);border:1px solid var(--line);
+  }
   .price-name{font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:0.1em;text-transform:uppercase;color:var(--amber-dim);}
   .price-card.featured .price-name{color:var(--amber);}
   .price-amount{display:flex;align-items:baseline;gap:6px;margin-top:12px;}
-  .price-amount .n{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:40px;}
-  .price-amount .p{color:var(--ink-dim);font-size:14px;}
-  .price-desc{color:var(--ink-dim);font-size:13.5px;margin-top:10px;line-height:1.6;min-height:40px;}
-  .price-list{margin:26px 0 28px;display:flex;flex-direction:column;gap:13px;flex:1;}
-  .price-list li{display:flex;align-items:flex-start;gap:10px;font-size:14.5px;color:var(--ink);}
-  .price-list svg{flex:none;width:16px;height:16px;stroke:var(--up);margin-top:2px;}
-  @media(max-width:900px){
-    .pricing-grid{grid-template-columns:1fr;max-width:420px;margin:0 auto;}
-    .price-card.featured{order:-1;}
+  .price-amount .n{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:34px;}
+  .price-amount .p{color:var(--ink-dim);font-size:13px;}
+  .price-desc{color:var(--ink-dim);font-size:13px;margin-top:10px;line-height:1.6;min-height:52px;}
+  .price-list{margin:24px 0 26px;display:flex;flex-direction:column;gap:12px;flex:1;}
+  .price-list li{display:flex;align-items:flex-start;gap:9px;font-size:13.5px;color:var(--ink);}
+  .price-list svg{flex:none;width:15px;height:15px;stroke:var(--up);margin-top:2px;}
+  .price-nudge{
+    text-align:center;font-size:11.5px;color:var(--ink-faint);margin-top:12px;line-height:1.5;
+  }
+  @media(max-width:980px){
+    .pricing-grid{grid-template-columns:repeat(2,1fr);max-width:640px;margin:0 auto;}
+  }
+  @media(max-width:560px){
+    .pricing-grid{grid-template-columns:1fr;}
   }
 
   .pricing-note{
@@ -418,56 +426,80 @@
     <div class="section-head rf-reveal">
       <div class="eyebrow" style="justify-content:center;">Prezzi</div>
       <h2>Scegli il tuo livello di operatività.</h2>
-      <p class="lede">Inizia con il conto demo, senza impegno. Passa a un piano reale quando sei pronto.</p>
+      <p class="lede">Parti dal conto demo, senza impegno. Ogni piano successivo sblocca più strumenti, più strategie e più libertà operativa.</p>
     </div>
 
     <div class="pricing-grid">
 
       <div class="price-card rf-reveal">
-        <div class="price-name mono">Starter</div>
+        <div class="price-name mono">Free</div>
         <div class="price-amount"><span class="n display">€0</span><span class="p mono">/mese</span></div>
-        <p class="price-desc">Per prendere confidenza con Rafox senza alcun rischio.</p>
+        <p class="price-desc">Prendi confidenza con l'AI Advisor senza alcun rischio, tempo illimitato.</p>
         <ul class="price-list">
           <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> Conto demo illimitato</li>
           <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> 10.000 USDT virtuali</li>
           <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> 1 strumento alla volta</li>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> AI Advisor incluso</li>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> Sessioni da 1 ora</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> Strategia Moderata</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> Sessioni fisse da 1 ora</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> 1 alert di prezzo</li>
         </ul>
         <a class="btn btn-ghost btn-block" href="app.html">Inizia Gratis</a>
+        <p class="price-nudge">Passa a Beginner quando vuoi operare con capitale reale.</p>
+      </div>
+
+      <div class="price-card rf-reveal">
+        <span class="price-badge trial">7 giorni gratis</span>
+        <div class="price-name mono">Beginner</div>
+        <div class="price-amount"><span class="n display">€14,99</span><span class="p mono">/mese</span></div>
+        <p class="price-desc">Il primo passo con capitale reale, con margini di rischio contenuti.</p>
+        <ul class="price-list">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> Conto reale collegato al tuo exchange</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> 1 strumento alla volta</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> Strategie Conservativa e Moderata</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> Sessioni fino a 6 ore</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> AI Advisor con lettura del regime di mercato</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> Fino a 3 alert di prezzo</li>
+        </ul>
+        <a class="btn btn-ghost btn-block" href="https://buy.stripe.com/test_9B6dR81VDbrF769bLFbsc07" target="_blank" rel="noopener">Inizia la prova gratuita</a>
+        <p class="price-nudge">Passa a Pro per sbloccare tutte le strategie e più strumenti in parallelo.</p>
       </div>
 
       <div class="price-card featured rf-reveal">
         <span class="price-badge">Consigliato</span>
         <div class="price-name mono">Pro</div>
-        <div class="price-amount"><span class="n display">€49</span><span class="p mono">/mese</span></div>
-        <p class="price-desc">Per chi vuole operare con capitale reale in autonomia.</p>
+        <div class="price-amount"><span class="n display">€24,99</span><span class="p mono">/mese</span></div>
+        <p class="price-desc">Per chi vuole operare con capitale reale in piena autonomia.</p>
         <ul class="price-list">
           <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> Conto reale collegato al tuo exchange</li>
           <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> Fino a 3 strumenti in parallelo</li>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> Sessioni fino a 24 ore</li>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> Stop loss dinamici</li>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> Supporto prioritario</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> Tutte le strategie (Conservativa, Moderata, Aggressiva)</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> Sessioni libere fino a 24 ore</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> AI Advisor completo con segnali d'ingresso</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> Fino a 10 alert di prezzo</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> Supporto prioritario via email</li>
         </ul>
-        <a class="btn btn-primary btn-block" href="#" data-stripe-plan="pro">Passa a Pro</a>
+        <a class="btn btn-primary btn-block" href="https://buy.stripe.com/test_bJe8wOfMtgLZgGJ9Dxbsc06" target="_blank" rel="noopener">Passa a Pro</a>
+        <p class="price-nudge">Passa a Elite per l'operatività senza limiti.</p>
       </div>
 
       <div class="price-card rf-reveal">
         <div class="price-name mono">Elite</div>
-        <div class="price-amount"><span class="n display">€149</span><span class="p mono">/mese</span></div>
-        <p class="price-desc">Per un'operatività istituzionale, senza limiti stretti.</p>
+        <div class="price-amount"><span class="n display">€49,99</span><span class="p mono">/mese</span></div>
+        <p class="price-desc">Operatività istituzionale: tutto sbloccato, nessun compromesso.</p>
         <ul class="price-list">
           <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> Tutto di Pro, incluso</li>
           <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> Fino a 7 strumenti in parallelo</li>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> Rischio ed esposizione personalizzabili</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> Sessioni senza limite di durata</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> Rischio ed esposizione personalizzabili a mano</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> Alert di prezzo illimitati</li>
           <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> Canale Telegram privato</li>
           <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> Account manager dedicato</li>
         </ul>
-        <a class="btn btn-ghost btn-block" href="#" data-stripe-plan="elite">Passa a Elite</a>
+        <a class="btn btn-ghost btn-block" href="https://buy.stripe.com/test_9B6dR82ZHfHV8ad02Xbsc05" target="_blank" rel="noopener">Passa a Elite</a>
       </div>
 
     </div>
-    <p class="pricing-note">Prezzi indicativi, IVA esclusa · Puoi passare o tornare a un piano inferiore in ogni momento</p>
+    <p class="pricing-note">Prezzi IVA esclusa · Il piano Beginner include 7 giorni di prova gratuita, poi si rinnova automaticamente al prezzo mensile indicato · Puoi passare o tornare a un piano inferiore in ogni momento</p>
   </div>
 </section>
 
@@ -540,15 +572,6 @@
   } else {
     document.querySelectorAll('.rf-reveal').forEach(function(el){ el.classList.add('in'); });
   }
-
-  // I pulsanti "Passa a Pro/Elite" sono segnaposto: collegare qui il link
-  // di Stripe Checkout corretto per ciascun piano quando sarà pronto.
-  document.querySelectorAll('[data-stripe-plan]').forEach(function(btn){
-    btn.addEventListener('click', function(e){
-      e.preventDefault();
-      alert('Collegamento a Stripe Checkout non ancora configurato per il piano "' + btn.dataset.stripePlan + '".');
-    });
-  });
 })();
 </script>
 </body>
