@@ -12,15 +12,24 @@
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#0B0A08;
-    --bg-panel:#14120D;
-    --amber:#FFB000;
-    --amber-dim:#C97A1A;
-    --ink:#F2ECE2;
-    --ink-dim:#948C7C;
-    --grid:#2A2620;
-    --up:#4FD1AE;
-    --down:#E85D4C;
+    /* Colori Fintech Moderni */
+    --bg: #0F172A; /* Blu slate profondo, elegante */
+    --bg-panel: #1E293B; /* Pannelli in risalto morbido */
+    --amber: #F59E0B; /* Oro Rafox per mantenere il brand */
+    --amber-dim: #B45309;
+    --ink: #F8FAFC;
+    --ink-dim: #94A3B8;
+    --grid: #334155;
+    --up: #10B981; /* Verde smeraldo per i profitti */
+    --down: #EF4444; /* Rosso vibrante per le perdite */
+  }
+
+  /* Arrotondiamo i bordi per un look più moderno (stile App) */
+  .panel, select, input, .btn, .btn-ghost { 
+    border-radius: 8px; 
+  }
+  .appbar {
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
   }
   *{margin:0;padding:0;box-sizing:border-box;}
   body{
@@ -219,8 +228,15 @@
 <body>
 
 <header class="appbar">
-  <a class="logo" href="index.html" style="text-decoration:none;">RAFOX <span>/ app</span></a>
-  <span class="live-flag" id="status" data-state="wait" role="status">Connessione</span>
+  <div style="display:flex; align-items:center; gap:15px;">
+    <a class="logo" href="index.html" style="text-decoration:none;">RAFOX <span>/ app</span></a>
+    <span class="live-flag" id="status" data-state="wait" role="status">Connessione</span>
+  </div>
+  
+  <div style="display:flex; gap:10px;">
+    <button class="btn-ghost" id="btnStripePortal" style="padding: 8px 12px; font-size: 11px;">Gestisci Piano</button>
+    <button class="btn" id="btnKillSwitch" style="background:var(--down); color:#fff; padding: 8px 12px; font-size: 11px; box-shadow: 0 0 10px rgba(232,93,76,0.4);">🛑 KILL SWITCH</button>
+  </div>
 </header>
 
 <div class="wrap">
@@ -352,6 +368,21 @@
     <!-- Area operativa -->
     <div id="botArea" hidden>
 
+      <!-- NUOVO: RAFOX AI ADVISOR -->
+      <div class="panel" style="border-left: 3px solid var(--amber);">
+        <div class="panel-head"><h3>Rafox AI Advisor 🧠</h3><em id="aiStatus">Live</em></div>
+        <div class="panel-body">
+          <p id="aiMessage" style="font-family:'IBM Plex Mono',monospace; font-size:13px; color:var(--amber); margin-bottom: 10px;">
+            In attesa di analisi dati di mercato...
+          </p>
+          <div style="width: 100%; background: var(--grid); height: 4px; border-radius: 2px;">
+             <div id="riskThermometer" style="width: 15%; background: var(--up); height: 4px; border-radius: 2px; transition: width 0.5s;"></div>
+          </div>
+          <p class="note" style="border:none; margin-top:8px;">Esposizione del capitale raccomandata.</p>
+        </div>
+      </div>
+
+      <!-- VECCHIO: Conto demo (rimasto intatto!) -->
       <div class="panel">
         <div class="panel-head"><h3>Conto demo</h3><em id="accountPlan">&mdash;</em></div>
         <div class="panel-body">
@@ -788,6 +819,25 @@
 
   $('pfAdd').addEventListener('click', addPosition);
   $('alAdd').addEventListener('click', addAlert);
+  // --- NUOVI COMANDI RAFOX ---
+  $('btnStripePortal').addEventListener('click', () => {
+    // Portale Clienti Stripe collegato
+    window.open('https://billing.stripe.com/p/login/test_7sY8wOgQxdzNduxeXRbsc00', '_blank');
+  });
+
+  $('btnKillSwitch').addEventListener('click', async () => {
+    if (confirm('⚠️ ATTENZIONE: Sei sicuro di voler attivare il KILL SWITCH? Tutte le operazioni verranno chiuse immediatamente.')) {
+      if (API && API.loggedIn() && account) {
+        try {
+          await API.botCloseAll(account.id);
+          toast('🛑 KILL SWITCH ATTIVATO', 'Tutte le posizioni chiuse per emergenza.');
+          refreshBot();
+        } catch (e) { toast('Errore Kill Switch', e.message); }
+      } else {
+        toast('Kill Switch', 'Simulazione: Nessun conto attivo da fermare.');
+      }
+    }
+  });
   $('pfPx').addEventListener('keydown', e => { if (e.key === 'Enter') addPosition(); });
   $('alPx').addEventListener('keydown', e => { if (e.key === 'Enter') addAlert(); });
 

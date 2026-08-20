@@ -16,7 +16,7 @@
 (function (global) {
   'use strict';
 
-  const BASE = null;   // <— METTI QUI L'INDIRIZZO DEL TUO BACKEND
+  const BASE = 'https://rafoxv2claude-backend.onrender.com';
 
   const TOKEN_KEY = 'rfx.token';
 
