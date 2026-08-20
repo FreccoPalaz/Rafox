@@ -365,6 +365,12 @@
     display:block;font-family:'IBM Plex Mono',monospace;font-size:10px;
     letter-spacing:0.12em;text-transform:uppercase;color:var(--amber);margin-bottom:4px;
   }
+
+  /* L'attributo hidden deve sempre vincere su qualunque display impostato
+     inline (es. onboardModal usa display:flex per centrarsi quando visibile):
+     senza questa regola, hidden=true non nasconde più l'elemento perché lo
+     style inline ha priorità sulla regola di default del browser. */
+  [hidden]{ display:none !important; }
 </style>
 </head>
 <body>
