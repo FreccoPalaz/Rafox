@@ -251,9 +251,15 @@
   .price-amount .n{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:34px;}
   .price-amount .p{color:var(--ink-dim);font-size:13px;}
   .price-desc{color:var(--ink-dim);font-size:13px;margin-top:10px;line-height:1.6;min-height:52px;}
+  
   .price-list{margin:24px 0 26px;display:flex;flex-direction:column;gap:12px;flex:1;}
   .price-list li{display:flex;align-items:flex-start;gap:9px;font-size:13.5px;color:var(--ink);}
   .price-list svg{flex:none;width:15px;height:15px;stroke:var(--up);margin-top:2px;}
+  
+  /* Regola per funzioni bloccate aggiunta qui! */
+  .price-list li.missing { color: var(--ink-faint); }
+  .price-list li.missing svg { stroke: var(--ink-faint); }
+
   .price-nudge{
     text-align:center;font-size:11.5px;color:var(--ink-faint);margin-top:12px;line-height:1.5;
   }
@@ -425,44 +431,46 @@
     <div class="section-head rf-reveal">
       <div class="eyebrow" style="justify-content:center;">Prezzi</div>
       <h2>Scegli la tua potenza di calcolo.</h2>
-      <p class="lede">Inizia senza rischi per testare il motore. Passa ai piani superiori per sbloccare l'High-Frequency Trading e le latenze ultra-basse.</p>
+      <p class="lede">Inizia senza rischi per testare il motore. Passa ai piani superiori per sbloccare l'High-Frequency Trading e l'intelligenza artificiale completa.</p>
     </div>
 
     <div class="pricing-grid">
 
+      <!-- PIANO FREE -->
       <div class="price-card rf-reveal">
         <div class="price-name mono">Free</div>
         <div class="price-amount"><span class="n display">€0</span><span class="p mono">/mese</span></div>
         <p class="price-desc">Scopri come ragiona l'algoritmo in un ambiente di test protetto.</p>
         <ul class="price-list">
           <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> Conto Demo 10.000 USDT</li>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> AI Advisor (sola lettura)</li>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> Timeframe lenti (1h, 4h, 1D)</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> Timeframe lenti (4h, 1D)</li>
           <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> Backtest limitato a 3 mesi</li>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> Esecuzione manuale</li>
+          <li class="missing"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg> Operatività reale</li>
+          <li class="missing"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg> Motore OIR (Scalping)</li>
         </ul>
         <a class="btn btn-ghost btn-block" href="app.html">Inizia Gratis</a>
         <p class="price-nudge">Ottimo per prendere confidenza prima del mercato reale.</p>
       </div>
 
+      <!-- PIANO BEGINNER -->
       <div class="price-card rf-reveal">
-        <span class="price-badge trial">7 giorni gratis</span>
         <div class="price-name mono">Beginner</div>
         <div class="price-amount"><span class="n display">€19,99</span><span class="p mono">/mese</span></div>
         <p class="price-desc">Il primo passo con capitale reale, per chi si affaccia al bot trading.</p>
         <ul class="price-list">
           <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> Capitale max gestibile: $500</li>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> Bot Live su 1 Asset (BTC o ETH)</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> Bot Live su 1 Asset (BTC)</li>
           <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> Timeframe operativo: 1h</li>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> Stop-Loss fisso base</li>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> Backtest storico di 1 anno</li>
+          <li class="missing"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg> Motore OIR (Order Imbalance)</li>
+          <li class="missing"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg> AI Trailing Stop dinamico</li>
         </ul>
-        <a class="btn btn-ghost btn-block" href="https://buy.stripe.com/test_14A6oG7fX67lfCFaHBbsc0c" target="_blank" rel="noopener">Inizia Prova Gratuita</a>
-        <p class="price-nudge">Sblocca Pro per superare il limite di $500.</p>
+        <a class="btn btn-ghost btn-block" href="https://buy.stripe.com/test_14A6oG7fX67lfCFaHBbsc0c" target="_blank" rel="noopener">Scegli Beginner</a>
+        <p class="price-nudge">Funzionalità base. Algoritmi avanzati bloccati.</p>
       </div>
 
+      <!-- PIANO PRO (Con prova gratuita) -->
       <div class="price-card featured rf-reveal">
-        <span class="price-badge">Il più scelto</span>
+        <span class="price-badge trial" style="background:var(--amber); color:#1A1102; border:none;">7 GIORNI GRATIS</span>
         <div class="price-name mono">Pro</div>
         <div class="price-amount"><span class="n display">€49,99</span><span class="p mono">/mese</span></div>
         <p class="price-desc">Sblocca il vero potenziale dell'algoritmo quantitativo sui micro-trend.</p>
@@ -470,29 +478,30 @@
           <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> Capitale max gestibile: $10.000</li>
           <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> Fino a 5 Asset in parallelo</li>
           <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> Sblocca Timeframe 15min</li>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> AI Trailing Stop dinamico</li>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> Backtest storico di 2 anni</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> <b>Motore OIR in tempo reale</b></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> <b>AI Trailing Stop dinamico</b></li>
         </ul>
-        <a class="btn btn-primary btn-block" href="https://buy.stripe.com/test_00w28qgQx53h625bLFbsc0a" target="_blank" rel="noopener">Attiva Pro</a>
-        <p class="price-nudge">L'operatività standard per portafogli avanzati.</p>
+        <a class="btn btn-primary btn-block" href="https://buy.stripe.com/test_00w28qgQx53h625bLFbsc0a" target="_blank" rel="noopener">Inizia Prova Gratuita</a>
+        <p class="price-nudge">Prova la potenza completa senza impegno.</p>
       </div>
 
+      <!-- PIANO ELITE -->
       <div class="price-card rf-reveal">
         <div class="price-name mono">Elite</div>
         <div class="price-amount"><span class="n display">€99,99</span><span class="p mono">/mese</span></div>
         <p class="price-desc">Nessun limite. Esecuzione HFT su server dedicati per capitali elevati.</p>
         <ul class="price-list">
-          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> Capitale gestibile illimitato</li>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> Asset monitorati illimitati</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> Capitale e Asset illimitati</li>
           <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> Sblocca Timeframe 5min (Scalping)</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> Esecuzione a Latenza Zero</li>
           <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> Backtest storico profondo (5+ anni)</li>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> Esecuzione prioritaria a latenza zero</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> Account manager e Canale Privato</li>
         </ul>
         <a class="btn btn-ghost btn-block" href="https://buy.stripe.com/test_8x24gy43L3Zd9eh171bsc0b" target="_blank" rel="noopener">Scegli Elite</a>
       </div>
 
     </div>
-    <p class="pricing-note">Prezzi IVA esclusa · Il piano Beginner include 7 giorni di prova gratuita, poi si rinnova automaticamente al prezzo mensile indicato · Puoi fare upgrade o downgrade in ogni momento</p>
+    <p class="pricing-note">Prezzi IVA esclusa · Il piano PRO include 7 giorni di prova gratuita, poi si rinnova automaticamente al prezzo mensile indicato · Puoi fare upgrade o downgrade in ogni momento</p>
   </div>
 </section>
 
