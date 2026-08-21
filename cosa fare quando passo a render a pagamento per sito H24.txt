@@ -1,0 +1,1 @@
+Nota: quando poi passerai al piano a pagamento su Render, dovrai rimetterla a /data/oir_validation_logs (lì /data è davvero il disco persistente montato) — segnatelo da qualche parte per non dimenticarlo.

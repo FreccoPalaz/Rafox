@@ -148,7 +148,6 @@
   .hero-cta{display:flex;align-items:center;justify-content:center;gap:14px;margin-top:36px;flex-wrap:wrap;}
   .hero-note{margin-top:18px;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--ink-faint);}
 
-  /* segnale animato: elemento firma, richiama la lettura del mercato */
   .hero-signal{max-width:720px;margin:56px auto 0;position:relative;z-index:1;opacity:.9;}
   .hero-signal path{
     fill:none;stroke:var(--amber);stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;
@@ -335,10 +334,10 @@
   <div class="wrap hero-inner">
     <div class="eyebrow">AI Advisor istituzionale</div>
     <h1>L'Intelligenza Artificiale che fa trading per te.<br class="hide-mobile"> <span class="accent">Tu vivi, lei opera.</span></h1>
-    <p class="lede">Affida il tuo portafoglio al primo AI Advisor istituzionale. Analisi di mercato in tempo reale, gestione del rischio automatizzata e zero stress.</p>
+    <p class="lede">Affida il tuo portafoglio al primo AI Advisor istituzionale. Analisi dei volumi (OIR) in tempo reale, gestione quantitativa del rischio e operatività HFT.</p>
     <div class="hero-cta">
       <a class="btn btn-primary" href="app.html">Apri il Terminale</a>
-      <a class="btn btn-ghost" href="#come-funziona">Scopri come funziona</a>
+      <a class="btn btn-ghost" href="#come-funziona">Scopri l'Algoritmo</a>
     </div>
     <p class="hero-note">Conto demo con 10.000 USDT virtuali · Nessuna carta richiesta</p>
 
@@ -361,12 +360,12 @@
       <div class="lbl">Latenza di esecuzione</div>
     </div>
     <div class="stat">
-      <div class="num mono">10+</div>
-      <div class="lbl">Mercati monitorati</div>
+      <div class="num mono">Depth20</div>
+      <div class="lbl">Lettura Book Istituzionale</div>
     </div>
     <div class="stat">
       <div class="num mono">Non-custodial</div>
-      <div class="lbl">I fondi restano sul tuo exchange</div>
+      <div class="lbl">I fondi restano sull'exchange</div>
     </div>
   </div>
 </section>
@@ -376,8 +375,8 @@
   <div class="wrap">
     <div class="section-head rf-reveal">
       <div class="eyebrow" style="justify-content:center;">Come funziona</div>
-      <h2>Tre competenze che non devi avere tu.</h2>
-      <p class="lede">Rafox le mette in campo al posto tuo, 24 ore su 24.</p>
+      <h2>Il Vantaggio Statistico.</h2>
+      <p class="lede">Rafox non "prevede" il futuro. Calcola le probabilità sfruttando i dati che il 99% dei trader ignora.</p>
     </div>
 
     <div class="bento">
@@ -386,12 +385,12 @@
           <div class="bento-icon">
             <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 2a3.5 3.5 0 0 0-3.4 4.3A4 4 0 0 0 4 10a4 4 0 0 0 1.3 7 3.5 3.5 0 0 0 3.9 3H10a2 2 0 0 0 2-2V5a3 3 0 0 0-2.5-3Z"/><path d="M14.5 2a3.5 3.5 0 0 1 3.4 4.3A4 4 0 0 1 20 10a4 4 0 0 1-1.3 7 3.5 3.5 0 0 1-3.9 3H14a2 2 0 0 1-2-2"/></svg>
           </div>
-          <h3>Cervello AI</h3>
-          <p>Non studiare i grafici. Rafox legge il regime di mercato in tempo reale e sceglie la strategia coerente con le condizioni attuali — trend, volatilità e volume, non un'opinione.</p>
+          <h3>Cervello Quantitativo (OIR)</h3>
+          <p>Dimentica i vecchi indicatori in ritardo. Rafox legge in tempo reale l'<i>Order Imbalance Ratio</i> spingendosi fino al livello 20 del book di Binance, individuando i veri muri di liquidità prima che il prezzo esploda.</p>
           <div class="bento-tags">
-            <span class="bento-tag">Analisi del trend</span>
-            <span class="bento-tag">Lettura della volatilità</span>
-            <span class="bento-tag">Conferma sul volume</span>
+            <span class="bento-tag">Order Book Dinamico</span>
+            <span class="bento-tag">Filtro Anti-Spoofing</span>
+            <span class="bento-tag">Smart Scalping</span>
           </div>
         </div>
         <div class="bento-visual" aria-hidden="true">
@@ -405,16 +404,16 @@
         <div class="bento-icon">
           <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 5v6c0 5 3.4 8.6 8 11 4.6-2.4 8-6 8-11V5l-8-3Z"/><path d="m9.5 12 2 2 3.5-4"/></svg>
         </div>
-        <h3>Gestione del rischio</h3>
-        <p>Stop loss dinamici, esposizione massima per asset e limite di perdita giornaliero: la protezione del capitale è calcolata dal server, non lasciata al caso.</p>
+        <h3>Trailing Stop Dinamico AI</h3>
+        <p>Il bot non si limita a proteggere il capitale con uno stop-loss rigido. Segue il trend al rialzo, stringendo progressivamente il margine per chiudere l'operazione al picco assoluto.</p>
       </div>
 
       <div class="bento-card rf-reveal">
         <div class="bento-icon">
           <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h7l-1 8 10-12h-7l1-8Z"/></svg>
         </div>
-        <h3>Autopilota</h3>
-        <p>Una volta avviato, il bot esegue le operazioni sui nostri server blindati. Puoi chiudere l'app e spegnere il telefono: continua a lavorare per te.</p>
+        <h3>Latenza Istituzionale</h3>
+        <p>I nostri server su architettura cloud elaborano i dati WebSocket e sparano gli ordini limit in frazioni di secondo, proteggendoti dallo <i>slippage</i> letale dei mercati volatili.</p>
       </div>
     </div>
   </div>
@@ -425,8 +424,8 @@
   <div class="wrap">
     <div class="section-head rf-reveal">
       <div class="eyebrow" style="justify-content:center;">Prezzi</div>
-      <h2>Scegli il tuo livello di operatività.</h2>
-      <p class="lede">Parti dal conto demo, senza impegno. Ogni piano successivo sblocca più strumenti, più strategie e più libertà operativa.</p>
+      <h2>Scegli la tua potenza di calcolo.</h2>
+      <p class="lede">Inizia senza rischi per testare il motore. Passa ai piani superiori per sbloccare l'High-Frequency Trading e le latenze ultra-basse.</p>
     </div>
 
     <div class="pricing-grid">
@@ -434,72 +433,66 @@
       <div class="price-card rf-reveal">
         <div class="price-name mono">Free</div>
         <div class="price-amount"><span class="n display">€0</span><span class="p mono">/mese</span></div>
-        <p class="price-desc">Prendi confidenza con l'AI Advisor senza alcun rischio, tempo illimitato.</p>
+        <p class="price-desc">Scopri come ragiona l'algoritmo in un ambiente di test protetto.</p>
         <ul class="price-list">
-          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> Conto demo illimitato</li>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> 10.000 USDT virtuali</li>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> 1 strumento alla volta</li>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> Strategia Moderata</li>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> Sessioni fisse da 1 ora</li>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> 1 alert di prezzo</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> Conto Demo 10.000 USDT</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> AI Advisor (sola lettura)</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> Timeframe lenti (1h, 4h, 1D)</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> Backtest limitato a 3 mesi</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> Esecuzione manuale</li>
         </ul>
         <a class="btn btn-ghost btn-block" href="app.html">Inizia Gratis</a>
-        <p class="price-nudge">Passa a Beginner quando vuoi operare con capitale reale.</p>
+        <p class="price-nudge">Ottimo per prendere confidenza prima del mercato reale.</p>
       </div>
 
       <div class="price-card rf-reveal">
         <span class="price-badge trial">7 giorni gratis</span>
         <div class="price-name mono">Beginner</div>
-        <div class="price-amount"><span class="n display">€14,99</span><span class="p mono">/mese</span></div>
-        <p class="price-desc">Il primo passo con capitale reale, con margini di rischio contenuti.</p>
+        <div class="price-amount"><span class="n display">€19,99</span><span class="p mono">/mese</span></div>
+        <p class="price-desc">Il primo passo con capitale reale, per chi si affaccia al bot trading.</p>
         <ul class="price-list">
-          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> Conto reale collegato al tuo exchange</li>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> 1 strumento alla volta</li>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> Strategie Conservativa e Moderata</li>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> Sessioni fino a 6 ore</li>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> AI Advisor con lettura del regime di mercato</li>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> Fino a 3 alert di prezzo</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> Capitale max gestibile: $500</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> Bot Live su 1 Asset (BTC o ETH)</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> Timeframe operativo: 1h</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> Stop-Loss fisso base</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> Backtest storico di 1 anno</li>
         </ul>
-        <a class="btn btn-ghost btn-block" href="https://buy.stripe.com/test_9B6dR81VDbrF769bLFbsc07" target="_blank" rel="noopener">Inizia la prova gratuita</a>
-        <p class="price-nudge">Passa a Pro per sbloccare tutte le strategie e più strumenti in parallelo.</p>
+        <a class="btn btn-ghost btn-block" href="https://buy.stripe.com/test_14A6oG7fX67lfCFaHBbsc0c" target="_blank" rel="noopener">Inizia Prova Gratuita</a>
+        <p class="price-nudge">Sblocca Pro per superare il limite di $500.</p>
       </div>
 
       <div class="price-card featured rf-reveal">
-        <span class="price-badge">Consigliato</span>
+        <span class="price-badge">Il più scelto</span>
         <div class="price-name mono">Pro</div>
-        <div class="price-amount"><span class="n display">€24,99</span><span class="p mono">/mese</span></div>
-        <p class="price-desc">Per chi vuole operare con capitale reale in piena autonomia.</p>
+        <div class="price-amount"><span class="n display">€49,99</span><span class="p mono">/mese</span></div>
+        <p class="price-desc">Sblocca il vero potenziale dell'algoritmo quantitativo sui micro-trend.</p>
         <ul class="price-list">
-          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> Conto reale collegato al tuo exchange</li>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> Fino a 3 strumenti in parallelo</li>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> Tutte le strategie (Conservativa, Moderata, Aggressiva)</li>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> Sessioni libere fino a 24 ore</li>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> AI Advisor completo con segnali d'ingresso</li>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> Fino a 10 alert di prezzo</li>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> Supporto prioritario via email</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> Capitale max gestibile: $10.000</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> Fino a 5 Asset in parallelo</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> Sblocca Timeframe 15min</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> AI Trailing Stop dinamico</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> Backtest storico di 2 anni</li>
         </ul>
-        <a class="btn btn-primary btn-block" href="https://buy.stripe.com/test_bJe8wOfMtgLZgGJ9Dxbsc06" target="_blank" rel="noopener">Passa a Pro</a>
-        <p class="price-nudge">Passa a Elite per l'operatività senza limiti.</p>
+        <a class="btn btn-primary btn-block" href="https://buy.stripe.com/test_00w28qgQx53h625bLFbsc0a" target="_blank" rel="noopener">Attiva Pro</a>
+        <p class="price-nudge">L'operatività standard per portafogli avanzati.</p>
       </div>
 
       <div class="price-card rf-reveal">
         <div class="price-name mono">Elite</div>
-        <div class="price-amount"><span class="n display">€49,99</span><span class="p mono">/mese</span></div>
-        <p class="price-desc">Operatività istituzionale: tutto sbloccato, nessun compromesso.</p>
+        <div class="price-amount"><span class="n display">€99,99</span><span class="p mono">/mese</span></div>
+        <p class="price-desc">Nessun limite. Esecuzione HFT su server dedicati per capitali elevati.</p>
         <ul class="price-list">
-          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> Tutto di Pro, incluso</li>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> Fino a 7 strumenti in parallelo</li>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> Sessioni senza limite di durata</li>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> Rischio ed esposizione personalizzabili a mano</li>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> Alert di prezzo illimitati</li>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> Canale Telegram privato</li>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> Account manager dedicato</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> Capitale gestibile illimitato</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> Asset monitorati illimitati</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> Sblocca Timeframe 5min (Scalping)</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> Backtest storico profondo (5+ anni)</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> Esecuzione prioritaria a latenza zero</li>
         </ul>
-        <a class="btn btn-ghost btn-block" href="https://buy.stripe.com/test_9B6dR82ZHfHV8ad02Xbsc05" target="_blank" rel="noopener">Passa a Elite</a>
+        <a class="btn btn-ghost btn-block" href="https://buy.stripe.com/test_8x24gy43L3Zd9eh171bsc0b" target="_blank" rel="noopener">Scegli Elite</a>
       </div>
 
     </div>
-    <p class="pricing-note">Prezzi IVA esclusa · Il piano Beginner include 7 giorni di prova gratuita, poi si rinnova automaticamente al prezzo mensile indicato · Puoi passare o tornare a un piano inferiore in ogni momento</p>
+    <p class="pricing-note">Prezzi IVA esclusa · Il piano Beginner include 7 giorni di prova gratuita, poi si rinnova automaticamente al prezzo mensile indicato · Puoi fare upgrade o downgrade in ogni momento</p>
   </div>
 </section>
 
@@ -509,7 +502,7 @@
     <div class="footer-grid">
       <div class="footer-brand">
         <div class="nav-logo">RAFOX <span>/ AI trading</span></div>
-        <p>Rafox è un AI Advisor per il trading di criptovalute: legge il mercato, propone la strategia e — su piani a pagamento — esegue le operazioni sul tuo conto exchange, con limiti di rischio impostati dal server.</p>
+        <p>Rafox è un AI Advisor quantitativo per il mercato delle criptovalute: analizza lo squilibrio del book degli ordini (OIR) ed esegue operazioni automatizzate sul tuo conto exchange tramite API sicure.</p>
       </div>
       <div class="footer-col">
         <h4>Prodotto</h4>
@@ -561,7 +554,6 @@
   var yearEl = document.getElementById('rfYear');
   if (yearEl) yearEl.textContent = new Date().getFullYear();
 
-  // reveal on scroll — rispetta prefers-reduced-motion via CSS
   if ('IntersectionObserver' in window) {
     var io = new IntersectionObserver(function(entries){
       entries.forEach(function(e){
