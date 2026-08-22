@@ -650,14 +650,14 @@
             <div class="span2">
               <label class="label" for="botDuration">Durata</label>
               <select id="botDuration" class="bot-input">
-                <optgroup label="Troppo brevi per operare">
+                <optgroup label="High-Frequency & Scalping">
                   <option value="1">1 minuto</option>
                   <option value="3">3 minuti</option>
                   <option value="5">5 minuti</option>
                   <option value="15">15 minuti</option>
                   <option value="30">30 minuti</option>
                 </optgroup>
-                <optgroup label="Operative">
+                <optgroup label="Intraday & Multiday">
                   <option value="60">1 ora</option>
                   <option value="180">3 ore</option>
                   <option value="300" selected>5 ore</option>
@@ -1526,10 +1526,10 @@
 
   function applyPlanLimits(plan) {
     const minDuration = {
-      starter: 240, // 4 ore (240 min)
+      starter: 240, // 4 ore (sblocca da 5 ore in su)
       beginner: 60, // 1 ora
       pro: 15,      // 15 min
-      elite: 5      // 5 min (Scalping)
+      elite: 1      // 1 min (Sblocca tutto)
     }[plan] || 240;
 
     const durSelect = $('botDuration');
@@ -1549,7 +1549,6 @@
       }
     });
 
-    // Se l'utente era su un'opzione che ora è bloccata, spostalo alla prima sbloccata
     if (!hasValidSelection) {
       const firstValid = Array.from(durSelect.options).find(opt => !opt.disabled);
       if (firstValid) durSelect.value = firstValid.value;
