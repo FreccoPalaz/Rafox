@@ -502,40 +502,40 @@
 
   <section class="view" id="view-portafoglio">
     <h2 class="view-title">Portafoglio<button class="help-btn" type="button" data-help="portafoglio" aria-label="Come funziona questa sezione">?</button></h2>
-    <p class="view-sub">Traccia il controvalore delle tue posizioni spot e il P&amp;L latente in tempo reale.</p>
+    <p class="view-sub">Registra cosa possiedi: Rafox calcola da solo quanto vale oggi e quanto stai guadagnando, sui prezzi reali di mercato.</p>
 
     <div class="panel">
-      <div class="panel-head"><h3>Registra Posizione</h3></div>
+      <div class="panel-head"><h3>Aggiungi quello che possiedi</h3></div>
       <div class="panel-body">
         <div class="grid-form">
           <div class="span2">
-            <label class="label" for="pfSym">Asset (Simbolo)</label>
+            <label class="label" for="pfSym">Quale criptovaluta</label>
             <select id="pfSym"></select>
           </div>
           
           <div>
-            <label class="label" for="pfPx">Prezzo di Carico (Entry)</label>
-            <input id="pfPx" type="number" step="any" min="0" inputmode="decimal" placeholder="€">
+            <label class="label" for="pfPx">Prezzo d'acquisto</label>
+            <input id="pfPx" type="number" step="any" min="0" inputmode="decimal" placeholder="USDT">
             <div style="display:flex; justify-content:space-between; margin-top:6px; align-items:center;">
-              <p class="note" style="border:none;margin-top:0;padding-top:0;font-size:11px;line-height:1.2;">Costo di 1 moneta.</p>
+              <p class="note" style="border:none;margin-top:0;padding-top:0;font-size:11px;line-height:1.2;">Quanto costava 1 moneta quando l'hai comprata.</p>
               <a href="#" id="pfUseLive" style="font-size:11px; font-weight:600; color:var(--amber); text-decoration:none; white-space:nowrap;">+ Usa Prezzo Live</a>
             </div>
           </div>
 
           <div>
-            <label class="label" for="pfTotal">Capitale Investito</label>
-            <input id="pfTotal" type="number" step="any" min="0" inputmode="decimal" placeholder="500 €">
-            <p class="note" style="border:none;margin-top:6px;padding-top:0;font-size:11px;">Totale che hai speso.</p>
+            <label class="label" for="pfTotal">Quanto hai speso in tutto</label>
+            <input id="pfTotal" type="number" step="any" min="0" inputmode="decimal" placeholder="500 USDT">
+            <p class="note" style="border:none;margin-top:6px;padding-top:0;font-size:11px;">Il denaro totale investito.</p>
           </div>
 
           <div>
-            <label class="label" for="pfQty">Volume (Size)</label>
+            <label class="label" for="pfQty">Quantità</label>
             <input id="pfQty" type="number" step="any" min="0" inputmode="decimal" placeholder="0.00">
             <p class="note" style="border:none;margin-top:6px;padding-top:0;font-size:11px;">Si calcola da solo.</p>
           </div>
 
           <div style="display:flex; align-items:flex-start;">
-            <button class="btn" id="pfAdd" type="button" style="margin-top:23px;">Aggiungi al Portafoglio</button>
+            <button class="btn" id="pfAdd" type="button" style="margin-top:23px;">Aggiungi</button>
           </div>
 
         </div>
@@ -543,21 +543,21 @@
     </div>
 
     <div class="panel">
-      <div class="panel-head"><h3>Posizioni Aperte</h3><em id="pfCount"></em></div>
+      <div class="panel-head"><h3>Le tue posizioni</h3><em id="pfCount"></em></div>
       <div class="panel-body">
         <div class="empty" id="pfEmpty">Nessuna posizione registrata. Inserisci un asset qui sopra per monitorarne il controvalore.</div>
         
         <div id="pfSummary" hidden style="display:grid; grid-template-columns:repeat(3, 1fr); gap:12px; margin-bottom:20px; border-bottom:1px dashed var(--grid); padding-bottom:16px;">
           <div style="display:flex; flex-direction:column; gap:4px;">
-            <span style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:0.06em; text-transform:uppercase; color:var(--ink-dim);">Controvalore</span>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:0.06em; text-transform:uppercase; color:var(--ink-dim);">Vale oggi</span>
             <span id="pfSumValue" style="font-family:'IBM Plex Mono',monospace; font-size:18px; font-weight:600; color:var(--ink);">&mdash;</span>
           </div>
           <div style="display:flex; flex-direction:column; gap:4px;">
-            <span style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:0.06em; text-transform:uppercase; color:var(--ink-dim);">Capitale Investito</span>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:0.06em; text-transform:uppercase; color:var(--ink-dim);">Hai speso</span>
             <span id="pfSumCost" style="font-family:'IBM Plex Mono',monospace; font-size:18px; font-weight:600; color:var(--ink);">&mdash;</span>
           </div>
           <div style="display:flex; flex-direction:column; gap:4px;">
-            <span style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:0.06em; text-transform:uppercase; color:var(--ink-dim);">P&amp;L Latente</span>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:0.06em; text-transform:uppercase; color:var(--ink-dim);">Guadagno / Perdita</span>
             <span id="pfSumPnl" style="font-family:'IBM Plex Mono',monospace; font-size:18px; font-weight:600;">&mdash;</span>
           </div>
         </div>
@@ -565,7 +565,7 @@
         <div id="pfList"></div>
         
         <p class="note">
-          Il <b>P&amp;L (Profit &amp; Loss) Netto</b> misura il tuo rendimento reale rispetto al capitale investito. Il calcolo sottrae in automatico le <b>commissioni standard di exchange (0.2% round-trip)</b>. Il "Controvalore" è il denaro netto che incasseresti cliccando "Vendi" in questo esatto momento.
+          <b>Come si legge:</b> "Vale oggi" è il denaro che incasseresti vendendo tutto adesso, gi&agrave; al netto delle commissioni. "Hai speso" &egrave; quanto ti &egrave; costato comprare. La differenza tra i due &egrave; il tuo guadagno o la tua perdita &mdash; in gergo tecnico <i>P&amp;L</i>. Il calcolo sottrae in automatico le commissioni di exchange (0,1% all'acquisto e 0,1% alla vendita, come su Binance).
         </p>
       </div>
     </div>
@@ -776,7 +776,7 @@
           </div>
           <div>
             <label class="label" for="alPx">Questo prezzo</label>
-            <input id="alPx" type="number" step="any" min="0" inputmode="decimal" placeholder="€">
+            <input id="alPx" type="number" step="any" min="0" inputmode="decimal" placeholder="USDT">
           </div>
           <div class="span2">
             <p class="note" id="alDistanceHint" hidden style="border:none;padding-top:0;margin-top:0;"></p>
@@ -833,7 +833,7 @@
       <div class="onboard-step" data-step="1">
         <div style="font-size:28px;margin-bottom:14px;">&#127873;</div>
         <p class="advisor-text" style="font-size:15px;">
-          Benvenuto su Rafox. Ti abbiamo accreditato <b>10.000 €</b> nel tuo Conto Demo
+          Benvenuto su Rafox. Ti abbiamo accreditato <b>10.000 USDT</b> nel tuo Conto Demo
           per testare la potenza del nostro motore in totale sicurezza.
         </p>
       </div>
@@ -1108,7 +1108,7 @@
     const qty = parseFloat($('pfQty').value);
     const px  = parseFloat($('pfPx').value);
     if (!(qty > 0) || !(px > 0)) {
-      toast('Dati incompleti', 'Inserisci il Prezzo di Carico e il Capitale Investito.');
+      toast('Dati incompleti', 'Inserisci il prezzo d\u2019acquisto e quanto hai speso.');
       return;
     }
     positions.push({ id:Date.now(), sym, qty, px });
@@ -1191,14 +1191,14 @@
       return `<div class="item-row">
         <div class="ir-left">
           <span class="ir-sym">${a.short}</span>
-          <span class="ir-sub">${M.fmt.money(p.qty, 6)} @ ${M.fmt.money(p.px, a.dp)} €</span>
-          ${v != null ? `<span class="ir-sub" style="font-size:10.5px; color:var(--amber-dim); margin-top:2px;">Fee Binance (In+Out): -${M.fmt.money(totalFees, 2)} €</span>` : ''}
+          <span class="ir-sub">${M.fmt.money(p.qty, 6)} @ ${M.fmt.money(p.px, a.dp)} USDT</span>
+          ${v != null ? `<span class="ir-sub" style="font-size:10.5px; color:var(--amber-dim); margin-top:2px;">Fee Binance (In+Out): -${M.fmt.money(totalFees, 2)} USDT</span>` : ''}
           ${allocation != null ? `<div class="sc-meter" style="width:80px;margin-top:6px;"><span style="width:${allocation.toFixed(0)}%;"></span></div>
           <span class="ir-sub" style="font-size:10px;">${allocation.toFixed(1)}% del portafoglio</span>` : ''}
         </div>
         <div class="ir-right">
           <div class="ir-values">
-            <span class="ir-value">${v == null ? '\u2014' : M.fmt.money(v, 2) + ' €'}</span>
+            <span class="ir-value">${v == null ? '\u2014' : M.fmt.money(v, 2) + ' USDT'}</span>
             <span class="ir-value ${k}" style="font-size:11.5px;">${pnl == null ? '' : M.fmt.signed(pnl, 2) + ' \u00b7 ' + M.fmt.pct(pct)}</span>
           </div>
           <button class="btn-x" type="button" data-rm="${p.id}" aria-label="Rimuovi ${a.short}">\u00d7</button>
@@ -1208,8 +1208,8 @@
 
     const pnl = complete ? value - cost : null;
     const pct = complete && cost ? pnl / cost * 100 : null;
-    $('pfSumValue').textContent = complete ? M.fmt.money(value, 2) + ' €' : '\u2014';
-    $('pfSumCost').textContent = M.fmt.money(cost, 2) + ' €';
+    $('pfSumValue').textContent = complete ? M.fmt.money(value, 2) + ' USDT' : '\u2014';
+    $('pfSumCost').textContent = M.fmt.money(cost, 2) + ' USDT';
     const pnlEl = $('pfSumPnl');
     if (pnl == null) {
       pnlEl.textContent = '\u2014'; pnlEl.className = 'v';
@@ -1310,8 +1310,8 @@
       title: 'Quanto stai guadagnando davvero',
       lead: 'Se possiedi criptovalute — anche comprate altrove — qui puoi registrarle e vedere in ogni momento se sei in guadagno o in perdita.',
       steps: [
-        'Aggiungi una posizione indicando quale criptovaluta possiedi, in che quantità e a quale prezzo l\u2019hai comprata.',
-        'Rafox confronta quel prezzo con quello di mercato di adesso e calcola la differenza per te.',
+        'Indica quale criptovaluta possiedi, a quale prezzo l\u2019hai comprata e quanto hai speso in tutto: la quantità si calcola da sola.',
+        'Rafox confronta quel prezzo con quello di mercato di adesso e calcola la differenza per te, commissioni incluse.',
         '"Vale oggi" è quanto ricaveresti vendendo subito; "Hai speso" è quanto ti è costata. La differenza è il tuo risultato.'
       ],
       tip: 'Questa sezione non compra e non vende nulla: è un registro personale. Serve ad avere sempre chiara la tua situazione.'
@@ -1630,7 +1630,7 @@
     }
   }
 
-  function money(v){ return v == null ? '—' : M.fmt.money(v, 2) + ' €'; }
+  function money(v){ return v == null ? '—' : M.fmt.money(v, 2) + ' USDT'; }
 
   function showAuthOrBot(){
     const configured = API && API.configured();
@@ -2085,7 +2085,7 @@
       $('authPassword').value = '';
       await afterLogin(info);
       toast(kind === 'register' ? 'Conto demo creato' : 'Accesso effettuato',
-            kind === 'register' ? '10.000 € virtuali disponibili.' : 'Bentornato.');
+            kind === 'register' ? '10.000 USDT virtuali disponibili.' : 'Bentornato.');
       if (!maybeShowOnboarding()) showTourIfFirstTime('mercati');
     } catch (e) {
       toast('Accesso non riuscito', e.message);
