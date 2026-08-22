@@ -891,6 +891,11 @@
                    'ADAUSDT','AVAXUSDT','LINKUSDT','DOGEUSDT','PAXGUSDT'];
   const view = { symbol:'BTCUSDT', tf:'1h' };
 
+  /* account collegato: dichiarato qui, prima dello storage, perché le
+     chiavi di storage devono poter dipendere da chi è loggato. Finché
+     nessuno ha fatto login vale null e si usa lo spazio "ospite". */
+  let account = null;
+
   /* ---------- persistenza ---------- */
   const store = (function(){
     let ok = true;
@@ -910,8 +915,16 @@
     };
   })();
 
-  let positions = store.get('rfx.positions', []);
-  let alerts    = store.get('rfx.alerts', []);
+  /* Ogni utente ha la propria chiave di storage: senza questo, un secondo
+     account loggato sullo stesso browser vedrebbe il portafoglio/alert
+     lasciati dal primo, perché localStorage non distingue tra utenti da
+     solo — è la stessa origine per tutti. */
+  function scopeKey(base){
+    return account && account.id != null ? base + '.' + account.id : base;
+  }
+
+  let positions = store.get(scopeKey('rfx.positions'), []);
+  let alerts    = store.get(scopeKey('rfx.alerts'), []);
 
   function toast(title, body){
     const el = document.createElement('div');
@@ -1112,7 +1125,7 @@
       return;
     }
     positions.push({ id:Date.now(), sym, qty, px });
-    store.set('rfx.positions', positions);
+    store.set(scopeKey('rfx.positions'), positions);
     $('pfQty').value = ''; $('pfPx').value = ''; 
     if($('pfTotal')) $('pfTotal').value = '';
     renderPortfolio();
@@ -1223,7 +1236,7 @@
     const px = parseFloat($('alPx').value);
     if (!(px > 0)) { toast('Soglia mancante', 'Indica il prezzo da monitorare.'); return; }
     alerts.push({ id:Date.now(), sym:$('alSym').value, dir:$('alDir').value, px, fired:false });
-    store.set('rfx.alerts', alerts);
+    store.set(scopeKey('rfx.alerts'), alerts);
     $('alPx').value = '';
     renderAlerts();
     if ('Notification' in window && Notification.permission === 'default') {
@@ -1278,7 +1291,7 @@
         try { new Notification('Rafox — alert di prezzo', { body:text, icon:'icon-192.png' }); } catch {}
       }
     }
-    if (changed) { store.set('rfx.alerts', alerts); renderAlerts(); }
+    if (changed) { store.set(scopeKey('rfx.alerts'), alerts); renderAlerts(); }
   }
 
   document.querySelector('.tabbar').addEventListener('click', e => {
@@ -1558,14 +1571,14 @@
     const b = e.target.closest('[data-rm]');
     if (!b) return;
     positions = positions.filter(p => p.id !== +b.dataset.rm);
-    store.set('rfx.positions', positions);
+    store.set(scopeKey('rfx.positions'), positions);
     renderPortfolio();
   });
   $('alList').addEventListener('click', e => {
     const b = e.target.closest('[data-rma]');
     if (!b) return;
     alerts = alerts.filter(a => a.id !== +b.dataset.rma);
-    store.set('rfx.alerts', alerts);
+    store.set(scopeKey('rfx.alerts'), alerts);
     renderAlerts();
   });
 
@@ -1591,7 +1604,6 @@
   });
 
   const API = window.RafoxAPI;
-  let account = null;
   let botPollTimer = null;
   let userPlan = 'free'; 
 
@@ -2044,6 +2056,14 @@
       account = accounts.find(a => a.type === 'demo') || accounts[0];
       if (!account) { toast('Nessun conto', 'Il tuo utente non ha conti collegati.'); return; }
 
+      /* Ora che sappiamo chi è loggato, ricarica portafoglio e alert dallo
+         spazio di storage di QUESTO account, non da quello lasciato da un
+         eventuale utente precedente sullo stesso browser. */
+      positions = store.get(scopeKey('rfx.positions'), []);
+      alerts    = store.get(scopeKey('rfx.alerts'), []);
+      renderPortfolio();
+      renderAlerts();
+
       userPlan = normalizePlan(info.plan); 
       $('accountPlan').textContent = 'piano ' + userPlan;
       applyPlanLimits(userPlan); 
@@ -2068,6 +2088,12 @@
     API.logout();
     account = null;
     stopPolling();
+    /* Torna allo spazio "ospite": evita che il portafoglio/alert
+       dell'account appena uscito restino visibili al prossimo login. */
+    positions = store.get(scopeKey('rfx.positions'), []);
+    alerts    = store.get(scopeKey('rfx.alerts'), []);
+    renderPortfolio();
+    renderAlerts();
     showAuthOrBot();
   }
 
