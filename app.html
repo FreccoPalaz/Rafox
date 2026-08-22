@@ -371,6 +371,62 @@
      senza questa regola, hidden=true non nasconde più l'elemento perché lo
      style inline ha priorità sulla regola di default del browser. */
   [hidden]{ display:none !important; }
+
+  /* ---------- tutorial di sezione ---------- */
+  /* Un popup breve per ogni scheda, mostrato la prima volta che ci si
+     entra. Resta poi richiamabile dal pulsante "?" accanto al titolo:
+     l'aiuto non deve sparire per sempre dopo il primo utilizzo. */
+  .tour-overlay{
+    position:fixed;inset:0;z-index:200;
+    display:flex;align-items:center;justify-content:center;padding:20px;
+    background:rgba(7,11,20,0.82);
+    backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  }
+  .tour-box{
+    width:100%;max-width:430px;background:var(--bg-panel);
+    border:1px solid var(--grid);border-top:3px solid var(--amber);
+    border-radius:16px;padding:30px 26px 24px;position:relative;
+    box-shadow:0 30px 80px rgba(0,0,0,.5);
+  }
+  .tour-close{
+    position:absolute;top:12px;right:12px;background:transparent;border:none;
+    color:var(--ink-dim);font-size:18px;cursor:pointer;padding:8px;line-height:1;
+  }
+  .tour-close:hover{color:var(--ink);}
+  .tour-eyebrow{
+    font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:0.12em;
+    text-transform:uppercase;color:var(--amber);margin-bottom:10px;
+  }
+  .tour-box h3{
+    font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:600;
+    color:var(--ink);margin-bottom:12px;line-height:1.25;
+  }
+  .tour-lead{font-family:'Inter',sans-serif;font-size:14.5px;line-height:1.6;color:var(--ink-dim);}
+  .tour-steps{list-style:none;margin:18px 0 0;padding:0;display:flex;flex-direction:column;gap:12px;}
+  .tour-steps li{display:flex;gap:11px;align-items:flex-start;font-size:14px;line-height:1.5;color:var(--ink);}
+  .tour-steps .n{
+    flex:none;width:21px;height:21px;border-radius:50%;
+    background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.35);
+    color:var(--amber);font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;
+    display:flex;align-items:center;justify-content:center;margin-top:1px;
+  }
+  .tour-tip{
+    margin-top:18px;padding:11px 13px;border-radius:9px;
+    background:rgba(245,158,11,0.06);border:1px solid rgba(245,158,11,0.18);
+    font-size:12.5px;line-height:1.6;color:var(--ink-dim);
+  }
+  .tour-tip b{color:var(--amber);}
+
+  /* Pulsante "?" accanto al titolo di ogni sezione */
+  .help-btn{
+    background:transparent;border:1px solid var(--grid);border-radius:50%;
+    width:22px;height:22px;flex:none;cursor:pointer;
+    color:var(--ink-dim);font-family:'IBM Plex Mono',monospace;font-size:12px;
+    line-height:1;padding:0;transition:color .15s,border-color .15s;
+    display:inline-flex;align-items:center;justify-content:center;vertical-align:middle;
+    margin-left:9px;
+  }
+  .help-btn:hover{color:var(--amber);border-color:var(--amber-dim);}
 </style>
 </head>
 <body>
@@ -433,7 +489,7 @@
     <select id="symbol" style="position:absolute;width:1px;height:1px;overflow:hidden;opacity:0;"></select>
 
     <div class="panel">
-      <div class="panel-head"><h3>Mercati</h3><em id="watchlistState"></em></div>
+      <div class="panel-head"><h3>Mercati<button class="help-btn" type="button" data-help="mercati" aria-label="Come funziona questa sezione">?</button></h3><em id="watchlistState"></em></div>
       <div class="panel-body">
         <select id="watchSort" style="margin-bottom:14px;">
           <option value="default">Ordine predefinito</option>
@@ -474,49 +530,56 @@
   </section>
 
   <section class="view" id="view-portafoglio">
-    <h2 class="view-title">Portafoglio</h2>
-    <p class="view-sub">Posizioni inserite a mano, valorizzate sui prezzi live di mercato.</p>
+    <h2 class="view-title">Portafoglio<button class="help-btn" type="button" data-help="portafoglio" aria-label="Come funziona questa sezione">?</button></h2>
+    <p class="view-sub">Registra cosa possiedi: Rafox calcola da solo quanto stai guadagnando o perdendo, sui prezzi reali di mercato.</p>
 
     <div class="panel">
-      <div class="panel-head"><h3>Nuova posizione</h3></div>
+      <div class="panel-head"><h3>Aggiungi quello che possiedi</h3></div>
       <div class="panel-body">
         <div class="grid-form">
           <div class="span2">
-            <label class="label" for="pfSym">Asset</label>
+            <label class="label" for="pfSym">Quale criptovaluta</label>
             <select id="pfSym"></select>
           </div>
           <div>
             <label class="label" for="pfQty">Quantità</label>
             <input id="pfQty" type="number" step="any" min="0" inputmode="decimal" placeholder="0,5">
+            <p class="note" style="border:none;margin-top:6px;padding-top:0;font-size:11px;">Quante ne possiedi.</p>
           </div>
           <div>
-            <label class="label" for="pfPx">Prezzo di carico</label>
+            <label class="label" for="pfPx">Prezzo d'acquisto</label>
             <input id="pfPx" type="number" step="any" min="0" inputmode="decimal" placeholder="USDT">
+            <p class="note" style="border:none;margin-top:6px;padding-top:0;font-size:11px;">Quanto costava quando l'hai comprata, non adesso.</p>
           </div>
           <div class="span2">
-            <button class="btn" id="pfAdd" type="button">Aggiungi posizione</button>
+            <button class="btn" id="pfAdd" type="button">Aggiungi</button>
           </div>
         </div>
       </div>
     </div>
 
     <div class="panel">
-      <div class="panel-head"><h3>Posizioni</h3><em id="pfCount"></em></div>
+      <div class="panel-head"><h3>Le tue posizioni</h3><em id="pfCount"></em></div>
       <div class="panel-body">
-        <div class="empty" id="pfEmpty">Nessuna posizione. Aggiungine una per vedere il P&amp;L muoversi sui prezzi reali.</div>
+        <div class="empty" id="pfEmpty">Non hai ancora aggiunto nulla. Inserisci la tua prima posizione qui sopra per vedere il guadagno aggiornarsi in tempo reale.</div>
         <div id="pfSummary" class="stat-grid" hidden style="grid-template-columns:repeat(3,1fr);margin-bottom:4px;">
-          <div class="stat-card"><span class="k">Valore attuale</span><span class="v" id="pfSumValue">&mdash;</span></div>
-          <div class="stat-card"><span class="k">Costo</span><span class="v" id="pfSumCost">&mdash;</span></div>
-          <div class="stat-card"><span class="k">P&amp;L</span><span class="v" id="pfSumPnl">&mdash;</span></div>
+          <div class="stat-card"><span class="k">Vale oggi</span><span class="v" id="pfSumValue">&mdash;</span></div>
+          <div class="stat-card"><span class="k">Hai speso</span><span class="v" id="pfSumCost">&mdash;</span></div>
+          <div class="stat-card"><span class="k">Guadagno / Perdita</span><span class="v" id="pfSumPnl">&mdash;</span></div>
         </div>
         <div id="pfList"></div>
-        <p class="note">P&amp;L calcolato sul prezzo di mercato corrente. Commissioni, spread e slippage non sono inclusi.</p>
+        <p class="note">
+          <b>Come si legge:</b> "Vale oggi" &egrave; quanto ricaveresti vendendo adesso ai prezzi di mercato.
+          "Hai speso" &egrave; quanto ti &egrave; costato comprare. La differenza tra i due &egrave; il tuo
+          guadagno o la tua perdita (in gergo tecnico: <i>P&amp;L</i>).
+          Le commissioni dell'exchange non sono incluse nel calcolo.
+        </p>
       </div>
     </div>
   </section>
 
   <section class="view" id="view-bot">
-    <h2 class="view-title">Bot Live</h2>
+    <h2 class="view-title">Bot Live<button class="help-btn" type="button" data-help="bot" aria-label="Come funziona questa sezione">?</button></h2>
     <p class="view-sub">Conto demo con denaro virtuale, gestito dal server.</p>
 
     <!-- Backend non configurato -->
@@ -714,7 +777,7 @@
   </section>
 
   <section class="view" id="view-alert">
-    <h2 class="view-title">Alert di prezzo</h2>
+    <h2 class="view-title">Alert di prezzo<button class="help-btn" type="button" data-help="alert" aria-label="Come funziona questa sezione">?</button></h2>
     <p class="view-sub">Scattano quando il prezzo reale attraversa la soglia.</p>
 
     <div class="panel">
@@ -820,6 +883,21 @@
       </div>
       <button type="button" id="onboardNext" class="btn-glow" style="width:auto;padding:11px 22px;">Avanti</button>
     </div>
+  </div>
+</div>
+
+<!-- Guida di sezione: appare la prima volta che si apre ciascuna scheda,
+     e resta richiamabile dal pulsante "?" accanto al titolo. Il contenuto
+     viene riempito dal JS in base alla sezione. -->
+<div id="tourModal" class="tour-overlay" hidden>
+  <div class="tour-box">
+    <button type="button" id="tourClose" class="tour-close" aria-label="Chiudi la guida">&times;</button>
+    <div class="tour-eyebrow" id="tourEyebrow">Guida</div>
+    <h3 id="tourTitle">&mdash;</h3>
+    <p class="tour-lead" id="tourLead">&mdash;</p>
+    <ul class="tour-steps" id="tourSteps"></ul>
+    <div class="tour-tip" id="tourTip" hidden></div>
+    <button type="button" id="tourDone" class="btn-glow" style="margin-top:22px;">Ho capito</button>
   </div>
 </div>
 
@@ -1205,6 +1283,112 @@
       .forEach(v => v.classList.toggle('active', v.id === 'view-' + b.dataset.view));
     window.scrollTo({ top:0, behavior:'smooth' });
     if (b.dataset.view === 'mercati' && chart) chart.timeScale().fitContent();
+    showTourIfFirstTime(b.dataset.view);
+  });
+
+  /* =====================================================================
+     GUIDE DI SEZIONE
+
+     Una guida breve per scheda, mostrata la prima volta che ci si entra
+     (chiave localStorage separata per ognuna) e sempre richiamabile dal
+     pulsante "?" accanto al titolo.
+
+     Il testo spiega a cosa serve la sezione e come si usa, in italiano
+     comune: chi apre Rafox senza sapere cosa sia uno "stop loss" deve
+     capire lo stesso. I termini tecnici vengono introdotti tra parentesi
+     dopo la spiegazione, mai al posto suo — così chi è già esperto
+     ritrova il vocabolario che conosce senza che il principiante si
+     blocchi.
+     ===================================================================== */
+  const TOURS = {
+    mercati: {
+      eyebrow: 'Sezione Mercati',
+      title: 'I prezzi, aggiornati al secondo',
+      lead: 'Il punto di partenza: qui vedi quanto vale ogni criptovaluta in questo momento e come si sta muovendo.',
+      steps: [
+        'Nella lista in alto trovi le criptovalute seguite da Rafox, con il prezzo attuale e quanto è salito o sceso nelle ultime 24 ore.',
+        'Tocca una riga per aprirne il grafico: la scheda sotto mostra il suo andamento nel tempo.',
+        'I pulsanti 1m / 15m / 1h / 4h / 1g cambiano il livello di dettaglio: "1m" mostra gli ultimi minuti, "1g" gli ultimi mesi.'
+      ],
+      tip: 'Il verde indica un prezzo in salita, il rosso in discesa. Non serve ricaricare la pagina: i numeri si muovono da soli.'
+    },
+    portafoglio: {
+      eyebrow: 'Sezione Portafoglio',
+      title: 'Quanto stai guadagnando davvero',
+      lead: 'Se possiedi criptovalute — anche comprate altrove — qui puoi registrarle e vedere in ogni momento se sei in guadagno o in perdita.',
+      steps: [
+        'Aggiungi una posizione indicando quale criptovaluta possiedi, in che quantità e a quale prezzo l\u2019hai comprata.',
+        'Rafox confronta quel prezzo con quello di mercato di adesso e calcola la differenza per te.',
+        '"Vale oggi" è quanto ricaveresti vendendo subito; "Hai speso" è quanto ti è costata. La differenza è il tuo risultato.'
+      ],
+      tip: 'Questa sezione non compra e non vende nulla: è un registro personale. Serve ad avere sempre chiara la tua situazione.'
+    },
+    bot: {
+      eyebrow: 'Sezione Bot Live',
+      title: 'Il trading automatico, in tre passi',
+      lead: 'Qui il bot opera al posto tuo su un conto demo con denaro virtuale, così puoi vedere come lavora senza rischiare nulla di reale.',
+      steps: [
+        'Scegli su quale criptovaluta vuoi che il bot lavori.',
+        'Leggi il parere dell\u2019AI Advisor: descrive come si sta comportando il mercato adesso e quale approccio è compatibile con queste condizioni.',
+        'Scegli la strategia e per quanto tempo far lavorare il bot, poi avvialo. Da quel momento opera sui nostri server: puoi chiudere l\u2019app.'
+      ],
+      tip: '<b>Importante:</b> l\u2019AI Advisor descrive il mercato di adesso, non prevede il futuro. Nessuna strategia garantisce un guadagno.'
+    },
+    alert: {
+      eyebrow: 'Sezione Alert',
+      title: 'Ti avvisiamo noi',
+      lead: 'Invece di controllare i grafici in continuazione, imposta un prezzo e lascia che sia Rafox ad avvisarti quando viene raggiunto.',
+      steps: [
+        'Scegli la criptovaluta e indica se vuoi essere avvisato quando il prezzo <i>sale sopra</i> o <i>scende sotto</i> una certa soglia.',
+        'Inserisci il prezzo che ti interessa e crea l\u2019avviso.',
+        'Quando il mercato tocca quel livello ricevi una notifica immediata.'
+      ],
+      tip: 'Gli avvisi funzionano mentre l\u2019app è aperta. Consenti le notifiche del browser per riceverli anche in secondo piano.'
+    }
+  };
+
+  function openTour(view){
+    const t = TOURS[view];
+    if (!t) return;
+    $('tourEyebrow').textContent = t.eyebrow;
+    $('tourTitle').textContent = t.title;
+    $('tourLead').textContent = t.lead;
+    $('tourSteps').innerHTML = t.steps
+      .map((s, i) => `<li><span class="n">${i + 1}</span><span>${s}</span></li>`).join('');
+    const tip = $('tourTip');
+    if (t.tip) { tip.innerHTML = t.tip; tip.hidden = false; } else { tip.hidden = true; }
+    $('tourModal').dataset.view = view;
+    $('tourModal').hidden = false;
+  }
+
+  function showTourIfFirstTime(view){
+    if (!TOURS[view]) return;
+    let seen = false;
+    try { seen = localStorage.getItem('rfx_tour_' + view) === '1'; } catch {}
+    if (seen) return;
+    openTour(view);
+  }
+
+  function closeTour(){
+    const modal = $('tourModal');
+    const view = modal.dataset.view;
+    modal.hidden = true;
+    // Segnata come vista solo alla chiusura: se l'utente ricarica a metà
+    // lettura, la guida gli viene comunque riproposta.
+    if (view) { try { localStorage.setItem('rfx_tour_' + view, '1'); } catch {} }
+  }
+
+  $('tourClose').addEventListener('click', closeTour);
+  $('tourDone').addEventListener('click', closeTour);
+  // Clic sullo sfondo scuro: chiude, come ci si aspetta da un popup.
+  $('tourModal').addEventListener('click', e => { if (e.target === $('tourModal')) closeTour(); });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && !$('tourModal').hidden) closeTour();
+  });
+
+  // Pulsanti "?" accanto ai titoli: riaprono la guida in qualsiasi momento.
+  document.querySelectorAll('[data-help]').forEach(btn => {
+    btn.addEventListener('click', () => openTour(btn.dataset.help));
   });
 
   /* ---------- eventi ---------- */
@@ -1739,7 +1923,7 @@
       await afterLogin(info);
       toast(kind === 'register' ? 'Conto demo creato' : 'Accesso effettuato',
             kind === 'register' ? '10.000 USDT virtuali disponibili.' : 'Bentornato.');
-      maybeShowOnboarding();
+      if (!maybeShowOnboarding()) showTourIfFirstTime('mercati');
     } catch (e) {
       toast('Accesso non riuscito', e.message);
     }
@@ -1763,15 +1947,19 @@
   function closeOnboarding(){
     $('onboardModal').hidden = true;
     try { localStorage.setItem(ONBOARD_KEY, '1'); } catch {}
+    // Chiuso il benvenuto si resta su Mercati: è il momento naturale per
+    // la prima guida di sezione, senza sovrapporre due popup.
+    showTourIfFirstTime('mercati');
   }
 
   function maybeShowOnboarding(){
     let already = false;
     try { already = localStorage.getItem(ONBOARD_KEY) === '1'; } catch {}
-    if (already) return;
+    if (already) return false;
     onboardStep = 1;
     paintOnboardStep();
     $('onboardModal').hidden = false;
+    return true;
   }
 
   $('onboardNext').addEventListener('click', () => {
@@ -1893,7 +2081,10 @@
     // Bot Live: se c'è già una sessione valida, riprende senza rifare login
     showAuthOrBot();
     if (API && API.configured() && API.loggedIn()) {
-      try { await afterLogin(await API.me()); maybeShowOnboarding(); }
+      try {
+        await afterLogin(await API.me());
+        if (!maybeShowOnboarding()) showTourIfFirstTime('mercati');
+      }
       catch { handleLoggedOut(); }
     }
   })();
