@@ -519,8 +519,11 @@
           </div>
           <div>
             <label class="label" for="pfPx">Prezzo d'acquisto</label>
-            <input id="pfPx" type="number" step="any" min="0" inputmode="decimal" placeholder="USDT">
-            <p class="note" style="border:none;margin-top:6px;padding-top:0;font-size:11px;">Quanto costava quando l'hai comprata, non adesso.</p>
+            <input id="pfPx" type="number" step="any" min="0" inputmode="decimal" placeholder="€">
+            <div style="display:flex; justify-content:space-between; margin-top:6px; align-items:center; gap: 10px;">
+              <p class="note" style="border:none;margin-top:0;padding-top:0;font-size:11px;line-height:1.2;">Quanto l'hai pagata.</p>
+              <a href="#" id="pfUseLive" style="font-size:11px; font-weight:600; color:var(--amber); text-decoration:none; white-space:nowrap;">+ Usa Prezzo Attuale</a>
+            </div>
           </div>
           <div class="span2">
             <button class="btn" id="pfAdd" type="button">Aggiungi</button>
@@ -610,13 +613,6 @@
 
           <div id="suggestionBox" hidden>
             <p class="advisor-text" id="advisorText">&mdash;</p>
-
-            <!-- Stato d'ingresso: dice se la strategia consigliata entrerebbe
-                 ADESSO. Sta qui, subito sotto il verdetto, e non in fondo al
-                 pannello tecnico: senza, l'utente avvia il bot convinto che
-                 stia per operare e lo vede fermo per ore. -->
-            <div id="entryStatus" hidden></div>
-
             <p class="note" style="border:none;margin-top:10px;padding-top:0;">
               Descrive le condizioni di adesso, non prevede cosa succeder&agrave;: pu&ograve;
               cambiare al prossimo aggiornamento.
@@ -757,7 +753,7 @@
           </div>
           <div>
             <label class="label" for="alPx">Questo prezzo</label>
-            <input id="alPx" type="number" step="any" min="0" inputmode="decimal" placeholder="USDT">
+            <input id="alPx" type="number" step="any" min="0" inputmode="decimal" placeholder="€">
           </div>
           <div class="span2">
             <p class="note" id="alDistanceHint" hidden style="border:none;padding-top:0;margin-top:0;"></p>
@@ -814,7 +810,7 @@
       <div class="onboard-step" data-step="1">
         <div style="font-size:28px;margin-bottom:14px;">&#127873;</div>
         <p class="advisor-text" style="font-size:15px;">
-          Benvenuto su Rafox. Ti abbiamo accreditato <b>10.000 USDT</b> nel tuo Conto Demo
+          Benvenuto su Rafox. Ti abbiamo accreditato <b>10.000 €</b> nel tuo Conto Demo
           per testare la potenza del nostro motore in totale sicurezza.
         </p>
       </div>
@@ -1097,6 +1093,18 @@
     $('pfQty').value = ''; $('pfPx').value = '';
     renderPortfolio();
   }
+
+  $('pfUseLive').addEventListener('click', e => {
+    e.preventDefault();
+    const sym = $('pfSym').value;
+    const live = M.price(sym);
+    const a = M.bySym[sym];
+    if (live != null) {
+      $('pfPx').value = live.toFixed(a ? a.dp : 2);
+    } else {
+      toast('In attesa', 'Aspetta che il mercato si colleghi per leggere il prezzo live.');
+    }
+  });
 
   function renderPortfolio(){
     const n = positions.length;
@@ -1523,27 +1531,21 @@
     if (ev.symbol === view.symbol && series) series.update(ev.candle);
   });
 
-  /* =====================================================================
-     MOTORE LOGICO E LIMITI PIANI
-     ===================================================================== */
   const API = window.RafoxAPI;
   let account = null;
   let botPollTimer = null;
-  let userPlan = 'free'; // Variabile globale per bloccare le funzioni a schermo
+  let userPlan = 'free'; 
 
-  /* Gli account creati prima della rinomina hanno ancora plan="starter"
-     salvato nel database: senza questa normalizzazione cadrebbero sul
-     default e si ritroverebbero i permessi sbagliati. */
   function normalizePlan(plan){
     return plan === 'starter' ? 'free' : (plan || 'free');
   }
 
   function applyPlanLimits(plan) {
     const minDuration = {
-      free: 240,    // 4 ore (sblocca da 5 ore in su)
-      beginner: 60, // 1 ora
-      pro: 15,      // 15 min
-      elite: 1      // 1 min (Sblocca tutto)
+      free: 240,    
+      beginner: 60, 
+      pro: 15,      
+      elite: 1      
     }[plan] || 240;
 
     const durSelect = $('botDuration');
@@ -1554,7 +1556,7 @@
       if (val < minDuration) {
         opt.disabled = true;
         if (!opt.text.includes('\uD83D\uDD12')) {
-          opt.text = '\uD83D\uDD12 ' + opt.text; // Aggiunge il lucchetto visivo
+          opt.text = '\uD83D\uDD12 ' + opt.text; 
         }
       } else {
         opt.disabled = false;
@@ -1569,7 +1571,7 @@
     }
   }
 
-  function money(v){ return v == null ? '—' : M.fmt.money(v, 2) + ' USDT'; }
+  function money(v){ return v == null ? '—' : M.fmt.money(v, 2) + ' €'; }
 
   function showAuthOrBot(){
     const configured = API && API.configured();
@@ -1600,7 +1602,6 @@
       const durLabels = { 60:'1 ora', 180:'3 ore', 300:'5 ore', 480:'8 ore', 720:'12 ore', 1440:'24 ore' };
       const icons = { conservative:'\u{1F6E1}\uFE0F', moderate:'\u2696\uFE0F', aggressive:'\u26A1' };
 
-      // Applicazione Visual FOMO e blocco click per le strategie Pro/Elite
       $('strategyCards').innerHTML = list.map(s => {
         const isAggressive = s.name === 'aggressive';
         const locked = isAggressive && (userPlan === 'free' || userPlan === 'beginner');
@@ -1619,7 +1620,7 @@
           const strat = card.dataset.strategy;
           if (strat === 'aggressive' && (userPlan === 'free' || userPlan === 'beginner')) {
              toast('Strategia Bloccata', 'La strategia Aggressiva esegue High-Frequency Trading. Sbloccala passando al piano PRO o ELITE.');
-             return; // Impedisce di selezionare la strategia
+             return; 
           }
           $('botStrategy').value = strat;
           $('botStrategy').dispatchEvent(new Event('change'));
@@ -1833,9 +1834,6 @@
     $('suggestionReasons').innerHTML = (s.reasons || [])
       .map(r => `<li>${r}</li>`).join('');
 
-    // Stato d'ingresso in evidenza. Il backend lo manda già formulato: qui
-    // si sceglie solo il colore — ambra quando il bot resterebbe fermo,
-    // verde quando entrerebbe davvero.
     const statusEl = $('entryStatus');
     if (s.entry_status) {
       const bloccato = s.entry_status.startsWith('Attenzione');
@@ -1851,7 +1849,6 @@
       statusEl.innerHTML = '';
     }
 
-    // Il messaggio compare già qui sopra: non lo si ripete tra gli avvisi.
     $('suggestionWarnings').innerHTML = (s.warnings || [])
       .filter(w => w !== s.entry_status)
       .map(w => `<div class="warn" style="margin-top:10px;">${w}</div>`).join('');
@@ -1899,7 +1896,6 @@
     const applyBtn = document.getElementById('btnApplySuggestion');
     if (applyBtn) {
       applyBtn.addEventListener('click', () => {
-        // Se l'AI consiglia la strategia aggressiva, controlliamo se il piano lo permette
         if (s.strategy) {
           if (s.strategy === 'aggressive' && (userPlan === 'free' || userPlan === 'beginner')) {
              toast('Azione Bloccata', 'L\'AI consiglia la strategia Aggressiva, ma per usarla devi passare al piano PRO.');
@@ -1908,7 +1904,6 @@
           $('botStrategy').value = s.strategy;
         }
         
-        // Se l'AI consiglia un timeframe, controlliamo se è lucchettato
         if (s.suggested_duration_minutes) {
           const opt = Array.from($('botDuration').options).find(o => parseInt(o.value, 10) === s.suggested_duration_minutes);
           if (opt && opt.disabled) {
@@ -1990,9 +1985,9 @@
       account = accounts.find(a => a.type === 'demo') || accounts[0];
       if (!account) { toast('Nessun conto', 'Il tuo utente non ha conti collegati.'); return; }
 
-      userPlan = normalizePlan(info.plan); // Salviamo il piano per bloccare le funzioni
+      userPlan = normalizePlan(info.plan); 
       $('accountPlan').textContent = 'piano ' + userPlan;
-      applyPlanLimits(userPlan); // Applichiamo i lucchetti ai timeframe
+      applyPlanLimits(userPlan); 
 
       const canBot = account.type === 'demo' || userPlan !== 'free';
       $('upgrade-banner').hidden = canBot;
@@ -2001,7 +1996,7 @@
       paintAssetChips();
 
       showAuthOrBot();
-      await loadStrategies(); // I lucchetti sulle strategie vengono applicati qui
+      await loadStrategies(); 
       await refreshBot();
       refreshRegime();
       startPolling();
@@ -2031,7 +2026,7 @@
       $('authPassword').value = '';
       await afterLogin(info);
       toast(kind === 'register' ? 'Conto demo creato' : 'Accesso effettuato',
-            kind === 'register' ? '10.000 USDT virtuali disponibili.' : 'Bentornato.');
+            kind === 'register' ? '10.000 € virtuali disponibili.' : 'Bentornato.');
       if (!maybeShowOnboarding()) showTourIfFirstTime('mercati');
     } catch (e) {
       toast('Accesso non riuscito', e.message);
