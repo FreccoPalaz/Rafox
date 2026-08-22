@@ -2048,7 +2048,7 @@
       $('accountPlan').textContent = 'piano ' + userPlan;
       applyPlanLimits(userPlan); 
 
-      const canBot = account.type === 'demo' || userPlan !== 'free';
+      const canBot = account.type === 'demo' || userPlan !== 'elite';
       $('upgrade-banner').hidden = canBot;
       document.querySelectorAll('.bot-input').forEach(el => { el.disabled = !canBot; });
       fillSymbolChoices(userPlan, account.type);
