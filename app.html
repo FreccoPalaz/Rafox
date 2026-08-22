@@ -610,6 +610,13 @@
 
           <div id="suggestionBox" hidden>
             <p class="advisor-text" id="advisorText">&mdash;</p>
+
+            <!-- Stato d'ingresso: dice se la strategia consigliata entrerebbe
+                 ADESSO. Sta qui, subito sotto il verdetto, e non in fondo al
+                 pannello tecnico: senza, l'utente avvia il bot convinto che
+                 stia per operare e lo vede fermo per ore. -->
+            <div id="entryStatus" hidden></div>
+
             <p class="note" style="border:none;margin-top:10px;padding-top:0;">
               Descrive le condizioni di adesso, non prevede cosa succeder&agrave;: pu&ograve;
               cambiare al prossimo aggiornamento.
@@ -1522,11 +1529,18 @@
   const API = window.RafoxAPI;
   let account = null;
   let botPollTimer = null;
-  let userPlan = 'starter'; // Variabile globale per bloccare le funzioni a schermo
+  let userPlan = 'free'; // Variabile globale per bloccare le funzioni a schermo
+
+  /* Gli account creati prima della rinomina hanno ancora plan="starter"
+     salvato nel database: senza questa normalizzazione cadrebbero sul
+     default e si ritroverebbero i permessi sbagliati. */
+  function normalizePlan(plan){
+    return plan === 'starter' ? 'free' : (plan || 'free');
+  }
 
   function applyPlanLimits(plan) {
     const minDuration = {
-      starter: 240, // 4 ore (sblocca da 5 ore in su)
+      free: 240,    // 4 ore (sblocca da 5 ore in su)
       beginner: 60, // 1 ora
       pro: 15,      // 15 min
       elite: 1      // 1 min (Sblocca tutto)
@@ -1589,7 +1603,7 @@
       // Applicazione Visual FOMO e blocco click per le strategie Pro/Elite
       $('strategyCards').innerHTML = list.map(s => {
         const isAggressive = s.name === 'aggressive';
-        const locked = isAggressive && (userPlan === 'starter' || userPlan === 'beginner');
+        const locked = isAggressive && (userPlan === 'free' || userPlan === 'beginner');
         return `
           <button type="button" class="strategy-card" data-strategy="${s.name}" style="${locked ? 'opacity:0.5; filter:grayscale(1);' : ''}">
             <div class="sc-icon">${icons[s.name] || '\u25CF'}</div>
@@ -1603,7 +1617,7 @@
       $('strategyCards').querySelectorAll('.strategy-card').forEach(card => {
         card.addEventListener('click', () => {
           const strat = card.dataset.strategy;
-          if (strat === 'aggressive' && (userPlan === 'starter' || userPlan === 'beginner')) {
+          if (strat === 'aggressive' && (userPlan === 'free' || userPlan === 'beginner')) {
              toast('Strategia Bloccata', 'La strategia Aggressiva esegue High-Frequency Trading. Sbloccala passando al piano PRO o ELITE.');
              return; // Impedisce di selezionare la strategia
           }
@@ -1651,7 +1665,7 @@
 
   function fillSymbolChoices(plan, accountType){
     const byPlan = {
-      starter: [],
+      free: [],
       beginner: ['BTCUSDT', 'ETHUSDT'],
       pro:   ['BTCUSDT', 'ETHUSDT', 'SOLUSDT', 'BNBUSDT', 'XRPUSDT'],
       elite: ['BTCUSDT', 'ETHUSDT', 'SOLUSDT', 'BNBUSDT', 'XRPUSDT', 'AVAXUSDT', 'LINKUSDT', 'ADAUSDT', 'DOGEUSDT', 'PAXGUSDT']
@@ -1819,7 +1833,27 @@
     $('suggestionReasons').innerHTML = (s.reasons || [])
       .map(r => `<li>${r}</li>`).join('');
 
+    // Stato d'ingresso in evidenza. Il backend lo manda già formulato: qui
+    // si sceglie solo il colore — ambra quando il bot resterebbe fermo,
+    // verde quando entrerebbe davvero.
+    const statusEl = $('entryStatus');
+    if (s.entry_status) {
+      const bloccato = s.entry_status.startsWith('Attenzione');
+      const col = bloccato ? 'var(--amber)' : 'var(--up)';
+      const bg = bloccato ? 'rgba(245,158,11,0.07)' : 'rgba(22,224,146,0.07)';
+      statusEl.hidden = false;
+      statusEl.innerHTML =
+        `<div style="margin-top:14px;padding:12px 14px;border-radius:10px;` +
+        `background:${bg};border:1px solid ${col};color:var(--ink);` +
+        `font-size:13.5px;line-height:1.55;">${s.entry_status}</div>`;
+    } else {
+      statusEl.hidden = true;
+      statusEl.innerHTML = '';
+    }
+
+    // Il messaggio compare già qui sopra: non lo si ripete tra gli avvisi.
     $('suggestionWarnings').innerHTML = (s.warnings || [])
+      .filter(w => w !== s.entry_status)
       .map(w => `<div class="warn" style="margin-top:10px;">${w}</div>`).join('');
 
     const signals = data.entry_signals || [];
@@ -1867,7 +1901,7 @@
       applyBtn.addEventListener('click', () => {
         // Se l'AI consiglia la strategia aggressiva, controlliamo se il piano lo permette
         if (s.strategy) {
-          if (s.strategy === 'aggressive' && (userPlan === 'starter' || userPlan === 'beginner')) {
+          if (s.strategy === 'aggressive' && (userPlan === 'free' || userPlan === 'beginner')) {
              toast('Azione Bloccata', 'L\'AI consiglia la strategia Aggressiva, ma per usarla devi passare al piano PRO.');
              return;
           }
@@ -1956,14 +1990,14 @@
       account = accounts.find(a => a.type === 'demo') || accounts[0];
       if (!account) { toast('Nessun conto', 'Il tuo utente non ha conti collegati.'); return; }
 
-      $('accountPlan').textContent = 'piano ' + info.plan;
-      userPlan = info.plan; // Salviamo il piano per bloccare le funzioni
+      userPlan = normalizePlan(info.plan); // Salviamo il piano per bloccare le funzioni
+      $('accountPlan').textContent = 'piano ' + userPlan;
       applyPlanLimits(userPlan); // Applichiamo i lucchetti ai timeframe
 
-      const canBot = account.type === 'demo' || info.plan !== 'starter';
+      const canBot = account.type === 'demo' || userPlan !== 'free';
       $('upgrade-banner').hidden = canBot;
       document.querySelectorAll('.bot-input').forEach(el => { el.disabled = !canBot; });
-      fillSymbolChoices(info.plan, account.type);
+      fillSymbolChoices(userPlan, account.type);
       paintAssetChips();
 
       showAuthOrBot();
