@@ -12,42 +12,30 @@
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root{
-    /* Colori Fintech Moderni — scuriti per maggiore contrasto con pannelli e grafico */
-    --bg: #070B14; /* Blu slate quasi nero, più profondo dell'originale */
-    --bg-panel: #131B2E; /* Pannelli in risalto più netto sul fondo scurito */
-    --amber: #F59E0B; /* Oro Rafox per mantenere il brand */
+    --bg: #070B14; 
+    --bg-panel: #131B2E; 
+    --amber: #F59E0B; 
     --amber-dim: #B45309;
     --ink: #F8FAFC;
     --ink-dim: #94A3B8;
     --grid: #334155;
-    --up: #16E092; /* Verde smeraldo più acceso: risalta di più sul fondo scuro */
-    --down: #FF5A6E; /* Rosso più vibrante, stesso motivo */
+    --up: #16E092; 
+    --down: #FF5A6E; 
   }
 
-  /* Arrotondiamo i bordi per un look più moderno (stile App) */
-  .panel, select, input, .btn, .btn-ghost { 
-    border-radius: 8px; 
-  }
-  .appbar {
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-  }
+  .panel, select, input, .btn, .btn-ghost { border-radius: 8px; }
+  .appbar { box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); }
   *{margin:0;padding:0;box-sizing:border-box;}
   body{
-    background:var(--bg);
-    color:var(--ink);
-    font-family:'Inter',sans-serif;
-    font-size:15px;
-    -webkit-font-smoothing:antialiased;
-    padding-bottom:calc(72px + env(safe-area-inset-bottom));
+    background:var(--bg); color:var(--ink); font-family:'Inter',sans-serif;
+    font-size:15px; -webkit-font-smoothing:antialiased; padding-bottom:calc(72px + env(safe-area-inset-bottom));
   }
   .mono{font-family:'IBM Plex Mono',monospace;}
 
-  /* ---------- barra superiore ---------- */
   .appbar{
     display:flex;align-items:center;justify-content:space-between;
     padding:calc(14px + env(safe-area-inset-top)) 20px 14px;
-    border-bottom:1px solid var(--grid);
-    background:var(--bg-panel);
+    border-bottom:1px solid var(--grid); background:var(--bg-panel);
     position:sticky;top:0;z-index:20;
   }
   .logo{
@@ -82,7 +70,6 @@
     text-transform:uppercase;color:var(--amber-dim);margin-bottom:7px;display:block;
   }
 
-  /* ---------- quotazione ---------- */
   .quote-row{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin:14px 0 0;}
   #price{
     font-family:'IBM Plex Mono',monospace;font-weight:600;
@@ -91,12 +78,11 @@
   #price.tick-up{color:var(--up);text-shadow:0 0 18px rgba(22,224,146,.5);}
   #price.tick-down{color:var(--down);text-shadow:0 0 18px rgba(255,90,110,.5);}
   #chg{font-family:'IBM Plex Mono',monospace;font-size:15px;}
-  .up{color:var(--up);}
-  .down{color:var(--down);}
+  .up{color:var(--up);} .down{color:var(--down);}
   .daily{
-    display:flex;gap:26px;flex-wrap:wrap;
-    font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--ink-dim);
-    border-top:1px solid var(--grid);padding-top:14px;margin-top:16px;
+    display:flex;gap:26px;flex-wrap:wrap; font-family:'IBM Plex Mono',monospace;
+    font-size:12px;color:var(--ink-dim); border-top:1px solid var(--grid);
+    padding-top:14px;margin-top:16px;
   }
   .daily b{color:var(--ink);font-weight:600;}
 
@@ -116,8 +102,7 @@
     padding:10px 0;cursor:pointer;transition:background .18s,color .18s,box-shadow .18s;
   }
   .frames button[aria-pressed="true"]{
-    background:var(--amber);color:var(--bg);
-    box-shadow:0 4px 14px rgba(245,158,11,.35);
+    background:var(--amber);color:var(--bg); box-shadow:0 4px 14px rgba(245,158,11,.35);
   }
   #chart{
     height:340px;border:1px solid var(--grid);background:var(--bg-panel);
@@ -129,7 +114,6 @@
     border:1px dashed var(--grid);padding:26px;text-align:center;line-height:1.7;
   }
 
-  /* ---------- pannelli ---------- */
   .panel{
     background:var(--bg-panel);border:1px solid var(--grid);margin-bottom:22px;
     box-shadow:0 1px 0 rgba(255,255,255,.02) inset, 0 10px 30px rgba(0,0,0,.25);
@@ -172,7 +156,6 @@
     box-shadow:0 0 14px rgba(245,158,11,.15);
   }
 
-  /* ---------- wizard Bot Live ---------- */
   .step-head h3{display:flex;align-items:center;gap:8px;}
   .step-num{
     display:inline-flex;align-items:center;justify-content:center;
@@ -190,7 +173,6 @@
   .pill.down{color:var(--down);border-color:var(--down);background:rgba(239,68,68,0.08);}
   .pill.down::before{background:var(--down);}
 
-  /* ---------- Step 1: chip prezzo asset selezionato ---------- */
   .asset-chip{
     display:inline-flex;align-items:center;gap:8px;
     font-family:'IBM Plex Mono',monospace;font-size:12.5px;
@@ -199,7 +181,6 @@
   }
   .asset-chip b{color:var(--ink);font-weight:600;}
 
-  /* ---------- Step 2: pulsante primario in evidenza ---------- */
   .btn-glow{
     background:var(--amber);color:var(--bg);border:none;border-radius:10px;
     font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:14px;
@@ -210,38 +191,30 @@
   .btn-glow:hover{background:#FFC640;box-shadow:0 0 0 1px rgba(245,158,11,.4), 0 10px 30px rgba(245,158,11,.28);}
   .btn-glow:active{transform:translateY(1px);}
 
-  .advisor-text{
-    font-family:'Inter',sans-serif;font-size:15.5px;line-height:1.65;color:var(--ink);
-  }
+  .advisor-text{ font-family:'Inter',sans-serif;font-size:15.5px;line-height:1.65;color:var(--ink); }
 
-  /* ---------- schede strategia (Step 3) ---------- */
   .strategy-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:8px;}
   @media(max-width:520px){.strategy-cards{grid-template-columns:1fr;}}
   .strategy-card{
     background:var(--bg);border:1px solid var(--grid);border-radius:10px;
     padding:14px 12px;cursor:pointer;text-align:left;
-    transition:border-color .18s,box-shadow .18s,transform .12s;
+    transition:border-color .18s,box-shadow .18s,transform .12s, opacity .2s, filter .2s;
   }
   .strategy-card:hover{border-color:var(--amber-dim);transform:translateY(-1px);}
   .strategy-card.active{
-    border-color:var(--amber);
-    box-shadow:0 0 0 1px var(--amber), 0 8px 20px rgba(245,158,11,.15);
+    border-color:var(--amber); box-shadow:0 0 0 1px var(--amber), 0 8px 20px rgba(245,158,11,.15);
   }
   .strategy-card .sc-icon{font-size:18px;margin-bottom:6px;}
   .strategy-card .sc-label{
-    font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:13px;color:var(--ink);
-    margin-bottom:8px;
+    font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:13px;color:var(--ink); margin-bottom:8px;
   }
-  .strategy-card .sc-meter{
-    width:100%;height:3px;border-radius:2px;background:var(--grid);overflow:hidden;
-  }
+  .strategy-card .sc-meter{ width:100%;height:3px;border-radius:2px;background:var(--grid);overflow:hidden; }
   .strategy-card .sc-meter span{display:block;height:100%;background:var(--amber);}
   .strategy-card .sc-meter-label{
     font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:var(--ink-dim);
     margin-top:5px;letter-spacing:0.04em;text-transform:uppercase;
   }
 
-  /* ---------- watchlist (Mercati) ---------- */
   .watch-row{
     display:flex;align-items:center;justify-content:space-between;gap:12px;
     padding:13px 18px;margin:0 -18px;cursor:pointer;border-bottom:1px solid var(--grid);
@@ -252,8 +225,7 @@
   .watch-row.active{background:rgba(245,158,11,.07);border-left-color:var(--amber);}
   .watch-row .wr-left{display:flex;flex-direction:column;gap:2px;min-width:0;}
   .watch-row .wr-sym{font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:13.5px;color:var(--ink);}
-  .watch-row .wr-name{font-family:'Inter',sans-serif;font-size:11px;color:var(--ink-dim);
-    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .watch-row .wr-name{font-family:'Inter',sans-serif;font-size:11px;color:var(--ink-dim); overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
   .watch-row .wr-right{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex:none;}
   .watch-row .wr-price{font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:13.5px;color:var(--ink);}
   details.collapse{margin-top:14px;border-top:1px dashed var(--grid);padding-top:12px;}
@@ -273,10 +245,7 @@
   }
   .btn-x:hover{color:var(--down);}
 
-  table{
-    width:100%;border-collapse:collapse;
-    font-family:'IBM Plex Mono',monospace;font-size:13px;margin-top:18px;
-  }
+  table{ width:100%;border-collapse:collapse; font-family:'IBM Plex Mono',monospace;font-size:13px;margin-top:18px; }
   th{
     text-align:right;font-weight:500;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;
     color:var(--ink-dim);padding-bottom:9px;border-bottom:1px solid var(--grid);
@@ -296,18 +265,14 @@
     font-family:'IBM Plex Mono',monospace;font-size:12.5px;
   }
   .audit-row:last-child{border-bottom:none;}
-  .audit-row .audit-top{
-    display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:5px;
-  }
+  .audit-row .audit-top{ display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:5px; }
   .audit-row .audit-time{color:var(--ink-dim);font-size:11.5px;flex:none;}
   .audit-row .audit-event{font-weight:600;}
   .audit-row .audit-sym{color:var(--ink-dim);font-size:11px;}
   .audit-row .audit-reason{
-    color:var(--ink-dim);font-size:12px;line-height:1.55;
-    word-break:break-word;overflow-wrap:anywhere;
+    color:var(--ink-dim);font-size:12px;line-height:1.55; word-break:break-word;overflow-wrap:anywhere;
   }
 
-  /* ---------- righe portafoglio / alert ---------- */
   .item-row{
     display:flex;align-items:center;justify-content:space-between;gap:12px;
     padding:13px 0;border-bottom:1px dashed var(--grid);
@@ -322,8 +287,7 @@
   .item-row .ir-sub2{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink-dim);}
   .total{
     display:flex;justify-content:space-between;align-items:baseline;gap:12px;
-    font-family:'IBM Plex Mono',monospace;
-    border-top:1px solid var(--grid);margin-top:16px;padding-top:15px;
+    font-family:'IBM Plex Mono',monospace; border-top:1px solid var(--grid);margin-top:16px;padding-top:15px;
   }
   .total .k{font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink-dim);}
   .total .v{font-size:19px;font-weight:600;}
@@ -336,7 +300,6 @@
     border:1px solid var(--down);padding:11px 13px;line-height:1.6;margin-top:16px;
   }
 
-  /* ---------- navigazione inferiore ---------- */
   .tabbar{
     position:fixed;bottom:0;left:0;right:0;z-index:30;
     display:flex;background:var(--bg-panel);border-top:1px solid var(--grid);
@@ -349,44 +312,31 @@
   }
   .tabbar button[aria-selected="true"]{color:var(--amber);border-top-color:var(--amber);}
 
-  /* ---------- avvisi ---------- */
   #toasts{
     position:fixed;left:16px;right:16px;z-index:40;
-    bottom:calc(84px + env(safe-area-inset-bottom));
-    display:flex;flex-direction:column;gap:10px;
+    bottom:calc(84px + env(safe-area-inset-bottom)); display:flex;flex-direction:column;gap:10px;
   }
   @media(min-width:640px){#toasts{left:auto;width:340px;}}
   .toast{
     background:var(--bg-panel);border:1px solid var(--amber);border-left-width:3px;
-    padding:13px 15px;font-size:13.5px;line-height:1.5;
-    box-shadow:0 14px 40px rgba(0,0,0,0.55);
+    padding:13px 15px;font-size:13.5px;line-height:1.5; box-shadow:0 14px 40px rgba(0,0,0,0.55);
   }
   .toast b{
     display:block;font-family:'IBM Plex Mono',monospace;font-size:10px;
     letter-spacing:0.12em;text-transform:uppercase;color:var(--amber);margin-bottom:4px;
   }
 
-  /* L'attributo hidden deve sempre vincere su qualunque display impostato
-     inline (es. onboardModal usa display:flex per centrarsi quando visibile):
-     senza questa regola, hidden=true non nasconde più l'elemento perché lo
-     style inline ha priorità sulla regola di default del browser. */
   [hidden]{ display:none !important; }
 
-  /* ---------- tutorial di sezione ---------- */
-  /* Un popup breve per ogni scheda, mostrato la prima volta che ci si
-     entra. Resta poi richiamabile dal pulsante "?" accanto al titolo:
-     l'aiuto non deve sparire per sempre dopo il primo utilizzo. */
   .tour-overlay{
     position:fixed;inset:0;z-index:200;
     display:flex;align-items:center;justify-content:center;padding:20px;
-    background:rgba(7,11,20,0.82);
-    backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+    background:rgba(7,11,20,0.82); backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
   }
   .tour-box{
     width:100%;max-width:430px;background:var(--bg-panel);
     border:1px solid var(--grid);border-top:3px solid var(--amber);
-    border-radius:16px;padding:30px 26px 24px;position:relative;
-    box-shadow:0 30px 80px rgba(0,0,0,.5);
+    border-radius:16px;padding:30px 26px 24px;position:relative; box-shadow:0 30px 80px rgba(0,0,0,.5);
   }
   .tour-close{
     position:absolute;top:12px;right:12px;background:transparent;border:none;
@@ -417,7 +367,6 @@
   }
   .tour-tip b{color:var(--amber);}
 
-  /* Pulsante "?" accanto al titolo di ogni sezione */
   .help-btn{
     background:transparent;border:1px solid var(--grid);border-radius:50%;
     width:22px;height:22px;flex:none;cursor:pointer;
@@ -428,7 +377,6 @@
   }
   .help-btn:hover{color:var(--amber);border-color:var(--amber-dim);}
 
-  /* ---------- livelli suggeriti (sezione Alert) ---------- */
   .suggest-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
   @media(max-width:600px){.suggest-grid{grid-template-columns:1fr;}}
   .suggest-card{
@@ -456,7 +404,6 @@
 </head>
 <body>
 
-<!-- SCHERMATA DI LOGIN GLOBALE (Il Muro) -->
 <div id="loginScreen" style="min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; background: var(--bg);">
   <h1 class="logo" style="margin-bottom: 30px; font-size: 28px;">RAFOX <span>/ engine</span></h1>
   
@@ -486,7 +433,6 @@
   </div>
 </div>
 
-<!-- CONTENITORE PRINCIPALE DELL'APP (Nascosto all'inizio) -->
 <div id="mainApp" hidden>
 
 <header class="appbar">
@@ -606,7 +552,6 @@
     <h2 class="view-title">Bot Live<button class="help-btn" type="button" data-help="bot" aria-label="Come funziona questa sezione">?</button></h2>
     <p class="view-sub">Conto demo con denaro virtuale, gestito dal server.</p>
 
-    <!-- Backend non configurato -->
     <div class="panel" id="botOffline" hidden>
       <div class="panel-head"><h3>Backend non collegato</h3></div>
       <div class="panel-body">
@@ -617,10 +562,7 @@
       </div>
     </div>
 
-    <!-- Area operativa -->
     <div id="botArea" hidden>
-
-      <!-- Conto demo: contesto persistente, non fa parte dei passi guidati -->
       <div class="panel">
         <div class="panel-head"><h3>Conto demo</h3><em id="accountPlan">&mdash;</em></div>
         <div class="panel-body">
@@ -646,7 +588,6 @@
         <a href="index.html#prezzi" style="color:var(--amber);margin-left:6px;">Vedi i piani &rarr;</a>
       </div>
 
-      <!-- STEP 1 — Asset: la prima scelta, in cima. Tutto il resto dipende da questa. -->
       <div class="panel">
         <div class="panel-head step-head"><h3><span class="step-num">1</span> Seleziona l'asset</h3></div>
         <div class="panel-body">
@@ -660,7 +601,6 @@
         </div>
       </div>
 
-      <!-- STEP 2 — Verdetto AI -->
       <div class="panel" style="border-left: 3px solid var(--amber);">
         <div class="panel-head step-head">
           <h3><span class="step-num">2</span> Rafox AI Advisor 🧠</h3><em id="regimeState">&mdash;</em>
@@ -670,16 +610,12 @@
 
           <div id="suggestionBox" hidden>
             <p class="advisor-text" id="advisorText">&mdash;</p>
-
             <p class="note" style="border:none;margin-top:10px;padding-top:0;">
               Descrive le condizioni di adesso, non prevede cosa succeder&agrave;: pu&ograve;
               cambiare al prossimo aggiornamento.
             </p>
-
             <div id="trendBadges" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;"></div>
-
             <div id="suggestionText" style="margin-top:16px;"></div>
-
             <div style="width:100%;background:var(--grid);height:4px;border-radius:2px;margin-top:18px;">
               <div id="riskThermometer" style="width:10%;background:var(--ink-dim);height:4px;border-radius:2px;transition:width .5s,background .3s;"></div>
             </div>
@@ -702,7 +638,6 @@
         </div>
       </div>
 
-      <!-- STEP 3 — Avvio -->
       <div class="panel">
         <div class="panel-head step-head"><h3><span class="step-num">3</span> Avvia</h3><em id="sessionState">&mdash;</em></div>
         <div class="panel-body">
@@ -850,7 +785,6 @@
   <button type="button" role="tab" data-view="alert" aria-selected="false">Alert</button>
 </nav>
 
-<!-- Onboarding -->
 <div id="onboardModal" hidden style="
   position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;
   padding:20px;background:rgba(7,11,20,0.82);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
@@ -916,7 +850,7 @@
   </div>
 </div>
 
-</div> <!-- Fine mainApp -->
+</div> 
 <div id="toasts" aria-live="polite"></div>
 
 <script src="rafox-market.js"></script>
@@ -1582,9 +1516,45 @@
     if (ev.symbol === view.symbol && series) series.update(ev.candle);
   });
 
+  /* =====================================================================
+     MOTORE LOGICO E LIMITI PIANI
+     ===================================================================== */
   const API = window.RafoxAPI;
   let account = null;
   let botPollTimer = null;
+  let userPlan = 'starter'; // Variabile globale per bloccare le funzioni a schermo
+
+  function applyPlanLimits(plan) {
+    const minDuration = {
+      starter: 240, // 4 ore (240 min)
+      beginner: 60, // 1 ora
+      pro: 15,      // 15 min
+      elite: 5      // 5 min (Scalping)
+    }[plan] || 240;
+
+    const durSelect = $('botDuration');
+    let hasValidSelection = false;
+
+    Array.from(durSelect.options).forEach(opt => {
+      const val = parseInt(opt.value, 10);
+      if (val < minDuration) {
+        opt.disabled = true;
+        if (!opt.text.includes('\uD83D\uDD12')) {
+          opt.text = '\uD83D\uDD12 ' + opt.text; // Aggiunge il lucchetto visivo
+        }
+      } else {
+        opt.disabled = false;
+        opt.text = opt.text.replace('\uD83D\uDD12 ', '');
+        if (durSelect.value === opt.value) hasValidSelection = true;
+      }
+    });
+
+    // Se l'utente era su un'opzione che ora è bloccata, spostalo alla prima sbloccata
+    if (!hasValidSelection) {
+      const firstValid = Array.from(durSelect.options).find(opt => !opt.disabled);
+      if (firstValid) durSelect.value = firstValid.value;
+    }
+  }
 
   function money(v){ return v == null ? '—' : M.fmt.money(v, 2) + ' USDT'; }
 
@@ -1617,19 +1587,28 @@
       const durLabels = { 60:'1 ora', 180:'3 ore', 300:'5 ore', 480:'8 ore', 720:'12 ore', 1440:'24 ore' };
       const icons = { conservative:'\u{1F6E1}\uFE0F', moderate:'\u2696\uFE0F', aggressive:'\u26A1' };
 
-      // --- FIX 3: VISUAL FOMO APPLICATO QUI ---
-      $('strategyCards').innerHTML = list.map(s => `
-        <button type="button" class="strategy-card" data-strategy="${s.name}">
-          <div class="sc-icon">${icons[s.name] || '\u25CF'}</div>
-          <div class="sc-label">${s.label}</div>
-          <div class="sc-meter"><span style="width:${s.max_exposure_pct}%;"></span></div>
-          <div class="sc-meter-label">Esposizione max ${s.max_exposure_pct}%</div>
-          ${s.name === 'aggressive' ? '<div style="font-size:10px; color:var(--amber); margin-top:6px; font-family:\'IBM Plex Mono\',monospace; text-transform:uppercase; font-weight:600;">Solo PRO/Elite</div>' : ''}
-        </button>`).join('');
+      // Applicazione Visual FOMO e blocco click per le strategie Pro/Elite
+      $('strategyCards').innerHTML = list.map(s => {
+        const isAggressive = s.name === 'aggressive';
+        const locked = isAggressive && (userPlan === 'starter' || userPlan === 'beginner');
+        return `
+          <button type="button" class="strategy-card" data-strategy="${s.name}" style="${locked ? 'opacity:0.5; filter:grayscale(1);' : ''}">
+            <div class="sc-icon">${icons[s.name] || '\u25CF'}</div>
+            <div class="sc-label">${s.label}</div>
+            <div class="sc-meter"><span style="width:${s.max_exposure_pct}%;"></span></div>
+            <div class="sc-meter-label">Esposizione max ${s.max_exposure_pct}%</div>
+            ${locked ? '<div style="font-size:10px; color:var(--down); margin-top:6px; font-family:\'IBM Plex Mono\',monospace; text-transform:uppercase; font-weight:600;">\uD83D\uDD12 Solo PRO / ELITE</div>' : ''}
+          </button>`;
+      }).join('');
 
       $('strategyCards').querySelectorAll('.strategy-card').forEach(card => {
         card.addEventListener('click', () => {
-          $('botStrategy').value = card.dataset.strategy;
+          const strat = card.dataset.strategy;
+          if (strat === 'aggressive' && (userPlan === 'starter' || userPlan === 'beginner')) {
+             toast('Strategia Bloccata', 'La strategia Aggressiva esegue High-Frequency Trading. Sbloccala passando al piano PRO o ELITE.');
+             return; // Impedisce di selezionare la strategia
+          }
+          $('botStrategy').value = strat;
           $('botStrategy').dispatchEvent(new Event('change'));
         });
       });
@@ -1671,7 +1650,6 @@
     }
   }
 
-  // --- FIX 2: LIMITI SINCRONIZZATI CON IL BACKEND ---
   function fillSymbolChoices(plan, accountType){
     const byPlan = {
       starter: [],
@@ -1837,7 +1815,7 @@
     const therm = $('riskThermometer');
     therm.style.width = conf.pct + '%';
     therm.style.background = conf.cls === 'up' ? 'var(--up)' : (conf.cls === 'down' ? 'var(--down)' : 'var(--amber)');
-    $('thermometerCaption').textContent = `${conf.label} \u2014 affidabilit\u00e0 della lettura attuale, non un livello di esposizione.`;
+    $('thermometerCaption').textContent = `${conf.label} \u2014 affidabilit\u00e0 della lettura attuale.`;
 
     $('suggestionReasons').innerHTML = (s.reasons || [])
       .map(r => `<li>${r}</li>`).join('');
@@ -1888,8 +1866,25 @@
     const applyBtn = document.getElementById('btnApplySuggestion');
     if (applyBtn) {
       applyBtn.addEventListener('click', () => {
-        if (s.strategy) $('botStrategy').value = s.strategy;
-        if (s.suggested_duration_minutes) $('botDuration').value = s.suggested_duration_minutes;
+        // Se l'AI consiglia la strategia aggressiva, controlliamo se il piano lo permette
+        if (s.strategy) {
+          if (s.strategy === 'aggressive' && (userPlan === 'starter' || userPlan === 'beginner')) {
+             toast('Azione Bloccata', 'L\'AI consiglia la strategia Aggressiva, ma per usarla devi passare al piano PRO.');
+             return;
+          }
+          $('botStrategy').value = s.strategy;
+        }
+        
+        // Se l'AI consiglia un timeframe, controlliamo se è lucchettato
+        if (s.suggested_duration_minutes) {
+          const opt = Array.from($('botDuration').options).find(o => parseInt(o.value, 10) === s.suggested_duration_minutes);
+          if (opt && opt.disabled) {
+            toast('Azione Bloccata', 'L\'AI consiglia un timeframe veloce (' + s.suggested_duration_minutes + ' min). Passa a un piano superiore per sbloccarlo.');
+            return;
+          }
+          $('botDuration').value = s.suggested_duration_minutes;
+        }
+
         $('botStrategy').dispatchEvent(new Event('change'));
         scheduleRegime();
       });
@@ -1947,7 +1942,6 @@
     }
   }
 
-  // --- FIX 1: POLLING ANTI-CRASH APPLICATO QUI ---
   function startPolling(){
     stopPolling();
     botPollTimer = setTimeout(async function poll() {
@@ -1964,6 +1958,9 @@
       if (!account) { toast('Nessun conto', 'Il tuo utente non ha conti collegati.'); return; }
 
       $('accountPlan').textContent = 'piano ' + info.plan;
+      userPlan = info.plan; // Salviamo il piano per bloccare le funzioni
+      applyPlanLimits(userPlan); // Applichiamo i lucchetti ai timeframe
+
       const canBot = account.type === 'demo' || info.plan !== 'starter';
       $('upgrade-banner').hidden = canBot;
       document.querySelectorAll('.bot-input').forEach(el => { el.disabled = !canBot; });
@@ -1971,7 +1968,7 @@
       paintAssetChips();
 
       showAuthOrBot();
-      await loadStrategies();
+      await loadStrategies(); // I lucchetti sulle strategie vengono applicati qui
       await refreshBot();
       refreshRegime();
       startPolling();
