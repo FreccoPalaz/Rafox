@@ -594,10 +594,9 @@
         </div>
         <div id="pfList"></div>
         <p class="note">
-          <b>Come si legge:</b> "Vale oggi" &egrave; quanto ricaveresti vendendo adesso ai prezzi di mercato.
-          "Hai speso" &egrave; quanto ti &egrave; costato comprare. La differenza tra i due &egrave; il tuo
-          guadagno o la tua perdita (in gergo tecnico: <i>P&amp;L</i>).
-          Le commissioni dell'exchange non sono incluse nel calcolo.
+          <b>Come si legge:</b> "Vale oggi" &egrave; quanto ricaveresti vendendo subito; 
+          "Hai speso" &egrave; quanto ti &egrave; costata. La differenza &egrave; il tuo
+          guadagno o la tua perdita (<i>P&amp;L</i>). Le commissioni non sono incluse.
         </p>
       </div>
     </div>
@@ -613,9 +612,7 @@
       <div class="panel-body">
         <p class="note" style="border:none;padding:0;margin:0;">
           Questa sezione ha bisogno del backend Rafox. Apri <b>rafox-api.js</b> e imposta
-          <b>BASE</b> con l&rsquo;indirizzo del server (in locale: http://localhost:8080).
-          Il resto dell&rsquo;app &mdash; mercati, grafici, portafoglio e alert &mdash; funziona
-          comunque senza backend.
+          <b>BASE</b> con l&rsquo;indirizzo del server.
         </p>
       </div>
     </div>
@@ -645,7 +642,7 @@
       </div>
 
       <div class="warn" id="upgrade-banner" hidden>
-        <strong>Piano Starter.</strong> Il bot &egrave; disponibile dai piani Pro ed Elite.
+        <strong>Piano Base.</strong> Il bot operativo reale &egrave; disponibile dai piani Pro ed Elite.
         <a href="index.html#prezzi" style="color:var(--amber);margin-left:6px;">Vedi i piani &rarr;</a>
       </div>
 
@@ -663,12 +660,7 @@
         </div>
       </div>
 
-      <!-- STEP 2 — Verdetto AI: identità "Rafox AI Advisor" di Gemini, ora con dati reali.
-           Il paragrafo in linguaggio naturale è DESCRITTIVO (cosa sta facendo il mercato,
-           quale strategia è compatibile), mai un consiglio personale o una promessa — vedi
-           nota per Giovanni sul perché. La frase di cautela resta visibile qui, non solo
-           dentro "Vedi analisi tecnica": nasconderla insieme ai dettagli tecnici sarebbe
-           esattamente il tipo di scelta che rende un'interfaccia rassicurante ma scorretta. -->
+      <!-- STEP 2 — Verdetto AI -->
       <div class="panel" style="border-left: 3px solid var(--amber);">
         <div class="panel-head step-head">
           <h3><span class="step-num">2</span> Rafox AI Advisor 🧠</h3><em id="regimeState">&mdash;</em>
@@ -686,9 +678,6 @@
 
             <div id="trendBadges" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;"></div>
 
-            <!-- id "suggestionText" mantenuto per compatibilità con il JS esistente
-                 (contiene "Applica: Strategia · Durata"); qui non compare come testo
-                 principale ma resta il contenitore del pulsante generato dinamicamente -->
             <div id="suggestionText" style="margin-top:16px;"></div>
 
             <div style="width:100%;background:var(--grid);height:4px;border-radius:2px;margin-top:18px;">
@@ -705,10 +694,7 @@
                 <div id="entrySignalBox" style="margin-top:14px;"></div>
                 <p class="note">
                   Sono misure del mercato di adesso, <b>non una previsione</b>. Indicano quale
-                  combinazione strategia/durata &egrave; meccanicamente adatta alle condizioni
-                  correnti &mdash; e cambiano ogni volta che il mercato si muove, non sono fisse.
-                  Nessuno di questi numeri dice cosa succeder&agrave; da qui alla fine della sessione.
-
+                  combinazione strategia/durata &egrave; meccanicamente adatta.
                 </p>
               </div>
             </details>
@@ -716,9 +702,7 @@
         </div>
       </div>
 
-      <!-- STEP 3 — Avvio: controlli compatti, poi il pulsante grande. L'arresto
-           d'emergenza resta separato e visivamente secondario: è un'azione
-           distruttiva, non deve competere con quella primaria. -->
+      <!-- STEP 3 — Avvio -->
       <div class="panel">
         <div class="panel-head step-head"><h3><span class="step-num">3</span> Avvia</h3><em id="sessionState">&mdash;</em></div>
         <div class="panel-body">
@@ -776,8 +760,7 @@
             </div>
           </details>
           <p class="note">
-            Vengono registrati anche gli ordini rifiutati dal risk engine: un rifiuto dice
-            quanto un&rsquo;esecuzione.
+            Vengono registrati anche gli ordini rifiutati dal risk engine.
           </p>
         </div>
       </div>
@@ -816,9 +799,6 @@
           </div>
         </div>
 
-        <!-- Livelli proposti: calcolati sul range reale delle ultime 24h.
-             Descrivono com'è fatto il mercato adesso, non prevedono dove
-             andrà — la differenza è importante e il testo la rispetta. -->
         <div id="alSuggestBox" style="margin-top:18px;">
           <div class="label" style="margin-bottom:4px;">Livelli suggeriti</div>
           <p class="note" id="alRangeSummary" style="border:none;padding-top:0;margin-top:0;margin-bottom:12px;">&mdash;</p>
@@ -870,9 +850,7 @@
   <button type="button" role="tab" data-view="alert" aria-selected="false">Alert</button>
 </nav>
 
-<!-- Onboarding: appare una sola volta, dopo la prima registrazione o al
-     primo accesso se non è mai stato completato. Non blocca in modo
-     permanente: c'è sempre un modo di uscirne (X, o "Salta"). -->
+<!-- Onboarding -->
 <div id="onboardModal" hidden style="
   position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;
   padding:20px;background:rgba(7,11,20,0.82);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
@@ -903,7 +881,7 @@
         <div style="font-size:28px;margin-bottom:14px;">&#129504;</div>
         <p class="advisor-text" style="font-size:15px;">
           Non serve esperienza. Seleziona un asset e lascia che il nostro <b>AI Advisor</b>
-          legga il mercato per te, suggerendoti la strategia compatibile con le condizioni attuali.
+          legga il mercato per te, suggerendoti la strategia compatibile.
         </p>
       </div>
       <div class="onboard-step" data-step="3" hidden>
@@ -926,9 +904,6 @@
   </div>
 </div>
 
-<!-- Guida di sezione: appare la prima volta che si apre ciascuna scheda,
-     e resta richiamabile dal pulsante "?" accanto al titolo. Il contenuto
-     viene riempito dal JS in base alla sezione. -->
 <div id="tourModal" class="tour-overlay" hidden>
   <div class="tour-box">
     <button type="button" id="tourClose" class="tour-close" aria-label="Chiudi la guida">&times;</button>
@@ -956,7 +931,7 @@
                    'ADAUSDT','AVAXUSDT','LINKUSDT','DOGEUSDT','PAXGUSDT'];
   const view = { symbol:'BTCUSDT', tf:'1h' };
 
-  /* ---------- persistenza: localStorage con ripiego in memoria ---------- */
+  /* ---------- persistenza ---------- */
   const store = (function(){
     let ok = true;
     try { localStorage.setItem('__rfx','1'); localStorage.removeItem('__rfx'); }
@@ -988,14 +963,12 @@
     setTimeout(() => el.remove(), 9000);
   }
 
-  /* ---------- selettori ---------- */
   const options = SYMBOLS.map(s =>
     `<option value="${s}">${M.bySym[s].label} — ${M.bySym[s].name}</option>`).join('');
   for (const id of ['symbol','pfSym','alSym']) $(id).innerHTML = options;
   $('symbol').value = view.symbol;
 
-  /* ---------- watchlist ---------- */
-  const latestPrices = {};  // symbol -> { price, pct } — popolato dal flusso live
+  const latestPrices = {};
   let watchSort = 'default';
 
   function sortedSymbols(){
@@ -1068,7 +1041,6 @@
       r.classList.toggle('active', r.dataset.symbol === row.dataset.symbol));
   });
 
-  /* ---------- grafico ---------- */
   let chart = null, series = null, volumeSeries = null, emaFastSeries = null, emaSlowSeries = null;
 
   function initChart(){
@@ -1100,12 +1072,6 @@
       wickUpColor:up, wickDownColor:down
     });
 
-    // Medie mobili: lo stesso calcolo che la strategia usa per decidere
-    // quando entrare, reso visibile invece di restare solo nel testo
-    // dell'AI Advisor. Periodi indicativi (20/50): la strategia attiva usa
-    // periodi propri diversi per Conservativa/Moderata/Aggressiva, questa
-    // è una lettura di riferimento generale sul grafico, non un secondo
-    // calcolo della strategia stessa.
     emaFastSeries = chart.addLineSeries({
       color: up, lineWidth: 1, priceLineVisible: false, lastValueVisible: false,
     });
@@ -1114,9 +1080,6 @@
       priceLineVisible: false, lastValueVisible: false,
     });
 
-    // Volume come istogramma in basso, su una scala propria (occupa solo
-    // il 20% inferiore del grafico) — dato già presente in ogni candela,
-    // prima non veniva mai disegnato.
     volumeSeries = chart.addHistogramSeries({
       priceFormat:{ type:'volume' },
       priceScaleId:'volume',
@@ -1147,7 +1110,7 @@
         volumeSeries.setData(candles.map(c => ({
           time: c.time,
           value: c.volume || 0,
-          color: c.close >= c.open ? up + '55' : down + '55',  // trasparenza: non deve competere con le candele
+          color: c.close >= c.open ? up + '55' : down + '55',
         })));
       }
       chart.timeScale().fitContent();
@@ -1156,7 +1119,6 @@
     }
   }
 
-  /* ---------- quotazione ---------- */
   function paintQuote(row){
     const dp = M.fmt.dp(view.symbol);
     if (row.price != null) {
@@ -1181,7 +1143,6 @@
     if (row.vol  != null) $('vol').textContent  = M.fmt.compact(row.vol);
   }
 
-  /* ---------- portafoglio ---------- */
   function addPosition(){
     const sym = $('pfSym').value;
     const qty = parseFloat($('pfQty').value);
@@ -1203,8 +1164,6 @@
     $('pfSummary').hidden = !n;
     if (!n) { $('pfList').innerHTML = ''; return; }
 
-    // Prima passata: calcola valore/costo per ogni posizione e il totale,
-    // perché il peso percentuale di ciascuna dipende dal totale.
     let value = 0, cost = 0, complete = true;
     const rows = positions.map(p => {
       const a = M.bySym[p.sym], live = M.price(p.sym);
@@ -1250,7 +1209,6 @@
     }
   }
 
-  /* ---------- alert ---------- */
   function addAlert(){
     const px = parseFloat($('alPx').value);
     if (!(px > 0)) { toast('Soglia mancante', 'Indica il prezzo da monitorare.'); return; }
@@ -1313,7 +1271,6 @@
     if (changed) { store.set('rfx.alerts', alerts); renderAlerts(); }
   }
 
-  /* ---------- navigazione ---------- */
   document.querySelector('.tabbar').addEventListener('click', e => {
     const b = e.target.closest('button[data-view]');
     if (!b) return;
@@ -1326,20 +1283,6 @@
     showTourIfFirstTime(b.dataset.view);
   });
 
-  /* =====================================================================
-     GUIDE DI SEZIONE
-
-     Una guida breve per scheda, mostrata la prima volta che ci si entra
-     (chiave localStorage separata per ognuna) e sempre richiamabile dal
-     pulsante "?" accanto al titolo.
-
-     Il testo spiega a cosa serve la sezione e come si usa, in italiano
-     comune: chi apre Rafox senza sapere cosa sia uno "stop loss" deve
-     capire lo stesso. I termini tecnici vengono introdotti tra parentesi
-     dopo la spiegazione, mai al posto suo — così chi è già esperto
-     ritrova il vocabolario che conosce senza che il principiante si
-     blocchi.
-     ===================================================================== */
   const TOURS = {
     mercati: {
       eyebrow: 'Sezione Mercati',
@@ -1413,25 +1356,20 @@
     const modal = $('tourModal');
     const view = modal.dataset.view;
     modal.hidden = true;
-    // Segnata come vista solo alla chiusura: se l'utente ricarica a metà
-    // lettura, la guida gli viene comunque riproposta.
     if (view) { try { localStorage.setItem('rfx_tour_' + view, '1'); } catch {} }
   }
 
   $('tourClose').addEventListener('click', closeTour);
   $('tourDone').addEventListener('click', closeTour);
-  // Clic sullo sfondo scuro: chiude, come ci si aspetta da un popup.
   $('tourModal').addEventListener('click', e => { if (e.target === $('tourModal')) closeTour(); });
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape' && !$('tourModal').hidden) closeTour();
   });
 
-  // Pulsanti "?" accanto ai titoli: riaprono la guida in qualsiasi momento.
   document.querySelectorAll('[data-help]').forEach(btn => {
     btn.addEventListener('click', () => openTour(btn.dataset.help));
   });
 
-  /* ---------- eventi ---------- */
   $('symbol').addEventListener('change', async () => {
     view.symbol = $('symbol').value;
     $('price').dataset.v = '';
@@ -1465,21 +1403,6 @@
   }
   $('alSym').addEventListener('change', updateAlertCurrentPrice);
 
-  /* =====================================================================
-     LIVELLI SUGGERITI PER GLI AVVISI
-
-     Un principiante che apre questa sezione non sa che numero scrivere:
-     troppo vicino al prezzo attuale e l'avviso scatta subito senza dire
-     nulla, troppo lontano e non scatta mai.
-
-     Qui proponiamo tre livelli calcolati sul range reale delle ultime 24
-     ore. Attenzione a cosa sono e cosa NON sono: descrivono com'è fatto
-     il mercato adesso (dove ha girato oggi, quanto si muove di solito),
-     non prevedono dove andrà. Il testo di ogni proposta dice esattamente
-     questo — "se lo supera stai vedendo X", mai "salirà" o "conviene
-     comprare qui". La differenza è tutta la differenza che c'è tra uno
-     strumento onesto e una promessa che non possiamo mantenere.
-     ===================================================================== */
   function alertSuggestions(sym){
     const row = latestPrices[sym] || {};
     const live = M.price(sym);
@@ -1505,10 +1428,6 @@
       });
     }
 
-    // Livello percentuale: sempre disponibile anche se il prezzo sta già
-    // fuori dal range giornaliero, così la sezione non resta mai vuota.
-    // Il 2% è una distanza che su BTC/ETH richiede tipicamente ore, non
-    // secondi: abbastanza perché l'avviso significhi qualcosa.
     out.push({
       label: '+2% da adesso',
       price: live * 1.02,
@@ -1569,9 +1488,6 @@
     });
   }
 
-  /* Avviso quando la soglia scelta a mano è troppo vicina al prezzo
-     attuale: senza questo, il primo avviso di un principiante scatta
-     dopo pochi secondi e la funzione sembra rotta. */
   function updateDistanceHint(){
     const el = $('alDistanceHint');
     const sym = $('alSym').value;
@@ -1609,9 +1525,8 @@
 
   $('alPx').addEventListener('input', updateDistanceHint);
   $('alDir').addEventListener('change', updateDistanceHint);
-  // --- NUOVI COMANDI RAFOX ---
+  
   $('btnStripePortal').addEventListener('click', () => {
-    // Portale Clienti Stripe collegato
     window.open('https://billing.stripe.com/p/login/test_7sY8wOgQxdzNduxeXRbsc00', '_blank');
   });
 
@@ -1646,13 +1561,9 @@
     renderAlerts();
   });
 
-  /* ---------- flusso live ---------- */
   M.on('status', s => { $('status').dataset.state = s.state; $('status').textContent = s.text; });
 
   M.on('price', row => {
-    // Conserviamo anche massimo e minimo delle 24h: servono alla sezione
-    // Alert per proporre soglie basate sul range reale della giornata,
-    // invece di lasciare l'utente a indovinare un numero.
     const prev = latestPrices[row.symbol] || {};
     latestPrices[row.symbol] = {
       price: row.price,
@@ -1671,16 +1582,8 @@
     if (ev.symbol === view.symbol && series) series.update(ev.candle);
   });
 
-  /* =====================================================================
-     BOT LIVE — collegato al backend Rafox.
-
-     Tutto ciò che conta avviene sul server: il piano dell'utente, i limiti
-     di rischio, il timer della sessione e l'esecuzione degli ordini. Questa
-     parte è solo il pannello di controllo — se qualcuno modifica questo
-     JavaScript dal browser, il server risponde comunque di no.
-     ===================================================================== */
   const API = window.RafoxAPI;
-  let account = null;         // conto demo corrente
+  let account = null;
   let botPollTimer = null;
 
   function money(v){ return v == null ? '—' : M.fmt.money(v, 2) + ' USDT'; }
@@ -1695,12 +1598,10 @@
     }
 
     if (loggedIn) {
-      // Forza la scomparsa del Muro sovrascrivendo lo stile
       $('loginScreen').style.display = 'none';
       $('mainApp').hidden = false;
       $('botArea').hidden = false; 
     } else {
-      // Mostra il Muro e nasconde l'App
       $('loginScreen').style.display = 'flex';
       $('mainApp').hidden = true;
     }
@@ -1716,16 +1617,16 @@
       const durLabels = { 60:'1 ora', 180:'3 ore', 300:'5 ore', 480:'8 ore', 720:'12 ore', 1440:'24 ore' };
       const icons = { conservative:'\u{1F6E1}\uFE0F', moderate:'\u2696\uFE0F', aggressive:'\u26A1' };
 
-      // Schede cliccabili: il <select> nascosto resta l'unica fonte di
-      // verità per il resto del codice (JS esistente invariato), le
-      // schede si limitano a impostarne il valore e simulare il change.
+      // --- FIX 3: VISUAL FOMO APPLICATO QUI ---
       $('strategyCards').innerHTML = list.map(s => `
         <button type="button" class="strategy-card" data-strategy="${s.name}">
           <div class="sc-icon">${icons[s.name] || '\u25CF'}</div>
           <div class="sc-label">${s.label}</div>
           <div class="sc-meter"><span style="width:${s.max_exposure_pct}%;"></span></div>
           <div class="sc-meter-label">Esposizione max ${s.max_exposure_pct}%</div>
+          ${s.name === 'aggressive' ? '<div style="font-size:10px; color:var(--amber); margin-top:6px; font-family:\'IBM Plex Mono\',monospace; text-transform:uppercase; font-weight:600;">Solo PRO/Elite</div>' : ''}
         </button>`).join('');
+
       $('strategyCards').querySelectorAll('.strategy-card').forEach(card => {
         card.addEventListener('click', () => {
           $('botStrategy').value = card.dataset.strategy;
@@ -1745,9 +1646,6 @@
           card.classList.toggle('active', card.dataset.strategy === $('botStrategy').value);
         });
 
-        // Se la selezione attuale (manuale) è diversa dal suggerimento live
-        // dell'AI Advisor, lo si dice esplicitamente: sono due cose diverse
-        // (una scelta tua, un consiglio del sistema), non un contrasto.
         const mismatchEl = $('selectionMismatch');
         if (!mismatchEl) return;
         const currentDuration = parseInt($('botDuration').value, 10);
@@ -1773,13 +1671,13 @@
     }
   }
 
+  // --- FIX 2: LIMITI SINCRONIZZATI CON IL BACKEND ---
   function fillSymbolChoices(plan, accountType){
-    // deve restare allineato ai limiti del server; il server decide comunque.
-    // Il conto demo non ha restrizioni di simboli: mostra l'elenco più ampio.
     const byPlan = {
       starter: [],
-      pro:   ['BTCUSDT','ETHUSDT','SOLUSDT'],
-      elite: ['BTCUSDT','ETHUSDT','SOLUSDT','BNBUSDT','XRPUSDT','AVAXUSDT','LINKUSDT']
+      beginner: ['BTCUSDT', 'ETHUSDT'],
+      pro:   ['BTCUSDT', 'ETHUSDT', 'SOLUSDT', 'BNBUSDT', 'XRPUSDT'],
+      elite: ['BTCUSDT', 'ETHUSDT', 'SOLUSDT', 'BNBUSDT', 'XRPUSDT', 'AVAXUSDT', 'LINKUSDT', 'ADAUSDT', 'DOGEUSDT', 'PAXGUSDT']
     };
     const list = accountType === 'demo' ? byPlan.elite : (byPlan[plan] || []);
     $('botPair').innerHTML = list
@@ -1856,8 +1754,8 @@
   }
 
   let regimeTimer = null;
-  let lastSuggestion = null;  // { strategy, suggested_duration_minutes } — per confronto con la selezione manuale
-  let recheckSelectionMismatch = null;  // impostata da loadStrategies(), richiamata da paintRegime
+  let lastSuggestion = null;  
+  let recheckSelectionMismatch = null;  
 
   function paintRegime(data){
     const rows = data.regimes || [];
@@ -1865,8 +1763,6 @@
     $('regimeTable').hidden = rows.length === 0;
     $('regimeState').textContent = rows.length ? 'aggiornata' : '\u2014';
 
-    // Badge compatti in cima: la direzione a colpo d'occhio, senza dover
-    // aprire "Espandi analisi" solo per sapere se il mercato sale o scende.
     $('trendBadges').innerHTML = rows.map(r => {
       const cls = r.direction === 'rialzista' ? 'up' : (r.direction === 'ribassista' ? 'down' : '');
       const sym = M.bySym[r.symbol] ? M.bySym[r.symbol].short : r.symbol;
@@ -1894,11 +1790,6 @@
     if (recheckSelectionMismatch) recheckSelectionMismatch();
     $('suggestionBox').hidden = false;
 
-    // Frase in linguaggio naturale: descrive cosa sta facendo il mercato e
-    // quale strategia è compatibile. Mai un consiglio personale ("ti
-    // consiglio...") né una promessa di risultato ("per proteggere il
-    // capitale") — solo una descrizione di condizioni meccaniche, tradotta
-    // in italiano semplice invece che in sigle tecniche.
     const labels = { conservative:'Conservativa', moderate:'Moderata', aggressive:'Aggressiva' };
     const durLabels = { 60:'1 ora', 180:'3 ore', 300:'5 ore', 480:'8 ore', 720:'12 ore', 1440:'24 ore' };
 
@@ -1936,9 +1827,6 @@
       $('suggestionText').innerHTML = '';
     }
 
-    // Il termometro riflette l'affidabilità della lettura attuale (quanto
-    // è netto il segnale), non un'esposizione consigliata: non esiste un
-    // numero di "esposizione" da mostrare qui senza inventarlo.
     const confidenceMap = {
       buona:   { pct: 85, cls: 'up',   label: 'Lettura netta' },
       media:   { pct: 55, cls: '',     label: 'Lettura moderata' },
@@ -1991,10 +1879,7 @@
         `<p style="color:var(--ink-dim);font-size:12px;margin-top:8px;line-height:1.5;">
           Questa lettura usa un timeframe diverso da quello della tabella sopra:
           pu&ograve; restare "in attesa" anche quando il regime generale &egrave;
-          favorevole. &Egrave; lo stesso calcolo che user&agrave; il bot per decidere,
-          non un'approssimazione. L'ingresso richiede anche RSI non ipercomprato
-          e volume sopra la media recente: filtrano movimenti gi&agrave; estesi o
-          non confermati da una partecipazione reale.
+          favorevole. &Egrave; lo stesso calcolo che user&agrave; il bot per decidere.
         </p>`;
     } else {
       $('entrySignalBox').innerHTML = '';
@@ -2021,9 +1906,6 @@
     }
     $('regimeState').textContent = 'lettura in corso\u2026';
     try {
-      // Nessuna durata inviata: il consiglio è libero, sceglie strategia
-      // E durata dal regime di mercato. Se l'utente ne ha già scelta una
-      // diversa dal menu, la useremo solo per il pulsante "Avvia bot".
       paintRegime(await API.regime(symbols, null));
     } catch (e) {
       $('regimeState').textContent = 'non disponibile';
@@ -2046,9 +1928,7 @@
   }
 
   function scheduleRegime(){
-    paintAssetChips();  // dato locale, nessuna richiesta: aggiorna subito
-    // piccolo ritardo: cambiando più strumenti di fila si evita una
-    // richiesta per ogni clic
+    paintAssetChips();  
     if (regimeTimer) clearTimeout(regimeTimer);
     regimeTimer = setTimeout(refreshRegime, 400);
   }
@@ -2067,12 +1947,15 @@
     }
   }
 
+  // --- FIX 1: POLLING ANTI-CRASH APPLICATO QUI ---
   function startPolling(){
     stopPolling();
-    // il bot lavora sul server; qui si legge lo stato ogni 10 secondi
-    botPollTimer = setInterval(refreshBot, 10000);
+    botPollTimer = setTimeout(async function poll() {
+      await refreshBot();
+      botPollTimer = setTimeout(poll, 10000);
+    }, 10000);
   }
-  function stopPolling(){ if (botPollTimer) { clearInterval(botPollTimer); botPollTimer = null; } }
+  function stopPolling(){ if (botPollTimer) { clearTimeout(botPollTimer); botPollTimer = null; } }
 
   async function afterLogin(info){
     try {
@@ -2125,7 +2008,6 @@
     }
   }
 
-  /* ---------- onboarding ---------- */
   const ONBOARD_KEY = 'rfx_onboarded';
   let onboardStep = 1;
   const ONBOARD_STEPS = 3;
@@ -2143,8 +2025,6 @@
   function closeOnboarding(){
     $('onboardModal').hidden = true;
     try { localStorage.setItem(ONBOARD_KEY, '1'); } catch {}
-    // Chiuso il benvenuto si resta su Mercati: è il momento naturale per
-    // la prima guida di sezione, senza sovrapporre due popup.
     showTourIfFirstTime('mercati');
   }
 
@@ -2220,7 +2100,6 @@
     });
   }
 
-  /* ---------- installazione sulla home ---------- */
   let deferredInstall = null;
 
   window.addEventListener('beforeinstallprompt', e => {
@@ -2238,7 +2117,6 @@
       deferredInstall = null;
       if (choice.outcome === 'accepted') $('installBanner').hidden = true;
     } else {
-      // iOS Safari non espone un prompt nativo: solo istruzioni.
       toast('Aggiungi a Home', 'Su iPhone: tocca Condividi (il quadrato con la freccia) in basso, poi "Aggiungi a Home".');
     }
   });
@@ -2255,7 +2133,6 @@
     }
   })();
 
-  /* ---------- avvio ---------- */
   (async function start(){
     renderPortfolio();
     renderAlerts();
@@ -2274,7 +2151,6 @@
       navigator.serviceWorker.register('sw.js').catch(() => {});
     }
 
-    // Bot Live: se c'è già una sessione valida, riprende senza rifare login
     showAuthOrBot();
     if (API && API.configured() && API.loggedIn()) {
       try {
