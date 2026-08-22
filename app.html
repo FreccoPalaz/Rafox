@@ -502,50 +502,61 @@
 
   <section class="view" id="view-portafoglio">
     <h2 class="view-title">Portafoglio<button class="help-btn" type="button" data-help="portafoglio" aria-label="Come funziona questa sezione">?</button></h2>
-    <p class="view-sub">Registra cosa possiedi: Rafox calcola da solo quanto stai guadagnando o perdendo, sui prezzi reali di mercato.</p>
+    <p class="view-sub">Traccia il controvalore delle tue posizioni spot e il P&amp;L latente in tempo reale.</p>
 
     <div class="panel">
-      <div class="panel-head"><h3>Aggiungi quello che possiedi</h3></div>
+      <div class="panel-head"><h3>Registra Posizione</h3></div>
       <div class="panel-body">
         <div class="grid-form">
           <div class="span2">
-            <label class="label" for="pfSym">Quale criptovaluta</label>
+            <label class="label" for="pfSym">Asset (Simbolo)</label>
             <select id="pfSym"></select>
           </div>
           <div>
-            <label class="label" for="pfQty">Quantità</label>
+            <label class="label" for="pfQty">Volume (Size)</label>
             <input id="pfQty" type="number" step="any" min="0" inputmode="decimal" placeholder="0,5">
-            <p class="note" style="border:none;margin-top:6px;padding-top:0;font-size:11px;">Quante ne possiedi.</p>
+            <p class="note" style="border:none;margin-top:6px;padding-top:0;font-size:11px;">Quantit&agrave; totale detenuta.</p>
           </div>
           <div>
-            <label class="label" for="pfPx">Prezzo d'acquisto</label>
+            <label class="label" for="pfPx">Prezzo di Carico (Entry)</label>
             <input id="pfPx" type="number" step="any" min="0" inputmode="decimal" placeholder="€">
             <div style="display:flex; justify-content:space-between; margin-top:6px; align-items:center; gap: 10px;">
-              <p class="note" style="border:none;margin-top:0;padding-top:0;font-size:11px;line-height:1.2;">Quanto l'hai pagata.</p>
-              <a href="#" id="pfUseLive" style="font-size:11px; font-weight:600; color:var(--amber); text-decoration:none; white-space:nowrap;">+ Usa Prezzo Attuale</a>
+              <p class="note" style="border:none;margin-top:0;padding-top:0;font-size:11px;line-height:1.2;">Costo medio d'acquisto.</p>
+              <a href="#" id="pfUseLive" style="font-size:11px; font-weight:600; color:var(--amber); text-decoration:none; white-space:nowrap;">+ Usa Prezzo Live</a>
             </div>
           </div>
           <div class="span2">
-            <button class="btn" id="pfAdd" type="button">Aggiungi</button>
+            <button class="btn" id="pfAdd" type="button">Aggiungi al Portafoglio</button>
           </div>
         </div>
       </div>
     </div>
 
     <div class="panel">
-      <div class="panel-head"><h3>Le tue posizioni</h3><em id="pfCount"></em></div>
+      <div class="panel-head"><h3>Posizioni Aperte</h3><em id="pfCount"></em></div>
       <div class="panel-body">
-        <div class="empty" id="pfEmpty">Non hai ancora aggiunto nulla. Inserisci la tua prima posizione qui sopra per vedere il guadagno aggiornarsi in tempo reale.</div>
-        <div id="pfSummary" class="stat-grid" hidden style="grid-template-columns:repeat(3,1fr);margin-bottom:4px;">
-          <div class="stat-card"><span class="k">Vale oggi</span><span class="v" id="pfSumValue">&mdash;</span></div>
-          <div class="stat-card"><span class="k">Hai speso</span><span class="v" id="pfSumCost">&mdash;</span></div>
-          <div class="stat-card"><span class="k">Guadagno / Perdita</span><span class="v" id="pfSumPnl">&mdash;</span></div>
+        <div class="empty" id="pfEmpty">Nessuna posizione registrata. Inserisci un asset qui sopra per monitorarne il controvalore.</div>
+        
+        <!-- Nuova griglia istituzionale (sostituisce il vecchio layout rotto) -->
+        <div id="pfSummary" hidden style="display:grid; grid-template-columns:repeat(3, 1fr); gap:12px; margin-bottom:20px; border-bottom:1px dashed var(--grid); padding-bottom:16px;">
+          <div style="display:flex; flex-direction:column; gap:4px;">
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:0.06em; text-transform:uppercase; color:var(--ink-dim);">Controvalore</span>
+            <span id="pfSumValue" style="font-family:'IBM Plex Mono',monospace; font-size:18px; font-weight:600; color:var(--ink);">&mdash;</span>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:4px;">
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:0.06em; text-transform:uppercase; color:var(--ink-dim);">Capitale Investito</span>
+            <span id="pfSumCost" style="font-family:'IBM Plex Mono',monospace; font-size:18px; font-weight:600; color:var(--ink);">&mdash;</span>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:4px;">
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:0.06em; text-transform:uppercase; color:var(--ink-dim);">P&amp;L Latente</span>
+            <span id="pfSumPnl" style="font-family:'IBM Plex Mono',monospace; font-size:18px; font-weight:600;">&mdash;</span>
+          </div>
         </div>
+        
         <div id="pfList"></div>
+        
         <p class="note">
-          <b>Come si legge:</b> "Vale oggi" &egrave; quanto ricaveresti vendendo subito; 
-          "Hai speso" &egrave; quanto ti &egrave; costata. La differenza &egrave; il tuo
-          guadagno o la tua perdita (<i>P&amp;L</i>). Le commissioni non sono incluse.
+          Il <b>P&amp;L (Profit &amp; Loss) latente</b> misura il rendimento netto della posizione rispetto al capitale investito, calcolato sui prezzi spot in tempo reale. Le commissioni di esecuzione dell'exchange non sono incluse nella stima.
         </p>
       </div>
     </div>
