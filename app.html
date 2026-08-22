@@ -427,6 +427,31 @@
     margin-left:9px;
   }
   .help-btn:hover{color:var(--amber);border-color:var(--amber-dim);}
+
+  /* ---------- livelli suggeriti (sezione Alert) ---------- */
+  .suggest-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+  @media(max-width:600px){.suggest-grid{grid-template-columns:1fr;}}
+  .suggest-card{
+    background:var(--bg);border:1px solid var(--grid);border-radius:10px;
+    padding:13px 14px;cursor:pointer;text-align:left;width:100%;
+    transition:border-color .18s,box-shadow .18s,transform .12s;
+  }
+  .suggest-card:hover{border-color:var(--amber-dim);transform:translateY(-1px);}
+  .suggest-card:disabled{opacity:.45;cursor:default;transform:none;}
+  .suggest-card .sg-label{
+    font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:0.06em;
+    text-transform:uppercase;color:var(--amber-dim);margin-bottom:6px;
+  }
+  .suggest-card .sg-price{
+    font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:15px;color:var(--ink);
+  }
+  .suggest-card .sg-why{
+    font-family:'Inter',sans-serif;font-size:11.5px;line-height:1.45;
+    color:var(--ink-dim);margin-top:6px;
+  }
+  .suggest-card .sg-dist{
+    font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--ink-dim);margin-top:5px;
+  }
 </style>
 </head>
 <body>
@@ -778,43 +803,58 @@
 
   <section class="view" id="view-alert">
     <h2 class="view-title">Alert di prezzo<button class="help-btn" type="button" data-help="alert" aria-label="Come funziona questa sezione">?</button></h2>
-    <p class="view-sub">Scattano quando il prezzo reale attraversa la soglia.</p>
+    <p class="view-sub">Imposta un prezzo e lascia che sia Rafox a controllare il mercato per te.</p>
 
     <div class="panel">
-      <div class="panel-head"><h3>Nuovo alert</h3></div>
+      <div class="panel-head"><h3>Nuovo avviso</h3></div>
       <div class="panel-body">
         <div class="grid-form">
           <div class="span2">
-            <label class="label" for="alSym">Asset</label>
+            <label class="label" for="alSym">Quale criptovaluta</label>
             <select id="alSym"></select>
             <p class="note" id="alCurrentPrice" style="margin-top:8px;border:none;padding-top:0;">&mdash;</p>
           </div>
+        </div>
+
+        <!-- Livelli proposti: calcolati sul range reale delle ultime 24h.
+             Descrivono com'è fatto il mercato adesso, non prevedono dove
+             andrà — la differenza è importante e il testo la rispetta. -->
+        <div id="alSuggestBox" style="margin-top:18px;">
+          <div class="label" style="margin-bottom:4px;">Livelli suggeriti</div>
+          <p class="note" id="alRangeSummary" style="border:none;padding-top:0;margin-top:0;margin-bottom:12px;">&mdash;</p>
+          <div id="alSuggestions" class="suggest-grid"></div>
+        </div>
+
+        <div class="grid-form" style="margin-top:20px;">
           <div>
-            <label class="label" for="alDir">Condizione</label>
+            <label class="label" for="alDir">Avvisami quando</label>
             <select id="alDir">
               <option value="above">Sale sopra</option>
               <option value="below">Scende sotto</option>
             </select>
           </div>
           <div>
-            <label class="label" for="alPx">Soglia</label>
+            <label class="label" for="alPx">Questo prezzo</label>
             <input id="alPx" type="number" step="any" min="0" inputmode="decimal" placeholder="USDT">
           </div>
           <div class="span2">
-            <button class="btn" id="alAdd" type="button">Crea alert</button>
+            <p class="note" id="alDistanceHint" hidden style="border:none;padding-top:0;margin-top:0;"></p>
+          </div>
+          <div class="span2">
+            <button class="btn" id="alAdd" type="button">Crea avviso</button>
           </div>
         </div>
       </div>
     </div>
 
     <div class="panel">
-      <div class="panel-head"><h3>Attivi</h3><em id="alCount"></em></div>
+      <div class="panel-head"><h3>Avvisi attivi</h3><em id="alCount"></em></div>
       <div class="panel-body">
-        <div class="empty" id="alEmpty">Nessun alert. Il primo scatta appena il prezzo tocca la soglia che imposti.</div>
+        <div class="empty" id="alEmpty">Nessun avviso impostato. Scegli un livello qui sopra: il primo scatta appena il prezzo lo raggiunge.</div>
         <div id="alList"></div>
         <p class="note" id="alHint"></p>
         <p class="note">
-          Gli alert vengono controllati mentre l'app è aperta. Per riceverli con l'app chiusa
+          Gli avvisi vengono controllati mentre l'app è aperta. Per riceverli con l'app chiusa
           serve il servizio di notifiche push lato server, non ancora attivo.
         </p>
       </div>
@@ -1339,11 +1379,11 @@
       title: 'Ti avvisiamo noi',
       lead: 'Invece di controllare i grafici in continuazione, imposta un prezzo e lascia che sia Rafox ad avvisarti quando viene raggiunto.',
       steps: [
-        'Scegli la criptovaluta e indica se vuoi essere avvisato quando il prezzo <i>sale sopra</i> o <i>scende sotto</i> una certa soglia.',
-        'Inserisci il prezzo che ti interessa e crea l\u2019avviso.',
+        'Scegli la criptovaluta: Rafox ti mostra subito dove si è mossa nelle ultime 24 ore.',
+        'Tocca uno dei <b>livelli suggeriti</b> per usarlo, oppure scrivi tu il prezzo che ti interessa.',
         'Quando il mercato tocca quel livello ricevi una notifica immediata.'
       ],
-      tip: 'Gli avvisi funzionano mentre l\u2019app è aperta. Consenti le notifiche del browser per riceverli anche in secondo piano.'
+      tip: '<b>I livelli suggeriti descrivono il mercato di adesso, non prevedono il futuro.</b> Ti dicono dove il prezzo ha girato oggi, così scegli una soglia sensata invece di indovinare un numero.'
     }
   };
 
@@ -1420,8 +1460,155 @@
     $('alCurrentPrice').textContent = live != null
       ? `Prezzo attuale: ${M.fmt.money(live, a.dp)}`
       : 'Prezzo attuale non ancora disponibile.';
+    renderAlertSuggestions();
+    updateDistanceHint();
   }
   $('alSym').addEventListener('change', updateAlertCurrentPrice);
+
+  /* =====================================================================
+     LIVELLI SUGGERITI PER GLI AVVISI
+
+     Un principiante che apre questa sezione non sa che numero scrivere:
+     troppo vicino al prezzo attuale e l'avviso scatta subito senza dire
+     nulla, troppo lontano e non scatta mai.
+
+     Qui proponiamo tre livelli calcolati sul range reale delle ultime 24
+     ore. Attenzione a cosa sono e cosa NON sono: descrivono com'è fatto
+     il mercato adesso (dove ha girato oggi, quanto si muove di solito),
+     non prevedono dove andrà. Il testo di ogni proposta dice esattamente
+     questo — "se lo supera stai vedendo X", mai "salirà" o "conviene
+     comprare qui". La differenza è tutta la differenza che c'è tra uno
+     strumento onesto e una promessa che non possiamo mantenere.
+     ===================================================================== */
+  function alertSuggestions(sym){
+    const row = latestPrices[sym] || {};
+    const live = M.price(sym);
+    if (live == null) return null;
+
+    const dp = M.fmt.dp(sym);
+    const out = [];
+
+    if (row.high != null && row.high > live) {
+      out.push({
+        label: 'Massimo di oggi',
+        price: row.high,
+        dir: 'above',
+        why: 'Il punto più alto toccato nelle ultime 24 ore. Se lo supera, esce dal range della giornata verso l\u2019alto.'
+      });
+    }
+    if (row.low != null && row.low < live) {
+      out.push({
+        label: 'Minimo di oggi',
+        price: row.low,
+        dir: 'below',
+        why: 'Il punto più basso toccato nelle ultime 24 ore. Se scende sotto, esce dal range della giornata verso il basso.'
+      });
+    }
+
+    // Livello percentuale: sempre disponibile anche se il prezzo sta già
+    // fuori dal range giornaliero, così la sezione non resta mai vuota.
+    // Il 2% è una distanza che su BTC/ETH richiede tipicamente ore, non
+    // secondi: abbastanza perché l'avviso significhi qualcosa.
+    out.push({
+      label: '+2% da adesso',
+      price: live * 1.02,
+      dir: 'above',
+      why: 'Un rialzo del 2% rispetto al prezzo attuale. Su queste criptovalute è un movimento che di norma richiede ore.'
+    });
+    out.push({
+      label: '-2% da adesso',
+      price: live * 0.98,
+      dir: 'below',
+      why: 'Un ribasso del 2% rispetto al prezzo attuale. Utile per accorgersi in tempo di una discesa.'
+    });
+
+    return { live, dp, items: out.slice(0, 3) };
+  }
+
+  function renderAlertSuggestions(){
+    const sym = $('alSym').value;
+    const a = M.bySym[sym];
+    const data = alertSuggestions(sym);
+    const box = $('alSuggestions');
+    const summary = $('alRangeSummary');
+
+    if (!data) {
+      summary.textContent = 'Prezzi non ancora disponibili: i livelli compaiono appena il mercato si collega.';
+      box.innerHTML = '';
+      return;
+    }
+
+    const row = latestPrices[sym] || {};
+    if (row.high != null && row.low != null) {
+      const rangePct = (row.high - row.low) / row.low * 100;
+      summary.innerHTML =
+        `Nelle ultime 24 ore <b>${a.name}</b> si è mosso tra ` +
+        `${M.fmt.money(row.low, data.dp)} e ${M.fmt.money(row.high, data.dp)} ` +
+        `(un'escursione del ${rangePct.toFixed(1)}%). Tocca un livello per usarlo.`;
+    } else {
+      summary.textContent = 'Tocca un livello per inserirlo automaticamente nel campo qui sotto.';
+    }
+
+    box.innerHTML = data.items.map((s, i) => {
+      const dist = (s.price - data.live) / data.live * 100;
+      return `<button type="button" class="suggest-card" data-sg="${i}">
+        <div class="sg-label">${s.label}</div>
+        <div class="sg-price">${M.fmt.money(s.price, data.dp)}</div>
+        <div class="sg-dist">${dist >= 0 ? '+' : ''}${dist.toFixed(2)}% dal prezzo attuale</div>
+        <div class="sg-why">${s.why}</div>
+      </button>`;
+    }).join('');
+
+    box.querySelectorAll('[data-sg]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const s = data.items[+btn.dataset.sg];
+        $('alPx').value = s.price.toFixed(data.dp);
+        $('alDir').value = s.dir;
+        updateDistanceHint();
+      });
+    });
+  }
+
+  /* Avviso quando la soglia scelta a mano è troppo vicina al prezzo
+     attuale: senza questo, il primo avviso di un principiante scatta
+     dopo pochi secondi e la funzione sembra rotta. */
+  function updateDistanceHint(){
+    const el = $('alDistanceHint');
+    const sym = $('alSym').value;
+    const live = M.price(sym);
+    const px = parseFloat($('alPx').value);
+
+    if (!(px > 0) || live == null) { el.hidden = true; return; }
+
+    const dist = (px - live) / live * 100;
+    const dir = $('alDir').value;
+    const already = dir === 'above' ? px <= live : px >= live;
+
+    if (already) {
+      el.hidden = false;
+      el.style.color = 'var(--down)';
+      el.textContent = dir === 'above'
+        ? 'Attenzione: il prezzo è già sopra questa soglia, l\u2019avviso scatterebbe subito.'
+        : 'Attenzione: il prezzo è già sotto questa soglia, l\u2019avviso scatterebbe subito.';
+      return;
+    }
+
+    if (Math.abs(dist) < 0.3) {
+      el.hidden = false;
+      el.style.color = 'var(--amber)';
+      el.textContent =
+        `Questa soglia dista solo ${Math.abs(dist).toFixed(2)}% dal prezzo attuale: ` +
+        `il mercato potrebbe raggiungerla in pochi minuti. Per un avviso più significativo, scegli un livello più distante.`;
+      return;
+    }
+
+    el.hidden = false;
+    el.style.color = 'var(--ink-dim)';
+    el.textContent = `Distanza dal prezzo attuale: ${Math.abs(dist).toFixed(2)}%.`;
+  }
+
+  $('alPx').addEventListener('input', updateDistanceHint);
+  $('alDir').addEventListener('change', updateDistanceHint);
   // --- NUOVI COMANDI RAFOX ---
   $('btnStripePortal').addEventListener('click', () => {
     // Portale Clienti Stripe collegato
@@ -1463,7 +1650,16 @@
   M.on('status', s => { $('status').dataset.state = s.state; $('status').textContent = s.text; });
 
   M.on('price', row => {
-    latestPrices[row.symbol] = { price: row.price, pct: row.pct };
+    // Conserviamo anche massimo e minimo delle 24h: servono alla sezione
+    // Alert per proporre soglie basate sul range reale della giornata,
+    // invece di lasciare l'utente a indovinare un numero.
+    const prev = latestPrices[row.symbol] || {};
+    latestPrices[row.symbol] = {
+      price: row.price,
+      pct: row.pct,
+      high: row.high != null ? row.high : prev.high,
+      low: row.low != null ? row.low : prev.low,
+    };
     updateWatchlistRow(row.symbol);
     if (row.symbol === view.symbol) paintQuote(row);
     if (row.symbol === $('alSym').value) updateAlertCurrentPrice();
