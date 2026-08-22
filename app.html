@@ -2114,7 +2114,7 @@
 
   function maybeShowOnboarding(){
     let already = false;
-    try { localStorage.getItem(ONBOARD_KEY) === '1'; } catch {}
+    try { already = localStorage.getItem(ONBOARD_KEY) === '1'; } catch {}
     if (already) return false;
     onboardStep = 1;
     paintOnboardStep();
