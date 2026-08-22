@@ -512,22 +512,32 @@
             <label class="label" for="pfSym">Asset (Simbolo)</label>
             <select id="pfSym"></select>
           </div>
-          <div>
-            <label class="label" for="pfQty">Volume (Size)</label>
-            <input id="pfQty" type="number" step="any" min="0" inputmode="decimal" placeholder="0,5">
-            <p class="note" style="border:none;margin-top:6px;padding-top:0;font-size:11px;">Quantit&agrave; totale detenuta.</p>
-          </div>
+          
           <div>
             <label class="label" for="pfPx">Prezzo di Carico (Entry)</label>
             <input id="pfPx" type="number" step="any" min="0" inputmode="decimal" placeholder="€">
-            <div style="display:flex; justify-content:space-between; margin-top:6px; align-items:center; gap: 10px;">
-              <p class="note" style="border:none;margin-top:0;padding-top:0;font-size:11px;line-height:1.2;">Costo medio d'acquisto.</p>
+            <div style="display:flex; justify-content:space-between; margin-top:6px; align-items:center;">
+              <p class="note" style="border:none;margin-top:0;padding-top:0;font-size:11px;line-height:1.2;">Costo di 1 moneta.</p>
               <a href="#" id="pfUseLive" style="font-size:11px; font-weight:600; color:var(--amber); text-decoration:none; white-space:nowrap;">+ Usa Prezzo Live</a>
             </div>
           </div>
-          <div class="span2">
-            <button class="btn" id="pfAdd" type="button">Aggiungi al Portafoglio</button>
+
+          <div>
+            <label class="label" for="pfTotal">Capitale Investito</label>
+            <input id="pfTotal" type="number" step="any" min="0" inputmode="decimal" placeholder="500 €">
+            <p class="note" style="border:none;margin-top:6px;padding-top:0;font-size:11px;">Totale che hai speso.</p>
           </div>
+
+          <div>
+            <label class="label" for="pfQty">Volume (Size)</label>
+            <input id="pfQty" type="number" step="any" min="0" inputmode="decimal" placeholder="0.00">
+            <p class="note" style="border:none;margin-top:6px;padding-top:0;font-size:11px;">Si calcola da solo.</p>
+          </div>
+
+          <div style="display:flex; align-items:flex-start;">
+            <button class="btn" id="pfAdd" type="button" style="margin-top:23px;">Aggiungi al Portafoglio</button>
+          </div>
+
         </div>
       </div>
     </div>
@@ -537,7 +547,6 @@
       <div class="panel-body">
         <div class="empty" id="pfEmpty">Nessuna posizione registrata. Inserisci un asset qui sopra per monitorarne il controvalore.</div>
         
-        <!-- Nuova griglia istituzionale (sostituisce il vecchio layout rotto) -->
         <div id="pfSummary" hidden style="display:grid; grid-template-columns:repeat(3, 1fr); gap:12px; margin-bottom:20px; border-bottom:1px dashed var(--grid); padding-bottom:16px;">
           <div style="display:flex; flex-direction:column; gap:4px;">
             <span style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:0.06em; text-transform:uppercase; color:var(--ink-dim);">Controvalore</span>
@@ -556,7 +565,7 @@
         <div id="pfList"></div>
         
         <p class="note">
-          Il <b>P&amp;L (Profit &amp; Loss) latente</b> misura il rendimento netto della posizione rispetto al capitale investito, calcolato sui prezzi spot in tempo reale. Le commissioni di esecuzione dell'exchange non sono incluse nella stima.
+          Il <b>P&amp;L (Profit &amp; Loss) Netto</b> misura il tuo rendimento reale rispetto al capitale investito. Il calcolo sottrae in automatico le <b>commissioni standard di exchange (0.2% round-trip)</b>. Il "Controvalore" è il denaro netto che incasseresti cliccando "Vendi" in questo esatto momento.
         </p>
       </div>
     </div>
@@ -624,6 +633,9 @@
 
           <div id="suggestionBox" hidden>
             <p class="advisor-text" id="advisorText">&mdash;</p>
+
+            <div id="entryStatus" hidden></div>
+
             <p class="note" style="border:none;margin-top:10px;padding-top:0;">
               Descrive le condizioni di adesso, non prevede cosa succeder&agrave;: pu&ograve;
               cambiare al prossimo aggiornamento.
@@ -1096,14 +1108,37 @@
     const qty = parseFloat($('pfQty').value);
     const px  = parseFloat($('pfPx').value);
     if (!(qty > 0) || !(px > 0)) {
-      toast('Dati incompleti', 'Quantità e prezzo di carico devono essere maggiori di zero.');
+      toast('Dati incompleti', 'Inserisci il Prezzo di Carico e il Capitale Investito.');
       return;
     }
     positions.push({ id:Date.now(), sym, qty, px });
     store.set('rfx.positions', positions);
-    $('pfQty').value = ''; $('pfPx').value = '';
+    $('pfQty').value = ''; $('pfPx').value = ''; 
+    if($('pfTotal')) $('pfTotal').value = '';
     renderPortfolio();
   }
+
+  const elPx = $('pfPx');
+  const elTotal = $('pfTotal');
+  const elQty = $('pfQty');
+
+  function autoCalcQty() {
+    if(!elPx || !elTotal || !elQty) return;
+    const px = parseFloat(elPx.value);
+    const tot = parseFloat(elTotal.value);
+    if (px > 0 && tot > 0) { elQty.value = (tot / px).toFixed(6); }
+  }
+
+  function autoCalcTot() {
+    if(!elPx || !elTotal || !elQty) return;
+    const px = parseFloat(elPx.value);
+    const qty = parseFloat(elQty.value);
+    if (px > 0 && qty > 0) { elTotal.value = (px * qty).toFixed(2); }
+  }
+
+  if(elPx) elPx.addEventListener('input', () => { if (elTotal.value) autoCalcQty(); else if (elQty.value) autoCalcTot(); });
+  if(elTotal) elTotal.addEventListener('input', autoCalcQty);
+  if(elQty) elQty.addEventListener('input', autoCalcTot);
 
   $('pfUseLive').addEventListener('click', e => {
     e.preventDefault();
@@ -1111,7 +1146,9 @@
     const live = M.price(sym);
     const a = M.bySym[sym];
     if (live != null) {
-      $('pfPx').value = live.toFixed(a ? a.dp : 2);
+      elPx.value = live.toFixed(a ? a.dp : 2);
+      if (elTotal && elTotal.value) autoCalcQty();
+      else if (elQty && elQty.value) autoCalcTot();
     } else {
       toast('In attesa', 'Aspetta che il mercato si colleghi per leggere il prezzo live.');
     }
@@ -1127,29 +1164,42 @@
     let value = 0, cost = 0, complete = true;
     const rows = positions.map(p => {
       const a = M.bySym[p.sym], live = M.price(p.sym);
-      const c = p.qty * p.px;
-      cost += c;
-      if (live == null) complete = false; else value += p.qty * live;
-      const v = live == null ? null : p.qty * live;
-      return { p, a, c, v };
+      const rawCost = p.qty * p.px; // Capitale investito lordo
+      cost += rawCost;
+      
+      let v = null;
+      let totalFees = 0;
+      
+      if (live == null) {
+        complete = false;
+      } else {
+        const rawValue = p.qty * live;
+        // Calcolo Commissioni Binance VIP 0: 0.1% all'ingresso + 0.1% all'uscita stimata
+        totalFees = (rawCost * 0.001) + (rawValue * 0.001);
+        v = rawValue - totalFees; // Valore NETTO reale
+        value += v;
+      }
+      return { p, a, c: rawCost, v, totalFees };
     });
 
-    $('pfList').innerHTML = rows.map(({ p, a, c, v }) => {
+    $('pfList').innerHTML = rows.map(({ p, a, c, v, totalFees }) => {
       const pnl = v == null ? null : v - c;
       const pct = v == null ? null : pnl / c * 100;
       const k   = pnl == null ? '' : (pnl >= 0 ? 'up' : 'down');
       const allocation = (v != null && value > 0) ? (v / value * 100) : null;
+      
       return `<div class="item-row">
         <div class="ir-left">
           <span class="ir-sym">${a.short}</span>
-          <span class="ir-sub">${M.fmt.money(p.qty, 6)} @ ${M.fmt.money(p.px, a.dp)}</span>
-          ${allocation != null ? `<div class="sc-meter" style="width:80px;margin-top:5px;"><span style="width:${allocation.toFixed(0)}%;"></span></div>
+          <span class="ir-sub">${M.fmt.money(p.qty, 6)} @ ${M.fmt.money(p.px, a.dp)} €</span>
+          ${v != null ? `<span class="ir-sub" style="font-size:10.5px; color:var(--amber-dim); margin-top:2px;">Fee Binance (In+Out): -${M.fmt.money(totalFees, 2)} €</span>` : ''}
+          ${allocation != null ? `<div class="sc-meter" style="width:80px;margin-top:6px;"><span style="width:${allocation.toFixed(0)}%;"></span></div>
           <span class="ir-sub" style="font-size:10px;">${allocation.toFixed(1)}% del portafoglio</span>` : ''}
         </div>
         <div class="ir-right">
           <div class="ir-values">
-            <span class="ir-value">${v == null ? '\u2014' : M.fmt.money(v, 2)}</span>
-            <span class="ir-value ${k}" style="font-size:11px;">${pnl == null ? '' : M.fmt.signed(pnl, 2) + ' \u00b7 ' + M.fmt.pct(pct)}</span>
+            <span class="ir-value">${v == null ? '\u2014' : M.fmt.money(v, 2) + ' €'}</span>
+            <span class="ir-value ${k}" style="font-size:11.5px;">${pnl == null ? '' : M.fmt.signed(pnl, 2) + ' \u00b7 ' + M.fmt.pct(pct)}</span>
           </div>
           <button class="btn-x" type="button" data-rm="${p.id}" aria-label="Rimuovi ${a.short}">\u00d7</button>
         </div>
@@ -1158,8 +1208,8 @@
 
     const pnl = complete ? value - cost : null;
     const pct = complete && cost ? pnl / cost * 100 : null;
-    $('pfSumValue').textContent = complete ? M.fmt.money(value, 2) : '\u2014';
-    $('pfSumCost').textContent = M.fmt.money(cost, 2);
+    $('pfSumValue').textContent = complete ? M.fmt.money(value, 2) + ' €' : '\u2014';
+    $('pfSumCost').textContent = M.fmt.money(cost, 2) + ' €';
     const pnlEl = $('pfSumPnl');
     if (pnl == null) {
       pnlEl.textContent = '\u2014'; pnlEl.className = 'v';
@@ -1503,8 +1553,6 @@
       }
     }
   });
-  $('pfPx').addEventListener('keydown', e => { if (e.key === 'Enter') addPosition(); });
-  $('alPx').addEventListener('keydown', e => { if (e.key === 'Enter') addAlert(); });
 
   $('pfList').addEventListener('click', e => {
     const b = e.target.closest('[data-rm]');
@@ -2066,7 +2114,7 @@
 
   function maybeShowOnboarding(){
     let already = false;
-    try { already = localStorage.getItem(ONBOARD_KEY) === '1'; } catch {}
+    try { localStorage.getItem(ONBOARD_KEY) === '1'; } catch {}
     if (already) return false;
     onboardStep = 1;
     paintOnboardStep();
