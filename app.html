@@ -806,11 +806,21 @@
     <p class="view-sub">Il tuo profilo, i tuoi conti e la sicurezza dell'accesso.</p>
 
     <div class="panel">
-      <div class="panel-head"><h3>Profilo</h3></div>
-      <div class="panel-body">
-        <div class="daily" style="border-top:none;padding-top:0;margin-top:0;">
-          <span>Email <b id="acctEmail">&mdash;</b></span>
-          <span>Piano <b id="acctPlan">&mdash;</b></span>
+      <div class="panel-body" style="display:flex;align-items:center;gap:16px;padding:20px 18px;">
+        <div id="acctAvatar" style="
+              width:52px;height:52px;border-radius:50%;flex:none;
+              background:linear-gradient(135deg, var(--amber), #c77d00);
+              display:flex;align-items:center;justify-content:center;
+              font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:17px;color:var(--bg);">&mdash;</div>
+        <div style="flex:1;min-width:0;">
+          <div id="acctEmail" style="
+                font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:600;color:var(--ink);
+                overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">&mdash;</div>
+          <div style="margin-top:8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+            <span class="pill" id="acctPlanPill">piano &mdash;</span>
+            <button class="btn-ghost" id="acctUpgradeBtn" type="button" hidden
+                    style="padding:5px 11px;font-size:11px;width:auto;">Passa a Pro/Elite</button>
+          </div>
         </div>
       </div>
     </div>
@@ -862,6 +872,40 @@
         <p class="note">
           Esci per accedere con un'altra email, ad esempio durante un test.
         </p>
+      </div>
+    </div>
+
+    <div class="panel" style="border-color:rgba(239,68,68,0.35);">
+      <div class="panel-head" style="border-color:rgba(239,68,68,0.35);">
+        <h3 style="color:var(--down);">Zona pericolosa</h3>
+      </div>
+      <div class="panel-body">
+        <div id="acctDeactivateIntro">
+          <p class="note" style="border:none;padding:0;margin-bottom:14px;">
+            Disattivare l'account blocca l'accesso e ferma il bot su tutti i conti. Per la
+            riattivazione o l'eliminazione definitiva dei dati, contatta il supporto.
+          </p>
+          <button class="btn-ghost" id="btnStartDeactivate" type="button"
+                  style="border-color:var(--down);color:var(--down);padding:8px 12px;font-size:11px;width:auto;">
+            Disattiva account
+          </button>
+        </div>
+        <div id="acctDeactivateForm" hidden>
+          <div class="grid-form">
+            <div class="span2">
+              <label class="label" for="acctDeactivatePw">Conferma con la password</label>
+              <input id="acctDeactivatePw" type="password" autocomplete="current-password" placeholder="••••••••">
+            </div>
+            <div>
+              <button class="btn" id="btnConfirmDeactivate" type="button"
+                      style="background:var(--down);color:#fff;">Conferma disattivazione</button>
+            </div>
+            <div>
+              <button class="btn-ghost" id="btnCancelDeactivate" type="button"
+                      style="padding:10px 12px;font-size:12px;">Annulla</button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -1618,6 +1662,9 @@
   $('btnStripePortal').addEventListener('click', () => {
     window.open('https://billing.stripe.com/p/login/test_7sY8wOgQxdzNduxeXRbsc00', '_blank');
   });
+  $('acctUpgradeBtn').addEventListener('click', () => {
+    window.open('https://billing.stripe.com/p/login/test_7sY8wOgQxdzNduxeXRbsc00', '_blank');
+  });
 
   $('btnKillSwitch').addEventListener('click', async () => {
     if (confirm('⚠️ ATTENZIONE: Sei sicuro di voler attivare il KILL SWITCH? Tutte le operazioni verranno chiuse immediatamente.')) {
@@ -2121,7 +2168,15 @@
 
   function paintAcctProfile(){
     $('acctEmail').textContent = userEmail || '\u2014';
-    $('acctPlan').textContent = userPlan ? ('piano ' + userPlan) : '\u2014';
+
+    const initials = userEmail ? userEmail.slice(0, 2).toUpperCase() : '\u2014';
+    $('acctAvatar').textContent = initials;
+
+    const planPill = $('acctPlanPill');
+    planPill.textContent = userPlan ? ('piano ' + userPlan) : '\u2014';
+    planPill.className = 'pill' + (userPlan === 'pro' || userPlan === 'elite' ? ' up' : '');
+
+    $('acctUpgradeBtn').hidden = !(userPlan === 'free' || userPlan === 'beginner');
   }
 
   function renderAcctAccounts(){
@@ -2131,9 +2186,12 @@
     $('acctAccountsList').innerHTML = userAccounts.map(a => {
       const active = account && a.id === account.id;
       const label = a.type === 'demo' ? 'Conto demo' : 'Conto reale';
-      return `<div class="daily" style="border-top:1px solid var(--grid);padding:10px 0;
-                    display:flex;align-items:center;justify-content:space-between;gap:10px;">
-        <span>${label}${active ? ' &middot; <b style="color:var(--amber);">attivo</b>' : ''}</span>
+      const statusPill = active
+        ? '<span class="pill up">attivo</span>'
+        : '<span class="pill">non attivo</span>';
+      return `<div style="border-top:1px solid var(--grid);padding:12px 0;
+                    display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
+        <span style="display:flex;align-items:center;gap:10px;font-weight:600;">${label} ${statusPill}</span>
         ${active ? '' : `<button class="btn-ghost" data-switch-account="${a.id}" type="button"
                     style="padding:6px 10px;font-size:11px;width:auto;">Usa questo conto</button>`}
       </div>`;
@@ -2309,6 +2367,29 @@
         toast('Password aggiornata', 'Da ora usa la nuova password per accedere.');
       } catch (e2) {
         toast('Aggiornamento non riuscito', e2.message);
+      }
+    });
+
+    $('btnStartDeactivate').addEventListener('click', () => {
+      $('acctDeactivateIntro').hidden = true;
+      $('acctDeactivateForm').hidden = false;
+      $('acctDeactivatePw').focus();
+    });
+    $('btnCancelDeactivate').addEventListener('click', () => {
+      $('acctDeactivatePw').value = '';
+      $('acctDeactivateForm').hidden = true;
+      $('acctDeactivateIntro').hidden = false;
+    });
+    $('btnConfirmDeactivate').addEventListener('click', async () => {
+      const pw = $('acctDeactivatePw').value;
+      if (!pw) { toast('Password richiesta', 'Conferma con la tua password attuale.'); return; }
+      if (!confirm('Confermi di voler disattivare il tuo account? Non potrai più accedere finché non lo riattivi tramite il supporto.')) return;
+      try {
+        await API.deactivateAccount(pw);
+        toast('Account disattivato', 'Hai effettuato l\u2019uscita.');
+        handleLoggedOut();
+      } catch (e2) {
+        toast('Disattivazione non riuscita', e2.message);
       }
     });
 
