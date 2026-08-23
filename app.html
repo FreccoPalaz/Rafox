@@ -924,6 +924,23 @@
 
   </section>
 
+  <section class="view" id="view-storico">
+    <h2 class="view-title">Storico</h2>
+    <p class="view-sub">Ogni sessione del bot che hai lanciato, con l'esito e le operazioni che la compongono.</p>
+
+    <div class="panel">
+      <div class="panel-head"><h3>Sessioni passate</h3><em id="sessCount"></em></div>
+      <div class="panel-body">
+        <div class="empty" id="sessEmpty" hidden>Nessuna sessione lanciata finora su questo conto.</div>
+        <div id="sessList"></div>
+        <p class="note">
+          Tocca una sessione per vedere le operazioni che l'hanno composta.
+        </p>
+      </div>
+    </div>
+
+  </section>
+
 </div>
 
 <nav class="tabbar" role="tablist" aria-label="Sezioni">
@@ -931,6 +948,7 @@
   <button type="button" role="tab" data-view="portafoglio" aria-selected="false">Portafoglio</button>
   <button type="button" role="tab" data-view="bot" aria-selected="false">Bot Live</button>
   <button type="button" role="tab" data-view="alert" aria-selected="false">Alert</button>
+  <button type="button" role="tab" data-view="storico" aria-selected="false">Storico</button>
   <button type="button" role="tab" data-view="account" aria-selected="false">Account</button>
 </nav>
 
@@ -1429,6 +1447,7 @@
       .forEach(v => v.classList.toggle('active', v.id === 'view-' + b.dataset.view));
     window.scrollTo({ top:0, behavior:'smooth' });
     if (b.dataset.view === 'mercati' && chart) chart.timeScale().fitContent();
+    if (b.dataset.view === 'storico') loadSessions();
     showTourIfFirstTime(b.dataset.view);
   });
 
@@ -1995,6 +2014,92 @@
       </div>`;
     }).join('');
   }
+
+  // Cache in memoria dei trade già scaricati per sessione: evita di
+  // richiamare l'API ogni volta che l'utente riapre la stessa riga.
+  const sessionTradesCache = new Map();
+
+  async function loadSessions(){
+    if (!API.loggedIn() || !account) return;
+    try {
+      const rows = await API.sessions(account.id);
+      renderSessions(rows);
+    } catch (e) {
+      if (e.status === 401) { handleLoggedOut(); toast('Sessione scaduta', 'Rifai l\u2019accesso.'); return; }
+      toast('Storico non disponibile', e.message);
+    }
+  }
+
+  function renderSessions(rows){
+    $('sessCount').textContent = rows.length ? rows.length + (rows.length === 1 ? ' sessione' : ' sessioni') : '';
+    $('sessEmpty').hidden = rows.length > 0;
+    sessionTradesCache.clear();
+
+    $('sessList').innerHTML = rows.map(s => {
+      const stratLabel = STRATEGY_LABELS[s.strategy] || s.strategy;
+      const symLabel = s.symbols.map(sym => M.bySym[sym] ? M.bySym[sym].short : sym).join(' + ');
+      const when = new Date(s.start_at).toLocaleString('it-IT', { dateStyle: 'short', timeStyle: 'short' });
+      const statusLabel = s.status === 'active' ? 'in corso' : (s.stop_reason || 'conclusa');
+      const pnlCls = s.net_pnl == null ? '' : (s.net_pnl >= 0 ? 'up' : 'down');
+      const pnlTxt = s.net_pnl == null ? '\u2014' : M.fmt.signed(s.net_pnl, 2) + ' USDT';
+      return `
+        <div class="sess-item">
+          <button type="button" class="item-row" data-session-id="${s.id}" style="width:100%;text-align:left;background:none;border:none;cursor:pointer;">
+            <div class="ir-left">
+              <span class="ir-sym">${stratLabel} \u00b7 ${symLabel}</span>
+              <span class="ir-sub">${when} \u00b7 ${statusLabel} \u00b7 ${s.trade_count} operazioni</span>
+            </div>
+            <div class="ir-right">
+              <div class="ir-values">
+                <span class="ir-value ${pnlCls}">${pnlTxt}</span>
+              </div>
+            </div>
+          </button>
+          <div class="sess-trades" id="sess-trades-${s.id}" hidden></div>
+        </div>`;
+    }).join('');
+  }
+
+  $('sessList').addEventListener('click', async e => {
+    const b = e.target.closest('[data-session-id]');
+    if (!b) return;
+    const id = b.dataset.sessionId;
+    const box = $('sess-trades-' + id);
+    if (!box) return;
+
+    if (!box.hidden) { box.hidden = true; return; }
+
+    if (sessionTradesCache.has(id)) {
+      box.innerHTML = sessionTradesCache.get(id);
+      box.hidden = false;
+      return;
+    }
+
+    box.hidden = false;
+    box.innerHTML = `<p class="note" style="margin-top:0;border:none;padding-top:8px;">Carico le operazioni\u2026</p>`;
+    try {
+      const trades = await API.history(account.id, id);
+      const html = trades.length
+        ? trades.map(t => {
+            const k = t.pnl == null ? '' : (t.pnl >= 0 ? 'up' : 'down');
+            const sym = M.bySym[t.symbol] ? M.bySym[t.symbol].short : t.symbol;
+            const closed = t.closed_at ? new Date(t.closed_at).toLocaleString('it-IT', { dateStyle: 'short', timeStyle: 'short' }) : '\u2014';
+            return `<div class="audit-row">
+              <div class="audit-top">
+                <span class="audit-time">${closed}</span>
+                <span class="audit-event">${sym}</span>
+                <span class="audit-sym">${M.fmt.money(t.quantity, 6)} @ ${M.fmt.money(t.entry_price, 2)}${t.exit_price != null ? ' \u2192 ' + M.fmt.money(t.exit_price, 2) : ''}</span>
+              </div>
+              <div class="audit-reason ${k}">${t.pnl == null ? '\u2014' : M.fmt.signed(t.pnl, 2) + ' USDT'}</div>
+            </div>`;
+          }).join('')
+        : `<p class="note" style="margin-top:0;border:none;padding-top:8px;">Nessuna operazione chiusa in questa sessione.</p>`;
+      sessionTradesCache.set(id, html);
+      box.innerHTML = html;
+    } catch (e2) {
+      box.innerHTML = `<p class="note" style="margin-top:0;border:none;padding-top:8px;color:var(--down);">Caricamento non riuscito: ${e2.message}</p>`;
+    }
+  });
 
   let regimeTimer = null;
   let lastSuggestion = null;  

@@ -95,7 +95,10 @@
       { method: 'POST', body: { password } }),
     accounts:  () => request('/api/accounts'),
     account:   (id) => request('/api/accounts/' + id),
-    history:   (id) => request('/api/accounts/' + id + '/history'),
+    sessions:  (id) => request('/api/accounts/' + id + '/sessions'),
+    history:   (id, sessionId) => request(
+      '/api/accounts/' + id + '/history' + (sessionId != null ? '?session_id=' + sessionId : '')
+    ),
     audit:     (id) => request('/api/accounts/' + id + '/audit?limit=40'),
     resetDemo: (id) => request('/api/accounts/' + id + '/reset', { method: 'POST' }),
 
