@@ -89,6 +89,10 @@
     },
 
     me:        () => request('/api/auth/me'),
+    changePassword: (currentPassword, newPassword) => request('/api/auth/change-password',
+      { method: 'POST', body: { current_password: currentPassword, new_password: newPassword } }),
+    deactivateAccount: (password) => request('/api/auth/deactivate',
+      { method: 'POST', body: { password } }),
     accounts:  () => request('/api/accounts'),
     account:   (id) => request('/api/accounts/' + id),
     history:   (id) => request('/api/accounts/' + id + '/history'),
