@@ -708,6 +708,7 @@
           </div>
           <p class="note" id="strategyNote" style="margin-top:12px;">&mdash;</p>
           <p class="note" id="selectionMismatch" hidden style="border-color:var(--amber-dim);color:var(--amber);"></p>
+          <p class="note" id="activeSessionNotice" hidden style="border-color:var(--down);color:var(--down);"></p>
 
           <button class="btn bot-input" id="btnStartBot" type="button" style="margin-top:16px;">Avvia bot (demo)</button>
           <button class="btn" id="btnStopBot" type="button" hidden
@@ -1012,6 +1013,9 @@
   const SYMBOLS = ['BTCUSDT','ETHUSDT','SOLUSDT','BNBUSDT','XRPUSDT',
                    'ADAUSDT','AVAXUSDT','LINKUSDT','DOGEUSDT','PAXGUSDT'];
   const view = { symbol:'BTCUSDT', tf:'1h' };
+
+  // Nomi come compaiono altrove nell'app (card strategia, AI Advisor).
+  const STRATEGY_LABELS = { conservative: 'Conservativa', moderate: 'Moderata', aggressive: 'Aggressiva' };
 
   /* account collegato: dichiarato qui, prima dello storage, perché le
      chiavi di storage devono poter dipendere da chi è loggato. Finché
@@ -1929,17 +1933,41 @@
   function paintSession(s){
     const active = s && s.status === 'active';
     $('btnStopBot').hidden = !active;
-    $('btnStartBot').disabled = active;
+    /* Il pulsante resta sempre cliccabile: se il backend rifiuta perché
+       c'è già una sessione attiva, l'errore arriva come toast dal catch
+       di btnStartBot — molto più chiaro di un pulsante disabilitato che
+       non spiega perché il click non fa nulla. In più, questo avviso lo
+       spiega PRIMA che l'utente clicchi: il backend permette una sola
+       sessione attiva per conto (vedi bot.py, POST /bot/start), quindi
+       simboli/strategia/durata diversi in parallelo sulla stessa sessione
+       non sono supportati — va fermata quella in corso, oppure vanno
+       selezionati più simboli INSIEME nella stessa sessione (stessa
+       strategia e durata per tutti). */
+    const notice = $('activeSessionNotice');
 
-    if (!s || s.status === 'none') { $('sessionState').textContent = 'nessuna sessione'; return; }
+    if (!s || s.status === 'none') {
+      $('sessionState').textContent = 'nessuna sessione';
+      notice.hidden = true;
+      return;
+    }
     if (active) {
       const sec = s.seconds_remaining;
       const hh = String(Math.floor(sec / 3600)).padStart(2, '0');
       const mm = String(Math.floor((sec % 3600) / 60)).padStart(2, '0');
       const ss = String(sec % 60).padStart(2, '0');
       $('sessionState').textContent = `attiva · ${hh}:${mm}:${ss} rimanenti`;
+
+      const stratLabel = STRATEGY_LABELS[s.strategy] || s.strategy;
+      const symList = (s.symbols || []).map(sym => M.bySym[sym] ? M.bySym[sym].short : sym).join(', ');
+      notice.hidden = false;
+      notice.textContent =
+        `Hai già una sessione attiva su ${symList} (${stratLabel}, ${hh}:${mm}:${ss} rimanenti). ` +
+        `Il conto supporta una sessione alla volta: per avviarne una con parametri diversi, ` +
+        `fermala prima con "Ferma e liquida". Per operare su più simboli insieme, selezionali ` +
+        `tutti prima di avviare: condivideranno la stessa strategia e durata.`;
     } else {
       $('sessionState').textContent = s.stop_reason ? 'terminata — ' + s.stop_reason : 'terminata';
+      notice.hidden = true;
     }
   }
 
