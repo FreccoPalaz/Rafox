@@ -1,0 +1,12 @@
+Invoke-RestMethod -Method Post `
+  -Uri "https://rafoxv2claude-backend.onrender.com/api/admin/set-plan" `
+  -Headers @{ "X-Admin-Token" = "r7kKKzbE5Y8BMjxXZRLDcVxEHZs4pD4CgQdo-kBMimc" } `
+  -ContentType "application/json" `
+  -Body '{"email":"palazzarifrancesco9@gmail.com","plan":"elite"}'
+
+
+Se va a buon fine dovresti vedere una risposta tipo:
+
+email             previous_plan plan  changed note
+-----             ------------- ----  ------- ----
+...@gmail.com     free          elite True    L'utente deve uscire e rientrare...

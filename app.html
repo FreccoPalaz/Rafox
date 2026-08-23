@@ -172,6 +172,16 @@
   .pill.up::before{background:var(--up);}
   .pill.down{color:var(--down);border-color:var(--down);background:rgba(239,68,68,0.08);}
   .pill.down::before{background:var(--down);}
+  .instr-chip{
+    font-family:'IBM Plex Mono',monospace;font-size:12.5px;font-weight:600;
+    padding:8px 14px;border-radius:20px;border:1px solid var(--grid);
+    background:transparent;color:var(--ink-dim);cursor:pointer;transition:all .15s;
+  }
+  .instr-chip:hover:not(:disabled){border-color:var(--amber-dim);color:var(--ink);}
+  .instr-chip[aria-pressed="true"]{
+    background:var(--amber);border-color:var(--amber);color:var(--bg);
+  }
+  .instr-chip:disabled{opacity:.4;cursor:not-allowed;}
 
   .asset-chip{
     display:inline-flex;align-items:center;gap:8px;
@@ -442,7 +452,7 @@
   </div>
   
   <div style="display:flex; gap:10px;">
-    <a href="bpc_1U7hOMC857iabGIk8eNrufO9" class="btn-ghost" id="btnStripePortal" style="padding: 8px 12px; font-size: 11px; text-decoration: none;">Gestisci Piano</a>
+    <button class="btn-ghost" id="btnStripePortal" style="padding: 8px 12px; font-size: 11px;">Gestisci Piano</button>
     <button class="btn" id="btnKillSwitch" style="background:var(--down); color:#fff; padding: 8px 12px; font-size: 11px; box-shadow: 0 0 10px rgba(232,93,76,0.4);">🛑 KILL SWITCH</button>
   </div>
 </header>
@@ -615,10 +625,12 @@
         <div class="panel-head step-head"><h3><span class="step-num">1</span> Seleziona l'asset</h3></div>
         <div class="panel-body">
           <label class="label" for="botPair">Strumenti</label>
-          <select id="botPair" class="bot-input" multiple size="4"></select>
+          <div id="botPairChips" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;"></div>
+          <select id="botPair" class="bot-input" multiple size="4"
+                  style="position:absolute;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none;"></select>
           <div id="assetChips" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;"></div>
           <p class="note" style="margin-top:10px;">
-            Puoi selezionare pi&ugrave; strumenti: la lettura del mercato qui sotto si
+            Tocca uno o pi&ugrave; strumenti per selezionarli: la lettura del mercato qui sotto si
             aggiorna da sola appena cambi la selezione.
           </p>
         </div>
@@ -1849,9 +1861,18 @@
   }
 
   function fillSymbolChoices(plan, accountType){
+    /* Questi elenchi rispecchiano i piani mostrati su index.html#prezzi:
+       Beginner 1 asset (BTC), Pro fino a 5, Elite tutti. Free non ha
+       trading live, solo demo.
+       NOTA: sul conto demo (l'unico attivo oggi, dato che il trading
+       reale è spento) l'elenco resta sempre completo per TUTTI i piani,
+       apposta — è la prova gratuita del motore. Il limite per piano
+       prenderà effetto sul conto reale, quando il trading live sarà
+       attivo. Se preferite un'altra scelta (es. limitare gli asset già
+       in demo), va deciso e cambiato qui. */
     const byPlan = {
       free: [],
-      beginner: ['BTCUSDT', 'ETHUSDT'],
+      beginner: ['BTCUSDT'],
       pro:   ['BTCUSDT', 'ETHUSDT', 'SOLUSDT', 'BNBUSDT', 'XRPUSDT'],
       elite: ['BTCUSDT', 'ETHUSDT', 'SOLUSDT', 'BNBUSDT', 'XRPUSDT', 'AVAXUSDT', 'LINKUSDT', 'ADAUSDT', 'DOGEUSDT', 'PAXGUSDT']
     };
@@ -1859,6 +1880,24 @@
     $('botPair').innerHTML = list
       .map(s => `<option value="${s}">${M.bySym[s] ? M.bySym[s].label : s}</option>`).join('');
     if (list.length) $('botPair').options[0].selected = true;
+    renderSymbolChips();
+  }
+
+  /* Le chip sono l'unico modo con cui l'utente sceglie gli strumenti: il
+     <select multiple> sotto resta nel DOM ma invisibile, solo per tenere
+     lo stato — così tutto il codice che legge botPair.selectedOptions
+     continua a funzionare senza modifiche. Serve perché un <select
+     multiple> nativo si usa con Ctrl/Cmd+click, un gesto che su schermi
+     touch non esiste: senza le chip, da mobile è impossibile selezionare
+     più di uno strumento. */
+  function renderSymbolChips(){
+    const sel = $('botPair');
+    const isDisabled = sel.disabled;
+    $('botPairChips').innerHTML = Array.from(sel.options).map(o => {
+      const short = M.bySym[o.value] ? M.bySym[o.value].short : o.value;
+      return `<button type="button" class="instr-chip bot-input" data-sym="${o.value}"
+                aria-pressed="${o.selected}" ${isDisabled ? 'disabled' : ''}>${short}</button>`;
+    }).join('');
   }
 
   function paintAccount(d){
@@ -2213,8 +2252,11 @@
 
     const canBot = account.type === 'demo' || userPlan !== 'free';
     $('upgrade-banner').hidden = canBot;
-    document.querySelectorAll('.bot-input').forEach(el => { el.disabled = !canBot; });
     fillSymbolChoices(userPlan, account.type);
+    /* Il pannello disabilita TUTTI gli .bot-input, chip incluse: va fatto
+       DOPO fillSymbolChoices, che le ricrea da zero — altrimenti le nuove
+       chip nascono sempre abilitate anche quando il piano non lo permette. */
+    document.querySelectorAll('.bot-input').forEach(el => { el.disabled = !canBot; });
     paintAssetChips();
     renderAcctAccounts();
 
@@ -2394,6 +2436,17 @@
     });
 
     $('botPair').addEventListener('change', scheduleRegime);
+
+    $('botPairChips').addEventListener('click', e => {
+      const b = e.target.closest('[data-sym]');
+      if (!b || b.disabled) return;
+      const sel = $('botPair');
+      const opt = Array.from(sel.options).find(o => o.value === b.dataset.sym);
+      if (!opt) return;
+      opt.selected = !opt.selected;
+      b.setAttribute('aria-pressed', String(opt.selected));
+      sel.dispatchEvent(new Event('change', { bubbles: true }));
+    });
 
     $('btnStartBot').addEventListener('click', async () => {
       const symbols = Array.from($('botPair').selectedOptions).map(o => o.value);
