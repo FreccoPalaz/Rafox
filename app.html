@@ -587,7 +587,7 @@
 
     <div id="botArea" hidden>
       <div class="panel">
-        <div class="panel-head"><h3>Conto demo</h3><em id="accountPlan">&mdash;</em></div>
+        <div class="panel-head"><h3 id="accTitle">Conto demo</h3><em id="accountPlan">&mdash;</em></div>
         <div class="panel-body">
           <div class="daily" style="border-top:none;padding-top:0;margin-top:0;">
             <span>Equity <b id="accEquity">&mdash;</b></span>
@@ -727,18 +727,17 @@
       </div>
 
       <div class="panel">
-        <div class="panel-head"><h3>Account</h3></div>
+        <div class="panel-head"><h3>Manutenzione conto demo</h3></div>
         <div class="panel-body">
           <div class="grid-form">
             <div>
               <button class="btn" id="btnResetDemo" type="button"
                       style="background:transparent;border:1px solid var(--grid);color:var(--ink);">Azzera conto demo</button>
             </div>
-            <div>
-              <button class="btn" id="btnLogout" type="button"
-                      style="background:transparent;border:1px solid var(--grid);color:var(--ink);">Esci</button>
-            </div>
           </div>
+          <p class="note">
+            Gestisci email, password, conti e logout dalla sezione <b>Account</b>.
+          </p>
         </div>
       </div>
 
@@ -802,6 +801,72 @@
     </div>
   </section>
 
+  <section class="view" id="view-account">
+    <h2 class="view-title">Account</h2>
+    <p class="view-sub">Il tuo profilo, i tuoi conti e la sicurezza dell'accesso.</p>
+
+    <div class="panel">
+      <div class="panel-head"><h3>Profilo</h3></div>
+      <div class="panel-body">
+        <div class="daily" style="border-top:none;padding-top:0;margin-top:0;">
+          <span>Email <b id="acctEmail">&mdash;</b></span>
+          <span>Piano <b id="acctPlan">&mdash;</b></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head"><h3>I tuoi conti</h3><em id="acctAccountsCount"></em></div>
+      <div class="panel-body">
+        <div class="empty" id="acctAccountsEmpty" hidden>Nessun conto collegato.</div>
+        <div id="acctAccountsList"></div>
+        <p class="note">
+          Il conto attivo è quello usato dal Bot Live e dal Portafoglio. Passa al conto reale
+          solo quando sei pronto: opera con fondi veri.
+        </p>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head"><h3>Sicurezza</h3></div>
+      <div class="panel-body">
+        <div class="grid-form">
+          <div class="span2">
+            <label class="label" for="acctCurrentPw">Password attuale</label>
+            <input id="acctCurrentPw" type="password" autocomplete="current-password" placeholder="••••••••">
+          </div>
+          <div class="span2">
+            <label class="label" for="acctNewPw">Nuova password</label>
+            <input id="acctNewPw" type="password" autocomplete="new-password" placeholder="••••••••">
+          </div>
+          <div class="span2">
+            <label class="label" for="acctNewPw2">Ripeti nuova password</label>
+            <input id="acctNewPw2" type="password" autocomplete="new-password" placeholder="••••••••">
+          </div>
+          <div class="span2">
+            <button class="btn" id="btnChangePassword" type="button">Aggiorna password</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head"><h3>Sessione</h3></div>
+      <div class="panel-body">
+        <div class="grid-form">
+          <div>
+            <button class="btn" id="btnLogout" type="button"
+                    style="background:transparent;border:1px solid var(--grid);color:var(--ink);">Esci</button>
+          </div>
+        </div>
+        <p class="note">
+          Esci per accedere con un'altra email, ad esempio durante un test.
+        </p>
+      </div>
+    </div>
+
+  </section>
+
 </div>
 
 <nav class="tabbar" role="tablist" aria-label="Sezioni">
@@ -809,6 +874,7 @@
   <button type="button" role="tab" data-view="portafoglio" aria-selected="false">Portafoglio</button>
   <button type="button" role="tab" data-view="bot" aria-selected="false">Bot Live</button>
   <button type="button" role="tab" data-view="alert" aria-selected="false">Alert</button>
+  <button type="button" role="tab" data-view="account" aria-selected="false">Account</button>
 </nav>
 
 <div id="onboardModal" hidden style="
@@ -2050,35 +2116,70 @@
   }
   function stopPolling(){ if (botPollTimer) { clearTimeout(botPollTimer); botPollTimer = null; } }
 
+  let userAccounts = [];
+  let userEmail = null;
+
+  function paintAcctProfile(){
+    $('acctEmail').textContent = userEmail || '\u2014';
+    $('acctPlan').textContent = userPlan ? ('piano ' + userPlan) : '\u2014';
+  }
+
+  function renderAcctAccounts(){
+    const n = userAccounts.length;
+    $('acctAccountsCount').textContent = n ? n + (n === 1 ? ' conto' : ' conti') : '';
+    $('acctAccountsEmpty').hidden = n > 0;
+    $('acctAccountsList').innerHTML = userAccounts.map(a => {
+      const active = account && a.id === account.id;
+      const label = a.type === 'demo' ? 'Conto demo' : 'Conto reale';
+      return `<div class="daily" style="border-top:1px solid var(--grid);padding:10px 0;
+                    display:flex;align-items:center;justify-content:space-between;gap:10px;">
+        <span>${label}${active ? ' &middot; <b style="color:var(--amber);">attivo</b>' : ''}</span>
+        ${active ? '' : `<button class="btn-ghost" data-switch-account="${a.id}" type="button"
+                    style="padding:6px 10px;font-size:11px;width:auto;">Usa questo conto</button>`}
+      </div>`;
+    }).join('');
+  }
+
+  /* Attiva un conto (demo o reale): ricarica lo storage scoped, aggiorna
+     i limiti di piano, e ripristina bot/sessione per il nuovo conto. Usata
+     sia al login sia quando l'utente cambia conto dalla sezione Account. */
+  async function activateAccount(acc){
+    account = acc;
+
+    positions = store.get(scopeKey('rfx.positions'), []);
+    alerts    = store.get(scopeKey('rfx.alerts'), []);
+    renderPortfolio();
+    renderAlerts();
+
+    $('accTitle').textContent = account.type === 'demo' ? 'Conto demo' : 'Conto reale';
+
+    const canBot = account.type === 'demo' || userPlan !== 'free';
+    $('upgrade-banner').hidden = canBot;
+    document.querySelectorAll('.bot-input').forEach(el => { el.disabled = !canBot; });
+    fillSymbolChoices(userPlan, account.type);
+    paintAssetChips();
+    renderAcctAccounts();
+
+    await loadStrategies();
+    await refreshBot();
+    refreshRegime();
+    startPolling();
+  }
+
   async function afterLogin(info){
     try {
-      const accounts = await API.accounts();
-      account = accounts.find(a => a.type === 'demo') || accounts[0];
-      if (!account) { toast('Nessun conto', 'Il tuo utente non ha conti collegati.'); return; }
-
-      /* Ora che sappiamo chi è loggato, ricarica portafoglio e alert dallo
-         spazio di storage di QUESTO account, non da quello lasciato da un
-         eventuale utente precedente sullo stesso browser. */
-      positions = store.get(scopeKey('rfx.positions'), []);
-      alerts    = store.get(scopeKey('rfx.alerts'), []);
-      renderPortfolio();
-      renderAlerts();
-
-      userPlan = normalizePlan(info.plan); 
+      userEmail = info.email || (info.user && info.user.email) || null;
+      userPlan = normalizePlan(info.plan);
       $('accountPlan').textContent = 'piano ' + userPlan;
-      applyPlanLimits(userPlan); 
+      applyPlanLimits(userPlan);
+      paintAcctProfile();
 
-      const canBot = account.type === 'demo' || userPlan !== 'free';
-      $('upgrade-banner').hidden = canBot;
-      document.querySelectorAll('.bot-input').forEach(el => { el.disabled = !canBot; });
-      fillSymbolChoices(userPlan, account.type);
-      paintAssetChips();
+      userAccounts = await API.accounts();
+      const initial = userAccounts.find(a => a.type === 'demo') || userAccounts[0];
+      if (!initial) { toast('Nessun conto', 'Il tuo utente non ha conti collegati.'); return; }
 
       showAuthOrBot();
-      await loadStrategies(); 
-      await refreshBot();
-      refreshRegime();
-      startPolling();
+      await activateAccount(initial);
     } catch (e) {
       toast('Caricamento non riuscito', e.message);
     }
@@ -2087,6 +2188,8 @@
   function handleLoggedOut(){
     API.logout();
     account = null;
+    userAccounts = [];
+    userEmail = null;
     stopPolling();
     /* Torna allo spazio "ospite": evita che il portafoglio/alert
        dell'account appena uscito restino visibili al prossimo login. */
@@ -2094,6 +2197,8 @@
     alerts    = store.get(scopeKey('rfx.alerts'), []);
     renderPortfolio();
     renderAlerts();
+    paintAcctProfile();
+    renderAcctAccounts();
     showAuthOrBot();
   }
 
@@ -2163,6 +2268,48 @@
     $('btnLogout').addEventListener('click', () => {
       handleLoggedOut();
       toast('Uscita effettuata', 'Il bot continua comunque a lavorare sul server.');
+    });
+
+    $('acctAccountsList').addEventListener('click', async e => {
+      const b = e.target.closest('[data-switch-account]');
+      if (!b) return;
+      const id = +b.dataset.switchAccount;
+      const acc = userAccounts.find(a => a.id === id);
+      if (!acc) return;
+      b.disabled = true;
+      try {
+        await activateAccount(acc);
+        toast('Conto cambiato', (acc.type === 'demo' ? 'Conto demo' : 'Conto reale') + ' attivo.');
+      } catch (e2) {
+        toast('Cambio conto non riuscito', e2.message);
+      } finally {
+        b.disabled = false;
+      }
+    });
+
+    $('btnChangePassword').addEventListener('click', async () => {
+      const cur   = $('acctCurrentPw').value;
+      const next  = $('acctNewPw').value;
+      const next2 = $('acctNewPw2').value;
+      if (!cur || !next) {
+        toast('Dati incompleti', 'Inserisci la password attuale e quella nuova.');
+        return;
+      }
+      if (next !== next2) {
+        toast('Le password non coincidono', 'Ripeti la nuova password identica.');
+        return;
+      }
+      if (next.length < 8) {
+        toast('Password troppo corta', 'Usa almeno 8 caratteri.');
+        return;
+      }
+      try {
+        await API.changePassword(cur, next);
+        $('acctCurrentPw').value = ''; $('acctNewPw').value = ''; $('acctNewPw2').value = '';
+        toast('Password aggiornata', 'Da ora usa la nuova password per accedere.');
+      } catch (e2) {
+        toast('Aggiornamento non riuscito', e2.message);
+      }
     });
 
     $('botPair').addEventListener('change', scheduleRegime);
