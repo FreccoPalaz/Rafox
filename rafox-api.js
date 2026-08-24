@@ -113,6 +113,28 @@
     botStop:    (accountId) => request('/api/bot/stop?account_id=' + accountId, { method: 'POST' }),
     botCloseAll:(accountId) => request('/api/bot/close-all?account_id=' + accountId, { method: 'POST' }),
 
+    // --- NUOVA CHIAMATA PER STRIPE ---
+    billingPortal: () => request('/api/billing/portal', { method: 'POST' }),
+
+    ApiError
+  };
+
+  // --- NUOVA FUNZIONE PER IL BOTTONE GESTISCI PIANO ---
+  global.apriPortaleStripe = async function() {
+    try {
+        // Usa il motore di RafoxAPI per fare la chiamata sicura
+        const data = await global.RafoxAPI.billingPortal();
+        if (data && data.url) {
+            window.location.href = data.url; // Ti porta su Stripe
+        }
+    } catch (error) {
+        // Se c'è un errore (es. nessun piano attivo), mostra l'alert
+        alert(error.message || "Impossibile aprire il portale al momento.");
+    }
+  };
+
+})(window);
+
     ApiError
   };
 })(window);
