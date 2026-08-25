@@ -113,7 +113,6 @@
     botStop:    (accountId) => request('/api/bot/stop?account_id=' + accountId, { method: 'POST' }),
     botCloseAll:(accountId) => request('/api/bot/close-all?account_id=' + accountId, { method: 'POST' }),
 
-    // --- NUOVA CHIAMATA PER STRIPE ---
     billingPortal: () => request('/api/billing/portal', { method: 'POST' }),
 
     ApiError
