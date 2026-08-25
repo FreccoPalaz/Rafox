@@ -122,13 +122,11 @@
   // --- NUOVA FUNZIONE PER IL BOTTONE GESTISCI PIANO ---
   global.apriPortaleStripe = async function() {
     try {
-        // Usa il motore di RafoxAPI per fare la chiamata sicura
         const data = await global.RafoxAPI.billingPortal();
         if (data && data.url) {
-            window.location.href = data.url; // Ti porta su Stripe
+            window.location.href = data.url;
         }
     } catch (error) {
-        // Se c'è un errore (es. nessun piano attivo), mostra l'alert
         alert(error.message || "Impossibile aprire il portale al momento.");
     }
   };
